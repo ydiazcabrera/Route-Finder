@@ -9,6 +9,7 @@ namespace RouteFinder.Models
 {
     public class RouteAPIDAL
     {
+        //API Call returns route as string 
         public static string APICall(string URL)
         {
             HttpWebRequest request = WebRequest.CreateHttp(URL);
@@ -22,11 +23,13 @@ namespace RouteFinder.Models
             return APIText;
         }
 
-        public static string Cooridnates (string startDestination,string endDestination,string avoidCoorinates)
+        //Method to get route coordinates based on user input and a square to avoid
+        public static string Coordinates (/*string startPoint,string endPoint,string avoidTopLeftCoordinates,string avoidBottomRightCoordinates*/)
         {
-            string URL = "";
-            APICall(URL);
+            
+            return APICall(URL);
 
+            
         }
     }
 } 
