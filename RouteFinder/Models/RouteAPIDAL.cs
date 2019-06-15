@@ -8,15 +8,33 @@ namespace RouteFinder.Models
 {
     public class RouteAPIDAL
     {
-        /// <summary>
-        /// Method to get a map to display
-        /// </summary>
-        /// <param name="startPoint">Long/Lat of start point</param>
-        /// <param name="endPoint">Long/Lat of end point</param>
-        /// <param name="avoidTopLeftCoordinates">Long/Lat of top left corner of square to avoid</param>
-        /// <param name="avoidBottomRightCoordinates">Long/Lat of bottom right corner of square to avoid</param>
-        /// <returns>Image URL</returns>
-        public static string DisplayMap(string startPoint, string endPoint, string avoidTopLeftCoordinates = null, string avoidBottomRightCoordinates = null)
+        //instantiate entity db class of sensors here
+        //public List<Sensor> sensors = new List<Sensor>();
+        public List<Sensor> sensors = new List<Sensor>
+        {
+            new Sensor{ Location = "42.9420703, -85.6847243", Name = "106", Type = "OST"},
+            new Sensor{ Location = "42.9547237, -85.6824347", Name = "107", Type = "OST"},
+            new Sensor{ Location = "42.9274400, -85.6604877", Name = "111", Type = "OST"},
+            new Sensor{ Location = "42.984136, -85.671280", Name = "101", Type = "OST"},
+            new Sensor{ Location = "42.9372291, -85.6669082", Name = "115", Type = "OST"},
+            new Sensor{ Location = "42.92732229883891,-85.64665123059183", Name = "24358c", Type = "SIMMS"},
+            new Sensor{ Location = "42.904438,-85.5814071", Name = "232915", Type = "SIMMS"},
+            new Sensor{ Location = "42.9414937, -85.658029", Name = "23339e", Type = "SIMMS"},
+            new Sensor{ Location = "42.9472356, -85.6822996", Name = "105", Type = "OST"},
+            new Sensor{ Location = "42.9201462, -85.6476561", Name = "108", Type = "OST"},
+            new Sensor{ Location = "42.984136, -85.671280", Name = "23acbc", Type = "SIMMS"},
+            new Sensor{ Location = "42.9467373, -85.6843539", Name = "117", Type = "OST"}
+        };
+
+    /// <summary>
+    /// Method to get a map to display
+    /// </summary>
+    /// <param name="startPoint">Long/Lat of start point</param>
+    /// <param name="endPoint">Long/Lat of end point</param>
+    /// <param name="avoidTopLeftCoordinates">Long/Lat of top left corner of square to avoid</param>
+    /// <param name="avoidBottomRightCoordinates">Long/Lat of bottom right corner of square to avoid</param>
+    /// <returns>Image URL</returns>
+    public static string DisplayMap(string startPoint, string endPoint, string avoidTopLeftCoordinates = null, string avoidBottomRightCoordinates = null)
         {
             List<string> routeCoordinates = GetRoute(startPoint, endPoint, avoidTopLeftCoordinates, avoidBottomRightCoordinates);
 
@@ -64,6 +82,8 @@ namespace RouteFinder.Models
             {
                 routeCoords += coordinate + ",";
             }
+
+            foreach(Sensor sensor in sensors)
 
             return $"https://image.maps.api.here.com/mia/1.6/route?r0={routeCoords}&w=500&app_id={AppId}&app_code={AppCode}";            
         }
