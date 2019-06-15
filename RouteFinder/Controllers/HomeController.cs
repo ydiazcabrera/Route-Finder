@@ -16,7 +16,17 @@ namespace RouteFinder.Controllers
 
         public ActionResult Index()
         {
-            ViewBag.APIText = RouteAPIDAL.DisplayMap("42.955485,-85.627450","42.956420,-85.696832","42.957991,-85.660483","42.953907,-85.652974");
+            //ViewBag.APIText = RouteAPIDAL.DisplayMap("42.955485,-85.627450","42.956420,-85.696832","42.957991,-85.660483","42.953907,-85.652974");
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Index(string startLong, string startLat, string endLong, string endLat)
+        {
+            string startPoint = $"{startLong},{startLat}";
+            string endPoint = $"{endLong},{endLat}";
+            ViewBag.APIText = RouteAPIDAL.DisplayMap(startPoint, endPoint, "42.957991,-85.660483", "42.953907,-85.652974");
 
             return View();
         }

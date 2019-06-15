@@ -1,4 +1,16 @@
-﻿
-<img src="@ViewBag.APIText" alt="Alternate Text" /> 
+﻿@if (ViewBag.APIText != null)
+{
+<img src="@ViewBag.APIText" alt="Alternate Text" />
 
+}
+
+<form action="/" method="post">
+    <label for="start">Start</label>
+    <input type="text" name="startLong" placeholder="Enter Starting Longitude" />
+    <input type="text" name="startLat" placeholder="Enter Starting Latitude" />
+    <label for="end">End</label>
+    <input type="text" name="endLong" placeholder="Enter Ending Longitude" />
+    <input type="text" name="endLat" placeholder="Enter Ending Latitude" />
+    <input type="submit" name="submit" value="Go" />
+</form>
 
