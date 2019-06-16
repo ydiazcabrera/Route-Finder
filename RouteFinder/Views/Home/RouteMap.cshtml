@@ -1,0 +1,82 @@
+﻿@using RouteFinder.Models;
+
+@{
+    Layout = null;
+    ViewBag.Title = "RouteMap";
+    string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
+}
+
+<h2>RouteMap</h2>
+
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Simple Polylines</title>
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+                * element that contains the map. */
+        #map {
+            height: 70%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+
+        var sensors = @Html.Raw(ViewBag.Sensors);
+
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: { lat: 42.9593647, lng: -85.642848 },
+                mapTypeId: 'terrain'
+            });
+
+            var flightPlanCoordinates = [
+                { lat: 42.955513, lng: -85.62745 },
+                { lat: 42.9555023, lng: -85.6316471 },
+                { lat: 42.9558134, lng: -85.6321514 },
+                { lat: 42.9568863, lng: -85.6339967 },
+                { lat: 42.9576051, lng: -85.6352842 },
+                { lat: 42.9593647, lng: -85.642848 },
+                { lat: 42.9596221, lng: -85.6438029 },
+                { lat: 42.9629588, lng: -85.6568384 },
+                { lat: 42.9630232, lng: -85.6589627 },
+                { lat: 42.9630661, lng: -85.6617737 },
+                { lat: 42.9631412, lng: -85.6636298 },
+                { lat: 42.9564352, lng: -85.6968316 }
+
+            ];
+            var flightPath = new google.maps.Polyline({
+                path: flightPlanCoordinates,
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+            });
+
+            //Displays the sensors that were passed in as "ViewBag.Markers"
+            for (i = 0; i < sensors.length; i++) {
+                var data = sensors[i]
+                var myLatlng = new google.maps.LatLng(data.lat, data.lng);
+                var marker = new google.maps.Marker({
+                    position: myLatlng,
+                    map: map,
+                    title: data.title
+                });
+            }
+
+            flightPath.setMap(map);
+        }
+    </script>
+    <script async defer
+            src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
+    </script>
+</body>
