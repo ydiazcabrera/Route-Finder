@@ -16,18 +16,18 @@ namespace RouteFinder.Controllers
 
         public ActionResult Index()
         {
-
+            //This is the old API set up with HERE called twice
             //ViewBag.APIText = RouteAPIDAL.DisplayMap("42.955485,-85.627450","42.956420,-85.696832","42.957991,-85.660483","42.953907,-85.652974");
-            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap("42.955485,-85.627450", "42.956420,-85.696832", "42.957991,-85.660483", "42.953907,-85.652974");
 
             return View();
         }
 
         public ActionResult RouteMap()
         {
-            List<string> sensorCoordinates = new List<string>();
-            
-            //hardcoded for testing purposes
+            // Hard-coded start/end points and a square to avoid. This will eventually pull in values from the user and sensor AQIs
+            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap("42.906722,-85.725006", "42.960974,-85.605329", "42.969954,-85.639754", "42.927074,-85.609183");
+
+            //hard-coded for testing purposes
             List<Sensor> sensors = new List<Sensor>
             {
                 new Sensor( "42.9420703", "-85.6847243", "106", "OST"),
@@ -44,13 +44,10 @@ namespace RouteFinder.Controllers
                 new Sensor( "42.9467373", "-85.6843539", "117", "OST")
             };
 
-            List<string> routeCoordinates = RouteAPIDAL.GetCoordinates();
-
-            string markers = "[";
-
+            // This section builds a string, which is passed to the view and used by the JS script to display the sensors
             //ToDo - Find a way to display the name of the sensor / the AQI on the map without having to hover over the marker
-            //Build raw Json? Html? String? to get used by the JS script in the view.
             // https://forums.asp.net/t/2120631.aspx?Using+Razor+in+javascript+to+create+Google+map <= Citation
+            string markers = "[";
             for (int i = 0; i < sensors.Count; i++)
             {
                 markers += "{";
@@ -60,12 +57,28 @@ namespace RouteFinder.Controllers
                 //markers += string.Format("'description': '{0}'", "AQI: 50"); // This doesn't seem to be working
                 markers += "},";
             }
-
             markers += "];";
 
-            ViewBag.Sensors = markers;
 
-            return View(sensorCoordinates);
+            // This section builds a string, which is passed to the view and used by the JS script to display the route
+            string route = "[";
+            for(int i = 0; i < routeCoordinates.Count() - 1; i++)
+            {
+                route += "{ lat: " + routeCoordinates[i].Latitude + ", lng: " + routeCoordinates[i].Longitude + " },";  
+            }
+            route += "{ lat: " + routeCoordinates[routeCoordinates.Count() - 1].Latitude + ", lng: " + routeCoordinates[routeCoordinates.Count() - 1].Longitude + " }];";
+
+            RouteCoordinate centerCoordinate = routeCoordinates[(routeCoordinates.Count() / 2)];
+            string mapCenter = "{ lat: " + centerCoordinate.Latitude + ", lng: " + centerCoordinate.Longitude + " }";
+
+            //Map center is imperfect because the middle coordinate isn't necessarily the middle of the map.
+            // It also doesn't address the zoom level. We could probably use a C# or .NET geography library to find the 
+            // distance between the two furthest points to set distance and zoom.
+            ViewBag.MapCenter = mapCenter;
+            ViewBag.Sensors = markers;
+            ViewBag.Route = route;
+
+            return View();
         }
 
         public ActionResult Contact()

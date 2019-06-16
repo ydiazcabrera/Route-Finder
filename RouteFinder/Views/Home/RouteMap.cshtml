@@ -1,6 +1,4 @@
-﻿@using RouteFinder.Models;
-
-@{
+﻿@{
     Layout = null;
     ViewBag.Title = "RouteMap";
     string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
@@ -33,31 +31,19 @@
         var sensors = @Html.Raw(ViewBag.Sensors);
 
         function initMap() {
+            //Create a new map
             var map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 12,
-                center: { lat: 42.9593647, lng: -85.642848 },
+                center: @Html.Raw(ViewBag.MapCenter), 
                 mapTypeId: 'terrain'
             });
 
-            //ToDo - you were tring to get the route coordinates from the API call to here by calling the APICall methods
-            // in the RouteMap action
-            var flightPlanCoordinates = [
-                { lat: 42.955513, lng: -85.62745 },
-                { lat: 42.9555023, lng: -85.6316471 },
-                { lat: 42.9558134, lng: -85.6321514 },
-                { lat: 42.9568863, lng: -85.6339967 },
-                { lat: 42.9576051, lng: -85.6352842 },
-                { lat: 42.9593647, lng: -85.642848 },
-                { lat: 42.9596221, lng: -85.6438029 },
-                { lat: 42.9629588, lng: -85.6568384 },
-                { lat: 42.9630232, lng: -85.6589627 },
-                { lat: 42.9630661, lng: -85.6617737 },
-                { lat: 42.9631412, lng: -85.6636298 },
-                { lat: 42.9564352, lng: -85.6968316 }
-            ];
+            // Holds the route coordinates in the correct format to be displayed on the map when used in flightPath
+            var routeCoordinates = @Html.Raw(ViewBag.Route);
 
-            var flightPath = new google.maps.Polyline({
-                path: flightPlanCoordinates,
+            //Create a line from the routeCoordinates
+            var routePath = new google.maps.Polyline({
+                path: routeCoordinates,
                 geodesic: true,
                 strokeColor: '#FF0000',
                 strokeOpacity: 1.0,
@@ -75,7 +61,7 @@
                 });
             }
 
-            flightPath.setMap(map);
+            routePath.setMap(map);
         }
     </script>
     <script async defer

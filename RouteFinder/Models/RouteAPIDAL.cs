@@ -70,7 +70,8 @@ namespace RouteFinder.Models
 
             return routeCoordinates;
         }
-
+        
+        // Old API set up with HERE  being called twice
         /// <summary>
         /// This method returns a image url by taking in a list of coordinates and calling map image api from here.com
         /// </summary>
