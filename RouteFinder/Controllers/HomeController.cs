@@ -22,6 +22,16 @@ namespace RouteFinder.Controllers
             return View();
         }
 
+        [HttpPost]
+        public ActionResult Index(string startLong, string startLat, string endLong, string endLat)
+        {
+            string startPoint = $"{startLong},{startLat}";
+            string endPoint = $"{endLong},{endLat}";
+            ViewBag.APIText = RouteAPIDAL.DisplayMap(startPoint, endPoint, "42.957991,-85.660483", "42.953907,-85.652974");
+
+            return View();
+        }
+
         public ActionResult RouteMap()
         {
             // Hard-coded start/end points and a square to avoid. This will eventually pull in values from the user and sensor AQIs
