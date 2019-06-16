@@ -1,16 +1,14 @@
-﻿using System;
+﻿using RouteFinder.Models;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using RouteFinder.Models;
 
 namespace RouteFinder.Controllers
 {
     public class HomeController : Controller
     {
         public ActionResult Route()
-        {            
+        {
             return View();
         }
 
@@ -32,10 +30,20 @@ namespace RouteFinder.Controllers
             return View();
         }
 
-        public ActionResult RouteMap()
+        [HttpPost]
+        public ActionResult RouteMap(string startLong, string startLat, string endLong, string endLat)
         {
+            if (startLong == null || startLat == null || endLong == null || endLat == null)
+            {
+                return RedirectToAction("Index");
+            }
+            //Combine long and lat into single string
+            string startPoint = $"{startLong},{startLat}";
+            string endPoint = $"{endLong},{endLat}";
+
             // Hard-coded start/end points and a square to avoid. This will eventually pull in values from the user and sensor AQIs
-            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap("42.906722,-85.725006", "42.960974,-85.605329", "42.969954,-85.639754", "42.927074,-85.609183");
+            //List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap("42.906722,-85.725006", "42.960974,-85.605329", "42.969954,-85.639754", "42.927074,-85.609183");
+            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap(startPoint, endPoint, "42.969954,-85.639754", "42.927074,-85.609183");
 
             //hard-coded for testing purposes
             List<Sensor> sensors = new List<Sensor>
@@ -61,7 +69,7 @@ namespace RouteFinder.Controllers
             for (int i = 0; i < sensors.Count; i++)
             {
                 markers += "{";
-                markers += string.Format("'title': '{0}',", sensors[i].Name); 
+                markers += string.Format("'title': '{0}',", sensors[i].Name);
                 markers += string.Format("'lat': '{0}',", sensors[i].Latitude);
                 markers += string.Format("'lng': '{0}',", sensors[i].Longitude);
                 //markers += string.Format("'description': '{0}'", "AQI: 50"); // This doesn't seem to be working
@@ -72,9 +80,9 @@ namespace RouteFinder.Controllers
 
             // This section builds a string, which is passed to the view and used by the JS script to display the route
             string route = "[";
-            for(int i = 0; i < routeCoordinates.Count() - 1; i++)
+            for (int i = 0; i < routeCoordinates.Count() - 1; i++)
             {
-                route += "{ lat: " + routeCoordinates[i].Latitude + ", lng: " + routeCoordinates[i].Longitude + " },";  
+                route += "{ lat: " + routeCoordinates[i].Latitude + ", lng: " + routeCoordinates[i].Longitude + " },";
             }
             route += "{ lat: " + routeCoordinates[routeCoordinates.Count() - 1].Latitude + ", lng: " + routeCoordinates[routeCoordinates.Count() - 1].Longitude + " }];";
 
