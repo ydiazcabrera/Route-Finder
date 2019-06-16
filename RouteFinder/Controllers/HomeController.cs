@@ -33,7 +33,10 @@ namespace RouteFinder.Controllers
         [HttpPost]
         public ActionResult RouteMap(string startLong, string startLat, string endLong, string endLat)
         {
-            if (startLong == null || startLat == null || endLong == null || endLat == null)
+            // Makes sure data is entered in form, but doesn't account for invalid data.
+            // Need to add validation in action or in the api call. I would assume we could make sure
+            // it is a valid number between. Might want to write a validation method for Longitude and Latitude
+            if (startLong == "" || startLat == "" || endLong == "" || endLat == "")
             {
                 return RedirectToAction("Index");
             }
