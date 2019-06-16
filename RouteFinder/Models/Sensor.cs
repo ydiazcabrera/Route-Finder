@@ -7,9 +7,9 @@ namespace RouteFinder.Models
 {
     public class Sensor : MapPoint
     {
-        public override string Latitude { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public override string Longitude { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public override string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public override string Latitude { get; set; }
+        public override string Longitude { get; set; }
+        public override string Name { get; set; }
         public string SensorType { get; set; }
 
         public Sensor(string latitude, string longitude, string name, string sensorType) : base(latitude, longitude, name)

@@ -9,7 +9,6 @@ namespace RouteFinder.Models
 {
     public class RouteAPIDAL
     {
-
         //instantiate entity db class of sensors instead of hardcoding them in here
         public List<Sensor> sensors = new List<Sensor>
         {
