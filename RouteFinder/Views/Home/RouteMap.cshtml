@@ -39,6 +39,8 @@
                 mapTypeId: 'terrain'
             });
 
+            //ToDo - you were tring to get the route coordinates from the API call to here by calling the APICall methods
+            // in the RouteMap action
             var flightPlanCoordinates = [
                 { lat: 42.955513, lng: -85.62745 },
                 { lat: 42.9555023, lng: -85.6316471 },
@@ -52,8 +54,8 @@
                 { lat: 42.9630661, lng: -85.6617737 },
                 { lat: 42.9631412, lng: -85.6636298 },
                 { lat: 42.9564352, lng: -85.6968316 }
-
             ];
+
             var flightPath = new google.maps.Polyline({
                 path: flightPlanCoordinates,
                 geodesic: true,

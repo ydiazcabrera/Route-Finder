@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,35 +13,40 @@ namespace RouteFinder.Models
         //instantiate entity db class of sensors instead of hardcoding them in here
         public List<Sensor> sensors = new List<Sensor>
         {
-                new Sensor{ Latitude = "42.9420703", Longitude = "-85.6847243", Name = "106", Type = "OST"},
-                new Sensor{ Latitude = "42.9547237", Longitude = "-85.6824347", Name = "107", Type = "OST"},
-                new Sensor{ Latitude = "42.9274400", Longitude = "-85.6604877", Name = "111", Type = "OST"},
-                new Sensor{ Latitude = "42.984136", Longitude = "-85.671280", Name = "101", Type = "OST"},
-                new Sensor{ Latitude = "42.9372291", Longitude = ":-85.6669082", Name = "115", Type = "OST"},
-                new Sensor{ Latitude = "42.92732229883891", Longitude = "-85.64665123059183", Name = "24358c", Type = "SIMMS"},
-                new Sensor{ Latitude = "42.904438", Longitude = "-85.5814071", Name = "232915", Type = "SIMMS"},
-                new Sensor{ Latitude = "42.9414937",  Longitude = "-85.658029", Name = "23339e", Type = "SIMMS"},
-                new Sensor{ Latitude = "42.9472356", Longitude = "-85.6822996", Name = "105", Type = "OST"},
-                new Sensor{ Latitude = "42.9201462", Longitude = "-85.6476561", Name = "108", Type = "OST"},
-                new Sensor{ Latitude = "42.984136", Longitude = "-85.671280", Name = "23acbc", Type = "SIMMS"},
-                new Sensor{ Latitude = "42.9467373", Longitude = "-85.6843539", Name = "117", Type = "OST"}
+                new Sensor{ Latitude = "42.9420703", Longitude = "-85.6847243", Name = "106", SensorType = "OST"},
+                new Sensor{ Latitude = "42.9547237", Longitude = "-85.6824347", Name = "107", SensorType = "OST"},
+                new Sensor{ Latitude = "42.9274400", Longitude = "-85.6604877", Name = "111", SensorType = "OST"},
+                new Sensor{ Latitude = "42.984136", Longitude = "-85.671280", Name = "101", SensorType = "OST"},
+                new Sensor{ Latitude = "42.9372291", Longitude = ":-85.6669082", Name = "115", SensorType = "OST"},
+                new Sensor{ Latitude = "42.92732229883891", Longitude = "-85.64665123059183", Name = "24358c", SensorType = "SIMMS"},
+                new Sensor{ Latitude = "42.904438", Longitude = "-85.5814071", Name = "232915", SensorType = "SIMMS"},
+                new Sensor{ Latitude = "42.9414937",  Longitude = "-85.658029", Name = "23339e", SensorType = "SIMMS"},
+                new Sensor{ Latitude = "42.9472356", Longitude = "-85.6822996", Name = "105", SensorType = "OST"},
+                new Sensor{ Latitude = "42.9201462", Longitude = "-85.6476561", Name = "108", SensorType = "OST"},
+                new Sensor{ Latitude = "42.984136", Longitude = "-85.671280", Name = "23acbc", SensorType = "SIMMS"},
+                new Sensor{ Latitude = "42.9467373", Longitude = "-85.6843539", Name = "117", SensorType = "OST"}
         };
 
-    /// <summary>
-    /// Method to get a map to display
-    /// </summary>
-    /// <param name="startPoint">Long/Lat of start point</param>
-    /// <param name="endPoint">Long/Lat of end point</param>
-    /// <param name="avoidTopLeftCoordinates">Long/Lat of top left corner of square to avoid</param>
-    /// <param name="avoidBottomRightCoordinates">Long/Lat of bottom right corner of square to avoid</param>
-    /// <returns>Image URL</returns>
-    public static string DisplayMap(string startPoint, string endPoint, string avoidTopLeftCoordinates = null, string avoidBottomRightCoordinates = null)
+        /// <summary>
+        /// Method to get a map to display
+        /// </summary>
+        /// <param name="startPoint">Long/Lat of start point</param>
+        /// <param name="endPoint">Long/Lat of end point</param>
+        /// <param name="avoidTopLeftCoordinates">Long/Lat of top left corner of square to avoid</param>
+        /// <param name="avoidBottomRightCoordinates">Long/Lat of bottom right corner of square to avoid</param>
+        /// <returns>Image URL</returns>
+        public static string DisplayMap(string startPoint, string endPoint, string avoidTopLeftCoordinates = null, string avoidBottomRightCoordinates = null)
         {
             List<string> routeCoordinates = GetRoute(startPoint, endPoint, avoidTopLeftCoordinates, avoidBottomRightCoordinates);
 
-            string mapImage = GetMap(routeCoordinates);
 
+            string mapImage = GetMap(routeCoordinates);
             return mapImage;
+        }
+
+        internal static List<string> GetCoordinates()
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -85,7 +91,7 @@ namespace RouteFinder.Models
 
             //foreach(Sensor sensor in sensors)
 
-            return $"https://image.maps.api.here.com/mia/1.6/route?r0={routeCoords}&w=500&app_id={AppId}&app_code={AppCode}";            
+            return $"https://image.maps.api.here.com/mia/1.6/route?r0={routeCoords}&w=500&app_id={AppId}&app_code={AppCode}";
         }
         /// <summary>
         /// Parses Json to get coordinates from APIText String
@@ -103,6 +109,8 @@ namespace RouteFinder.Models
             {
                 routeCoordinates.Add(token.ToString());
             }
+
+
             return routeCoordinates;
         }
 

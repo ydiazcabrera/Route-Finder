@@ -29,19 +29,24 @@ namespace RouteFinder.Controllers
             //hardcoded for testing purposes
             List<Sensor> sensors = new List<Sensor>
             {
-                new Sensor{ Latitude = "42.9420703", Longitude = "-85.6847243", Name = "106", Type = "OST"},
-                new Sensor{ Latitude = "42.9547237", Longitude = "-85.6824347", Name = "107", Type = "OST"},
-                new Sensor{ Latitude = "42.9274400", Longitude = "-85.6604877", Name = "111", Type = "OST"},
-                new Sensor{ Latitude = "42.984136", Longitude = "-85.671280", Name = "101", Type = "OST"},
-                new Sensor{ Latitude = "42.9372291", Longitude = ":-85.6669082", Name = "115", Type = "OST"},
-                new Sensor{ Latitude = "42.92732229883891", Longitude = "-85.64665123059183", Name = "24358c", Type = "SIMMS"},
-                new Sensor{ Latitude = "42.904438", Longitude = "-85.5814071", Name = "232915", Type = "SIMMS"},
-                new Sensor{ Latitude = "42.9414937",  Longitude = "-85.658029", Name = "23339e", Type = "SIMMS"},
-                new Sensor{ Latitude = "42.9472356", Longitude = "-85.6822996", Name = "105", Type = "OST"},
-                new Sensor{ Latitude = "42.9201462", Longitude = "-85.6476561", Name = "108", Type = "OST"},
-                new Sensor{ Latitude = "42.984136", Longitude = "-85.671280", Name = "23acbc", Type = "SIMMS"},
-                new Sensor{ Latitude = "42.9467373", Longitude = "-85.6843539", Name = "117", Type = "OST"}
+                new Sensor{ Latitude = "42.9420703", Longitude = "-85.6847243", Name = "106", SensorType = "OST"},
+                new Sensor{ Latitude = "42.9547237", Longitude = "-85.6824347", Name = "107", SensorType = "OST"},
+                new Sensor{ Latitude = "42.9274400", Longitude = "-85.6604877", Name = "111", SensorType = "OST"},
+                new Sensor{ Latitude = "42.984136", Longitude = "-85.671280", Name = "101", SensorType = "OST"},
+                new Sensor{ Latitude = "42.9372291", Longitude = ":-85.6669082", Name = "115", SensorType = "OST"},
+                new Sensor{ Latitude = "42.92732229883891", Longitude = "-85.64665123059183", Name = "24358c", SensorType = "SIMMS"},
+                new Sensor{ Latitude = "42.904438", Longitude = "-85.5814071", Name = "232915", SensorType = "SIMMS"},
+                new Sensor{ Latitude = "42.9414937",  Longitude = "-85.658029", Name = "23339e", SensorType = "SIMMS"},
+                new Sensor{ Latitude = "42.9472356", Longitude = "-85.6822996", Name = "105", SensorType = "OST"},
+                new Sensor{ Latitude = "42.9201462", Longitude = "-85.6476561", Name = "108", SensorType = "OST"},
+                new Sensor{ Latitude = "42.984136", Longitude = "-85.671280", Name = "23acbc", SensorType = "SIMMS"},
+                new Sensor{ Latitude = "42.9467373", Longitude = "-85.6843539", Name = "117", SensorType = "OST"}
             };
+
+            List<string> routeCoordinates = RouteAPIDAL.GetCoordinates();
+
+
+
 
             string markers = "[";
 
