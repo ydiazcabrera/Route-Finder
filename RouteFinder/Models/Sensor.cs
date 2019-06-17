@@ -1,23 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 
 namespace RouteFinder.Models
 {
-    public class Sensor : MapPoint
+    public class Sensor
     {
-        public override string Latitude { get; set; }
-        public override string Longitude { get; set; }
-        public override string Name { get; set; }
-        public string SensorType { get; set; }
+        [Key]
+        public int SensorId { get; set; }
+        public string Latitude { get; set; }
+        public string Longitude { get; set; }
+        public string Name { get; set; }
+        public string DeviceType { get; set; }
+        public int? AQI { get; set; }
 
-        public Sensor(string latitude, string longitude, string name, string sensorType) : base(latitude, longitude, name)
+        public Sensor(string latitude, string longitude, string name, string deviceType)
         {
-            this.Latitude = latitude;
-            this.Longitude = longitude;
-            this.Name = name;
-            this.SensorType = sensorType;
+            Latitude = latitude;
+            Longitude = longitude;
+            Name = name;
+            DeviceType = deviceType;
         }
+
+        public Sensor()
+        {
+
+        }
+    }
+
+    public class SensorDbContext : DbContext
+    {
+        public SensorDbContext() : base("SeamlessSensorData")
+        {
+
+        }
+
+        public DbSet<Sensor> Sensors { get; set; }
+        public DbSet<SensorsData> SensorsData { get; set; }
     }
 }
