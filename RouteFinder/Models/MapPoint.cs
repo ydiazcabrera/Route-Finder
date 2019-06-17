@@ -13,9 +13,9 @@ namespace RouteFinder.Models
 
         public MapPoint(string latitude, string longitude, string name)
         {
-            this.Latitude = latitude;
-            this.Longitude = longitude;
-            this.Name = name;
+            Latitude = latitude;
+            Longitude = longitude;
+            Name = name;
         }
     }
 }
