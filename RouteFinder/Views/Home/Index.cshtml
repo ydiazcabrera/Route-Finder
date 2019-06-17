@@ -1,4 +1,22 @@
-﻿
-<img src="@ViewBag.APIText" alt="Alternate Text" /> 
+﻿@if (ViewBag.APIText != null)
+{
+<img src="@ViewBag.APIText" alt="Alternate Text" />
 
+}
+
+<form action="~/Home/RouteMap" method="post">
+    <div class="form-group">
+        <label for="startLong">Starting Longitude: </label>
+        <input class="form-control" type="text" name="startLong" id="startLong" placeholder="Enter Starting Longitude" value="42.955485" />
+        <label for="startLat">Starting Latitude: </label>
+        <input class="form-control" type="text" name="startLat" id="startLat" placeholder="Enter Starting Latitude" value="-85.627450" />
+    </div>
+    <div class="form-group">
+        <label for="endLong">Ending Longitude: </label>
+        <input class="form-control" type="text" name="endLong" placeholder="Enter Ending Longitude" value="42.956420" />
+        <label for="endLat">Ending Latitude: </label>
+        <input class="form-control" type="text" name="endLat" placeholder="Enter Ending Latitude" value="-85.696832" />
+    </div>
+    <input type="submit" name="submit" value="Go" class="btn btn-success" />
+</form>
 

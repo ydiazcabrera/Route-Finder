@@ -1,0 +1,70 @@
+﻿@{
+    Layout = null;
+    ViewBag.Title = "RouteMap";
+    string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
+}
+
+<h2>RouteMap</h2>
+
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Simple Polylines</title>
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+                * element that contains the map. */
+        #map {
+            height: 70%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+
+        var sensors = @Html.Raw(ViewBag.Sensors);
+
+        function initMap() {
+            //Create a new map
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: @Html.Raw(ViewBag.MapCenter), 
+                mapTypeId: 'terrain'
+            });
+
+            // Holds the route coordinates in the correct format to be displayed on the map when used in flightPath
+            var routeCoordinates = @Html.Raw(ViewBag.Route);
+
+            //Create a line from the routeCoordinates
+            var routePath = new google.maps.Polyline({
+                path: routeCoordinates,
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+            });
+
+            //Displays the sensors that were passed in as "ViewBag.Markers"
+            for (i = 0; i < sensors.length; i++) {
+                var data = sensors[i]
+                var myLatlng = new google.maps.LatLng(data.lat, data.lng);
+                var marker = new google.maps.Marker({
+                    position: myLatlng,
+                    map: map,
+                    title: data.title
+                });
+            }
+
+            routePath.setMap(map);
+        }
+    </script>
+    <script async defer
+            src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
+    </script>
+</body>

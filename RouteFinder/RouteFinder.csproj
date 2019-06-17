@@ -124,6 +124,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+
+    <Compile Include="Models\RouteCoordinate.cs" />
+    <Compile Include="Models\MapPoint.cs" />
+    <Compile Include="Models\Sensor.cs" />
     <Compile Include="Models\AQI Calculator.cs" />
     <Compile Include="Models\ConfigReaderDAL.cs" />
     <Compile Include="Models\RouteAPIDAL.cs" />
@@ -165,7 +169,9 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Home\RouteMap.cshtml" />
     <Content Include="Views\Home\ConcentrationTable.cshtml" />
+
     <None Include="Web.Secrets.config" />
   </ItemGroup>
   <ItemGroup>
