@@ -8,26 +8,9 @@ namespace RouteFinder.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Route()
-        {
-            return View();
-        }
 
         public ActionResult Index()
         {
-            //This is the old API set up with HERE called twice
-            //ViewBag.APIText = RouteAPIDAL.DisplayMap("42.955485,-85.627450","42.956420,-85.696832","42.957991,-85.660483","42.953907,-85.652974");
-
-            return View();
-        }
-
-        [HttpPost]
-        public ActionResult Index(string startLong, string startLat, string endLong, string endLat)
-        {
-            string startPoint = $"{startLong},{startLat}";
-            string endPoint = $"{endLong},{endLat}";
-            ViewBag.APIText = RouteAPIDAL.DisplayMap(startPoint, endPoint, "42.957991,-85.660483", "42.953907,-85.652974");
-
             return View();
         }
 
@@ -88,8 +71,10 @@ namespace RouteFinder.Controllers
             {
                 route += "{ lat: " + routeCoordinates[i].Latitude + ", lng: " + routeCoordinates[i].Longitude + " },";
             }
+            // This allows to put last coordinate without a ending comma and closes the array
             route += "{ lat: " + routeCoordinates[routeCoordinates.Count() - 1].Latitude + ", lng: " + routeCoordinates[routeCoordinates.Count() - 1].Longitude + " }];";
 
+            //Finds center of map. Probably need to find more elogant solution.
             RouteCoordinate centerCoordinate = routeCoordinates[(routeCoordinates.Count() / 2)];
             string mapCenter = "{ lat: " + centerCoordinate.Latitude + ", lng: " + centerCoordinate.Longitude + " }";
 
@@ -103,12 +88,6 @@ namespace RouteFinder.Controllers
             return View();
         }
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
         public ActionResult ConcentrationTable()
         {
             DataTable concetration = new DataTable("Table");

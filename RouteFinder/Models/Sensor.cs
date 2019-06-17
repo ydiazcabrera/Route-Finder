@@ -7,17 +7,19 @@ namespace RouteFinder.Models
 {
     public class Sensor : MapPoint
     {
+        public int Id { get; set; }
         public override string Latitude { get; set; }
         public override string Longitude { get; set; }
         public override string Name { get; set; }
-        public string SensorType { get; set; }
+        public string DeviceType { get; set; }
+        public int? AQI { get; set; }
 
-        public Sensor(string latitude, string longitude, string name, string sensorType) : base(latitude, longitude, name)
+        public Sensor(string latitude, string longitude, string name, string deviceType) : base(latitude, longitude, name)
         {
-            this.Latitude = latitude;
-            this.Longitude = longitude;
-            this.Name = name;
-            this.SensorType = sensorType;
+            Latitude = latitude;
+            Longitude = longitude;
+            Name = name;
+            DeviceType = deviceType;
         }
     }
 }
