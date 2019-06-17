@@ -8,7 +8,7 @@ namespace RouteFinder.Models
     public class SensorsData
     {
         public int Id { get; set; }
-        public int SensorId { get; set; }
+        public Sensor Sensor { get; set; }
         public DateTime? Time { get; set; }
         public int? O3_PPB { get; set; }
         public int? PM10Avg_MicroGramPerCubicMeter { get; set; }

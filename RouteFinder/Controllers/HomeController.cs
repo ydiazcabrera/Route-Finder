@@ -8,9 +8,11 @@ namespace RouteFinder.Controllers
 {
     public class HomeController : Controller
     {
+        SensorDbContext db = new SensorDbContext();
 
         public ActionResult Index()
         {
+            db.Sensors.ToList();
             return View();
         }
 
