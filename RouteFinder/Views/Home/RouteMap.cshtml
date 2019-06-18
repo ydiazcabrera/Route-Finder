@@ -55,10 +55,29 @@
                 var data = sensors[i]
                 var myLatlng = new google.maps.LatLng(data.lat, data.lng);
                 var marker = new google.maps.Marker({
+                    //opacity: 0,
+                    labelAnchor: { x: 0, y: 30 },
                     position: myLatlng,
                     map: map,
-                    title: data.title
+                    title: data.title,
+                    scaledSize: new google.maps.Size(50, 50),
+                    icon: 'http://maps.google.com/mapfiles/kml/pal4/icon57.png',                   
+                    label: data.name,
                 });
+
+                var sensorBuffer = new google.maps.Circle({
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 1,
+                    fillColor: '#FF0000',
+                    fillOpacity: 0.35,
+                    map: map,
+                    center: myLatlng,
+                    radius: 400,
+                    label: data.name,
+                });
+
+
             }
 
             routePath.setMap(map);

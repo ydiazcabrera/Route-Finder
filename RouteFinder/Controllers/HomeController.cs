@@ -44,7 +44,13 @@ namespace RouteFinder.Controllers
             string markers = "[";
             for (int i = 0; i < sensors.Count; i++)
             {
-                markers += $"{{'title': '{sensors[i].Name}', 'lat': '{sensors[i].Latitude}', 'lng': '{sensors[i].Longitude}'}},";
+                markers += "{";
+                markers += string.Format("'name': '{0}',", sensors[i].Name);
+                markers += string.Format("'aqi': '{0}',", sensors[i].AQI);
+                markers += string.Format("'lat': '{0}',", sensors[i].Latitude);
+                markers += string.Format("'lng': '{0}',", sensors[i].Longitude);
+                //markers += string.Format("'description': '{0}'", "AQI: 50"); // This doesn't seem to be working
+                markers += "},";
             }
             markers += "];";
 
