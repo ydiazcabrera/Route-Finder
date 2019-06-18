@@ -34,7 +34,7 @@
             //Create a new map
             var map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 12,
-                center: @Html.Raw(ViewBag.MapCenter), 
+                center: @Html.Raw(ViewBag.MapCenter),
                 mapTypeId: 'terrain'
             });
 
@@ -61,8 +61,8 @@
                     map: map,
                     title: data.title,
                     scaledSize: new google.maps.Size(50, 50),
-                    icon: 'http://maps.google.com/mapfiles/kml/pal4/icon57.png',                   
-                    label: data.name,
+                    icon: 'http://maps.google.com/mapfiles/kml/pal4/icon57.png',
+                    label: data.aqi,
                 });
 
                 var sensorBuffer = new google.maps.Circle({
@@ -82,7 +82,70 @@
 
             routePath.setMap(map);
         }
+
     </script>
+    <style type='text/css'>
+        .my-legend .legend-title {
+            text-align: left;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 90%;
+        }
+
+        .my-legend .legend-scale ul {
+            margin: 0;
+            margin-bottom: 5px;
+            padding: 0;
+            float: left;
+            list-style: none;
+        }
+
+            .my-legend .legend-scale ul li {
+                font-size: 80%;
+                list-style: none;
+                margin-left: 0;
+                line-height: 18px;
+                margin-bottom: 2px;
+            }
+
+        .my-legend ul.legend-labels li span {
+            display: block;
+            float: left;
+            height: 16px;
+            width: 30px;
+            margin-right: 5px;
+            margin-left: 0;
+            border: 1px solid #999;
+        }
+
+        .my-legend .legend-source {
+            font-size: 70%;
+            color: #999;
+            clear: both;
+        }
+
+        .my-legend a {
+            color: #777;
+        }
+    </style>
+    <div class='my-legend'>
+        <div class='legend-title'>AQI Index</div>
+        <div class='legend-scale'>
+            <ul class='legend-labels'>
+                <li><span style='background:#00E400;'></span>Good</li>
+                <li><span style='background:#E1E100;'></span>Moderate</li>
+                <li><span style='background:#E17E00;'></span>Unhealthy for Sensitive Groups</li>
+                <li><span style='background:#FF0000;'></span>Unhealthy</li>
+                <li><span style='background:#8F3F97;'></span>Very Unhealthy</li>
+            </ul>
+        </div>
+        <div class='legend-source'>Source: <a href="#link to source">Name of source</a></div>
+    </div>
+
+
+    @*<div>
+            <img src="https://mde.maryland.gov/programs/Air/AirQualityMonitoring/PublishingImages/Widget/AQI.png" alt="Alternate Text" />
+        </div>*@
     <script async defer
             src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
     </script>
