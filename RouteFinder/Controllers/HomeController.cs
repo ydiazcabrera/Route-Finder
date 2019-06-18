@@ -31,12 +31,16 @@ namespace RouteFinder.Controllers
             string startPoint = $"{startLong},{startLat}";
             string endPoint = $"{endLong},{endLat}";
 
-            // Hard-coded start/end points and a square to avoid. This will eventually pull in values from the user and sensor AQIs
-            //List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap("42.906722,-85.725006", "42.960974,-85.605329", "42.969954,-85.639754", "42.927074,-85.609183");
-            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap(startPoint, endPoint, "42.969954,-85.639754", "42.927074,-85.609183");
-
             //Pull list of sensors directly from database.
             List<Sensor> sensors = GetListSensors();
+
+            //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
+            List<SensorBoundingBox> sbb = AvoidSensor(sensors);
+
+            // Hard-coded start/end points and a square to avoid. This will eventually pull in values from the user and sensor AQIs
+            //List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap("42.906722,-85.725006", "42.960974,-85.605329", "42.969954,-85.639754", "42.927074,-85.609183");
+            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap(startPoint, endPoint, sbb);
+
 
             // This section builds a string, which is passed to the view and used by the JS script to display the sensors
             //ToDo - Find a way to display the name of the sensor / the AQI on the map without having to hover over the marker
@@ -144,15 +148,17 @@ namespace RouteFinder.Controllers
         public List<SensorBoundingBox> AvoidSensor(List<Sensor> sensors)
         {
             List<SensorBoundingBox> sensorBoundings = new List<SensorBoundingBox>();
+           
             foreach (Sensor sensor in sensors)
             {
+                
                 double lat = double.Parse(sensor.Latitude);
                 double lon = double.Parse(sensor.Longitude);
                 double earthRadius = 6378137;
-                double n = 100;
-                double e = 100;
-                double s = -100;
-                double w = -100;
+                double n = 200;
+                double e = 200;
+                double s = -200;
+                double w = -200;
 
                 double uLat = n / earthRadius;
                 double uLon = e / (earthRadius * Math.Cos(Math.PI*lat/180));
@@ -165,12 +171,13 @@ namespace RouteFinder.Controllers
                 double seLatPoint = lat + dLat * 180 / Math.PI;
                 double seLonPoint = lon + dLon * 180 / Math.PI;
 
-                MapPoint NorthWest = new MapPoint(nwLatPoint.ToString(),nwLonPoint.ToString(), sensor.Name);
-                MapPoint SouthEast = new MapPoint(seLatPoint.ToString(), seLonPoint.ToString(), sensor.Name);
+                MapPoint NorthWest = new MapPoint(nwLatPoint.ToString("N6"),nwLonPoint.ToString("N6"), sensor.Name);
+                MapPoint SouthEast = new MapPoint(seLatPoint.ToString("N6"), seLonPoint.ToString("N6"), sensor.Name);
 
                 SensorBoundingBox sbb = new SensorBoundingBox(NorthWest, SouthEast);
 
                 sensorBoundings.Add(sbb);
+                
             }
 
             return sensorBoundings;
