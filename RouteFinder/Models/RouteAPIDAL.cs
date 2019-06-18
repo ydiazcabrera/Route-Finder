@@ -34,9 +34,9 @@ namespace RouteFinder.Models
         /// <param name="avoidTopLeftCoordinates">Long/Lat of top left corner of square to avoid</param>
         /// <param name="avoidBottomRightCoordinates">Long/Lat of bottom right corner of square to avoid</param>
         /// <returns>Image URL</returns>
-        public static List<RouteCoordinate> DisplayMap(string startPoint, string endPoint, string avoidTopLeftCoordinates = null, string avoidBottomRightCoordinates = null)
+        public static List<RouteCoordinate> DisplayMap(string startPoint, string endPoint, List<SensorBoundingBox> sensorsToAvoid = null)
         {
-            List<RouteCoordinate> routeCoordinates = GetRoute(startPoint, endPoint, avoidTopLeftCoordinates, avoidBottomRightCoordinates);
+            List<RouteCoordinate> routeCoordinates = GetRoute(startPoint, endPoint, sensorsToAvoid);
 
             return routeCoordinates;
             //string mapImage = GetMap(routeCoordinates);
@@ -57,12 +57,32 @@ namespace RouteFinder.Models
         /// <param name="avoidTopLeftCoordinates">Long/Lat of top left corner of square to avoid</param>
         /// <param name="avoidBottomRightCoordinates">Long/Lat of bottom right corner of square to avoid</param>
         /// <returns> A list of coordinates for route</returns>
-        public static List<RouteCoordinate> GetRoute(string startPoint, string endPoint, string avoidTopLeftCoordinates = null, string avoidBottomRightCoordinates = null)
+        public static List<RouteCoordinate> GetRoute(string startPoint, string endPoint, List<SensorBoundingBox> sensorsToAvoid = null)
         {
             string AppCode = ConfigReaderDAL.ReadSetting("app_code");
             string AppId = ConfigReaderDAL.ReadSetting("app_id");
 
-            string URL = $"https://route.api.here.com/routing/7.2/calculateroute.json?app_id={AppId}&app_code={AppCode}&waypoint0=geo!{startPoint}&waypoint1=geo!{endPoint}&mode=fastest;car;traffic:disabled&avoidareas={avoidTopLeftCoordinates};{avoidBottomRightCoordinates}&routeattributes=shape";
+            string URL = $"https://route.api.here.com/routing/7.2/calculateroute.json?app_id={AppId}&app_code={AppCode}&waypoint0=geo!{startPoint}&waypoint1=geo!{endPoint}&mode=fastest;car;traffic:disabled&avoidareas=";
+
+            for (int i = 0; i < sensorsToAvoid.Count; i++)
+            {
+                string sensor = sensorsToAvoid[i].NorthWest.Latitude;
+                sensor += "," + sensorsToAvoid[i].NorthWest.Longitude;
+               
+                sensor += ";";
+
+                sensor += sensorsToAvoid[i].SouthEast.Latitude;
+                sensor += "," + sensorsToAvoid[i].SouthEast.Longitude;
+
+                if(i != sensorsToAvoid.Count - 1)
+                {
+                    sensor += "!";
+                }
+
+                URL += sensor;
+            }
+
+            URL += "&routeattributes=shape";
 
             string APIText = APICall(URL);
 

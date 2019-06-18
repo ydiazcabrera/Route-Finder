@@ -33,12 +33,16 @@ namespace RouteFinder.Controllers
             string startPoint = $"{startLong},{startLat}";
             string endPoint = $"{endLong},{endLat}";
 
+            //Pull list of sensors directly from database.
+            List<Sensor> sensors = GetListSensors();
+
+            //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
+            List<SensorBoundingBox> sbb = AvoidSensor(sensors);
+
             // Hard-coded start/end points and a square to avoid. This will eventually pull in values from the user and sensor AQIs
             //List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap("42.906722,-85.725006", "42.960974,-85.605329", "42.969954,-85.639754", "42.927074,-85.609183");
-            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap(startPoint, endPoint, "42.969954,-85.639754", "42.927074,-85.609183");
+            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap(startPoint, endPoint, sbb);
 
-            //Pull list of sensors directly from database.
-            List<Sensor> sensors = db.Sensors.ToList();
 
             // This section builds a string, which is passed to the view and used by the JS script to display the sensors
             //ToDo - Find a way to display the name of the sensor / the AQI on the map without having to hover over the marker
@@ -129,6 +133,53 @@ namespace RouteFinder.Controllers
             return aqis;    
         }
 
+        public List<Sensor> GetListSensors()
+        {
+            List<Sensor> sensors = db.Sensors.ToList();
+            sensors.ForEach(x => x.AQI = 100);
+
+            return sensors;
+        }
+
+        public List<SensorBoundingBox> AvoidSensor(List<Sensor> sensors)
+        {
+            List<SensorBoundingBox> sensorBoundings = new List<SensorBoundingBox>();
+           
+            foreach (Sensor sensor in sensors)
+            {
+                
+                double lat = double.Parse(sensor.Latitude);
+                double lon = double.Parse(sensor.Longitude);
+                double earthRadius = 6378137;
+                double n = 200;
+                double e = 200;
+                double s = -200;
+                double w = -200;
+
+                double uLat = n / earthRadius;
+                double uLon = e / (earthRadius * Math.Cos(Math.PI*lat/180));
+                double dLat = s / earthRadius;
+                double dLon = w / (earthRadius * Math.Cos(Math.PI*lat/180));
+
+                double nwLatPoint = lat + uLat * 180 / Math.PI;
+                double nwLonPoint = lon + uLon * 180 / Math.PI;
+
+                double seLatPoint = lat + dLat * 180 / Math.PI;
+                double seLonPoint = lon + dLon * 180 / Math.PI;
+
+                MapPoint NorthWest = new MapPoint(nwLatPoint.ToString("N6"),nwLonPoint.ToString("N6"), sensor.Name);
+                MapPoint SouthEast = new MapPoint(seLatPoint.ToString("N6"), seLonPoint.ToString("N6"), sensor.Name);
+
+                SensorBoundingBox sbb = new SensorBoundingBox(NorthWest, SouthEast);
+
+                sensorBoundings.Add(sbb);
+                
+            }
+
+            return sensorBoundings;
+        }
+    }
+
         public double GetHourlyAvg(List<SensorsData> sensorData, string pollutant)
         {
             double dataPoint = 0.00;
@@ -151,21 +202,9 @@ namespace RouteFinder.Controllers
                 }
             }
 
-            //runningTotalPM25 += (int)s.PM25_MicroGramPerCubicMeter;
-
-
-
-            //double avgO3 = runningTotalO3 / datarows;
-            //double avgPM25 = runningTotalPM25 / datarows;
-
-            //int O3AQI= FindBreakpointsO3(avgO3);
-            //int PM25AQI= FindBreakpointsPM25(avgPM25);
-
-            //AQIs.Add(PM25AQI);
-            //AQIs.Add(O3AQI);
-
             return runningTotal / sensorData.Count();
         }
+  
         public int CalcluateO3AQI(double avgO3)
         {
             double O3Min=0;
@@ -179,8 +218,6 @@ namespace RouteFinder.Controllers
                 O3Max = 0.059;
                 AQIMin = 0;
                 AQIMax = 50;
-                //double EquationResult = ((AQIMax - AQIMin) / (O3Max - O3Min)) * (avgO3 - O3Min) + AQIMin;
-                //int AQI = Convert.ToInt32(Math.Round(EquationResult));
             }
             if (avgO3 >= 0.060 && avgO3 < 0.075)
             {
