@@ -7,9 +7,9 @@ namespace RouteFinder.Models
 {
     public class RouteCoordinate : MapPoint
     {
-        public override string Latitude { get; set; }
-        public override string Longitude { get; set; }
-        public override string Name { get; set; }
+        //public string Latitude { get; set; }
+        //public string Longitude { get; set; }
+        //public string Name { get; set; }
 
         public RouteCoordinate(string latitude, string longitude, string name) : base(latitude, longitude, name)
         {
