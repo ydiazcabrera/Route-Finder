@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Web.Mvc;
+using System.Data.Entity.Migrations;
 
 namespace RouteFinder.Controllers
 {
@@ -13,7 +14,7 @@ namespace RouteFinder.Controllers
 
         public ActionResult Index()
         {
-            SelectLast60();
+            GetAQI();
             return View();
         }
 
@@ -74,7 +75,7 @@ namespace RouteFinder.Controllers
             ViewBag.MapCenter = mapCenter;
             ViewBag.Sensors = markers;
             ViewBag.Route = route;
-            
+
             return View();
         }
 
@@ -132,7 +133,191 @@ namespace RouteFinder.Controllers
             return sensorsData;
 
         }
-    }
+        public void GetAQI()
+        {
+            List<Sensor> sensors = db.Sensors.ToList();
+            foreach (Sensor sensor in sensors)
+            {
+                List<SensorsData> sensorData = GetLastSixtyMinutesSensorData(sensor.Name);
+                List<int>AQIs =GetHourlyAvg(sensorData);
+                if(AQIs[0] > AQIs[1])
+                {
+                    sensor.AQI = AQIs[0];
+                }
+                else
+                {
+                    sensor.AQI = AQIs[1];
+                }
+                db.Sensors.AddOrUpdate();
+                db.SaveChanges();
+            }
 
-   
+            //return 1;
+        }
+
+        public List<int> GetHourlyAvg(List<SensorsData> sensorData)
+        {
+            List<int> AQIs = new List<int>();
+            int datarows = sensorData.Count();
+            int runningTotalO3 = 0;
+            int runningTotalPM25 = 0;
+
+            foreach (SensorsData s in sensorData)
+            {
+                runningTotalO3 += (int)(s.O3_PPB / 1000);
+                runningTotalPM25 += (int)s.PM25_MicroGramPerCubicMeter;
+            }
+
+            double avgO3 = runningTotalO3 / datarows;
+            double avgPM25 = runningTotalPM25 / datarows;
+            
+            int O3AQI= FindBreakpointsO3(avgO3);
+            AQIs.Add(O3AQI);
+            int PM25AQI= FindBreakpointsPM25(avgPM25);
+            AQIs.Add(PM25AQI);
+
+            return AQIs;
+        }
+        public int FindBreakpointsO3(double avgO3)
+        {
+            double O3Min=0;
+            double O3Max=0;
+            int AQIMin=0;
+            int AQIMax=0;
+
+            if (avgO3 >= 0 && avgO3 < 0.059)
+            {
+                O3Min = 0;
+                O3Max = 0.059;
+                AQIMin = 0;
+                AQIMax = 50;
+                //double EquationResult = ((AQIMax - AQIMin) / (O3Max - O3Min)) * (avgO3 - O3Min) + AQIMin;
+                //int AQI = Convert.ToInt32(Math.Round(EquationResult));
+            }
+            if (avgO3 >= 0.060 && avgO3 < 0.075)
+            {
+                O3Min = 0.060;
+                O3Max = 0.075;
+                AQIMin = 51;
+                AQIMax = 100;
+
+            }
+            if (avgO3 >= 0.076 && avgO3 < 0.095)
+            {
+                O3Min = 0.076;
+                O3Max = 0.095;
+                AQIMin = 101;
+                AQIMax = 150;
+
+            }
+            if (avgO3 >= 0.096 && avgO3 < 0.115)
+            {
+                O3Min = 0.096;
+                O3Max = 0.115;
+                AQIMin = 151;
+                AQIMax = 200;
+            }
+            if (avgO3 >= 0.116 && avgO3 < 0.374)
+            {
+                O3Min = 0.116;
+                O3Max = 0.374;
+                AQIMin = 201;
+                AQIMax = 300;
+            }
+            if (avgO3 >= 0.405)// this is a combination of two hazardous reading, might need to change
+            {
+                O3Min = 0.405;
+                O3Max = 0.604;
+                AQIMin = 301;
+                AQIMax = 500;
+            }
+            int AQI=AQIEquation(AQIMax, AQIMin, O3Max, O3Min, avgO3);
+            return AQI;
+        }
+
+        public int FindBreakpointsPM25(double avgPM25)
+        {
+
+            double PM25Min=0;
+            double PM25Max=0;
+            int AQIMin = 0;
+            int AQIMax = 0;
+
+            if (avgPM25 >= 0 && avgPM25 < 15.4)
+            {
+                PM25Min = 0;
+                PM25Max = 15.4;
+                AQIMin = 0;
+                AQIMax = 50;
+            }
+            if (avgPM25 >= 15.5 && avgPM25 < 40.4)
+            {
+                PM25Min = 15.5;
+                PM25Max = 40.4;
+                AQIMin = 51;
+                AQIMax = 100;
+            }
+            if (avgPM25 >= 40.5 && avgPM25 < 65.4)
+            {
+                PM25Min = 40.5;
+                PM25Max = 65.4;
+                AQIMin = 101;
+                AQIMax = 150;
+            }
+            if (avgPM25 >= 65.5 && avgPM25 < 150.4)
+            {
+                PM25Min = 65.5;
+                PM25Max = 150.4;
+                AQIMin = 151;
+                AQIMax = 200;
+            }
+            if (avgPM25 >= 150.5 && avgPM25 < 250.4)
+            {
+                PM25Min = 150.5;
+                PM25Max = 250.4;
+                AQIMin = 201;
+                AQIMax = 300;
+            }
+            if (avgPM25 >= 250.5 && avgPM25 < 350.4)
+            {
+                PM25Min = 250.5;
+                PM25Max = 350.4;
+                AQIMin = 301;
+                AQIMax = 400;
+            }
+            if (avgPM25 >= 350.5)
+            {
+                PM25Min = 350.5;
+                PM25Max = 500.4;
+                AQIMin = 401;
+                AQIMax = 500;
+            }
+            int AQI =AQIEquation(AQIMax, AQIMin, PM25Max, PM25Min, avgPM25);
+            return AQI;
+        }
+
+        public int AQIEquation(int aqiMax, int aquMin, double pollutantMax, double pollutantMin, double pollutantreading)
+        {
+            int AQI = Convert.ToInt32((((aqiMax - aquMin) / (pollutantMax - pollutantMin)) * (pollutantreading - pollutantMin)) + aquMin);
+            return AQI;
+        }
+
+        public int CaloriesBurnedWalked(int weight,int mile)
+        {
+            int caloriesBurned = 0;
+            if(weight >= 180)
+            {
+                caloriesBurned = 100 * mile;
+            }
+            else if(weight<180 && weight >= 120)
+            {
+                caloriesBurned = 65 * mile;
+            }
+            else
+            {
+                caloriesBurned = 53 * mile;
+            }
+            return caloriesBurned;
+        }
+    }
 }
