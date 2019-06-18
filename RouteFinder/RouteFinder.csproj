@@ -136,6 +136,7 @@
     <Compile Include="HelperClasses\AQI Calculator.cs" />
     <Compile Include="Models\ConfigReaderDAL.cs" />
     <Compile Include="Models\RouteAPIDAL.cs" />
+    <Compile Include="Models\SensorBoundingBox.cs" />
     <Compile Include="Models\SensorsData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

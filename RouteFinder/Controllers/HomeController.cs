@@ -14,7 +14,8 @@ namespace RouteFinder.Controllers
 
         public ActionResult Index()
         {
-            GetAQI();
+            
+
             return View();
         }
 
@@ -31,13 +32,19 @@ namespace RouteFinder.Controllers
             //Combine long and lat into single string
             string startPoint = $"{startLong},{startLat}";
             string endPoint = $"{endLong},{endLat}";
+            
+            //Get AQIs from for each sensor
+            List<int> aqis = GetSensorAQIs();
+            //Pull list of sensors directly from database.
+            List<Sensor> sensors = GetListSensors(aqis);
+
+            //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
+            List<SensorBoundingBox> sbb = AvoidSensor(sensors);
 
             // Hard-coded start/end points and a square to avoid. This will eventually pull in values from the user and sensor AQIs
             //List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap("42.906722,-85.725006", "42.960974,-85.605329", "42.969954,-85.639754", "42.927074,-85.609183");
-            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap(startPoint, endPoint, "42.969954,-85.639754", "42.927074,-85.609183");
+            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap(startPoint, endPoint, sbb);
 
-            //Pull list of sensors directly from database.
-            List<Sensor> sensors = db.Sensors.ToList();
 
             // This section builds a string, which is passed to the view and used by the JS script to display the sensors
             //ToDo - Find a way to display the name of the sensor / the AQI on the map without having to hover over the marker
@@ -79,51 +86,6 @@ namespace RouteFinder.Controllers
             return View();
         }
 
-        public ActionResult ConcentrationTable()
-        {
-            DataTable concetration = new DataTable("Table");
-            concetration.Columns.Add(new DataColumn()
-            {
-                ColumnName = "O3-8hr",
-                DataType = typeof(string)
-            });
-            concetration.Columns.Add(new DataColumn()
-            {
-                ColumnName = "03-1hr",
-                DataType = typeof(string)
-            });
-            concetration.Columns.Add(new DataColumn()
-            {
-                ColumnName = "PM10",
-                DataType = typeof(string)
-            });
-            concetration.Columns.Add(new DataColumn()
-            {
-                ColumnName = "PM25",
-                DataType = typeof(string)
-            });
-            concetration.Columns.Add(new DataColumn()
-            {
-                ColumnName = "AQI",
-                DataType = typeof(string)
-            });
-            concetration.Columns.Add(new DataColumn()
-            {
-                ColumnName = "Category",
-                DataType = typeof(string)
-            });
-
-            concetration.Rows.Add(new object[] { "0.000 - 0.059", "-", "0-54", "0.0-15.4", "0-50", "Good" });
-            concetration.Rows.Add(new object[] { "0.060 - 0.075", "-", "55-154", "15.5 -40.4", "51-100", "Moderate" });
-            concetration.Rows.Add(new object[] { "0.076 - 0.095", "0.125 - 0.164", "155-254", "40.5-65.4", "101-150", "Unhealthy for Sensitive Groups" });
-            concetration.Rows.Add(new object[] { "0.096 - 0.115", "0.165 - 0.204", "255-354", "(65.5 - 150.4)3", "151-200", "Unhealthy" });
-            concetration.Rows.Add(new object[] { "0.116 - 0.374", "0.205 - 0.404", "355-424", "(150.5 - (250.4)3", "201-300", "Very unhealthy" });
-            concetration.Rows.Add(new object[] { "()2", "0.405 - 0.504", "425 - 504", "(250.5-(350.4)3", "301-400", "Hazardous" });
-            concetration.Rows.Add(new object[] { "()2", "0.505 - 0.604", "505 - 604", "(350.5 - 500.4)3", "401-500", "Hazardous" });
-
-            return View(concetration);
-        }
-
         public List<SensorsData> GetLastSixtyMinutesSensorData(string sensorName)
         {
             DateTime oneMonthOneHourAgo = DateTime.Today.AddMonths(-1).AddHours(-1);
@@ -131,54 +93,124 @@ namespace RouteFinder.Controllers
             List<SensorsData> sensorsData = db.SensorsData.Where(x => x.Time >= oneMonthOneHourAgo && x.Time <= oneMonthAgo && x.Sensor.Name == sensorName).ToList();
 
             return sensorsData;
-
         }
-        public void GetAQI()
+
+        public List<int> GetSensorAQIs()
         {
-            List<Sensor> sensors = db.Sensors.ToList();
-            foreach (Sensor sensor in sensors)
+            List<int> aqis = new List<int>();
+
+            foreach(Sensor s in db.Sensors.ToList())
             {
-                List<SensorsData> sensorData = GetLastSixtyMinutesSensorData(sensor.Name);
-                List<int>AQIs =GetHourlyAvg(sensorData);
-                if(AQIs[0] > AQIs[1])
+                int aqi = 0;
+                //Pull an hour of data from a sensor
+                List<SensorsData> sixtyMinSensorData = GetLastSixtyMinutesSensorData(s.Name);
+
+                if (sixtyMinSensorData.Count() == 0) //There was no data collected by the sensor for the time called
                 {
-                    sensor.AQI = AQIs[0];
+                    //There should probably be some sort of opoeration here...
+                    aqis.Add(0); // for testing purposes
+                    continue;
+                }
+
+                // find the hourly average for ozone
+                double hourlyO3Avg = GetHourlyAvg(sixtyMinSensorData, "O3_PPB" );
+                int aqiO3 = CalcluateO3AQI(hourlyO3Avg);
+
+                // find the hourly average for particulate matter
+                double hourlyPM25Avg = GetHourlyAvg(sixtyMinSensorData, "PM25_MicroGramPerCubicMeter");
+                int aqiPM25 = CalcluatePM25AQI(hourlyPM25Avg);
+
+                if(aqiO3 > aqiPM25)
+                {
+                    aqi = aqiO3;
                 }
                 else
                 {
-                    sensor.AQI = AQIs[1];
+                    aqi = aqiPM25;
                 }
-                db.Sensors.AddOrUpdate();
-                db.SaveChanges();
-            }
 
-            //return 1;
+                aqis.Add(aqi);
+                
+            }
+            return aqis;    
         }
 
-        public List<int> GetHourlyAvg(List<SensorsData> sensorData)
+        public List<Sensor> GetListSensors(List<int> aqis)
         {
-            List<int> AQIs = new List<int>();
-            int datarows = sensorData.Count();
-            int runningTotalO3 = 0;
-            int runningTotalPM25 = 0;
-
-            foreach (SensorsData s in sensorData)
+            List<Sensor> sensors = db.Sensors.ToList();
+            for(int i = 0; i < sensors.Count(); i++)
             {
-                runningTotalO3 += (int)(s.O3_PPB / 1000);
-                runningTotalPM25 += (int)s.PM25_MicroGramPerCubicMeter;
+                sensors[i].AQI = aqis[i];
+            }
+            //sensors.ForEach(x => x.AQI = 100);
+
+            return sensors;
+        }
+
+        public List<SensorBoundingBox> AvoidSensor(List<Sensor> sensors)
+        {
+            List<SensorBoundingBox> sensorBoundings = new List<SensorBoundingBox>();
+           
+            foreach (Sensor sensor in sensors)
+            {
+                
+                double lat = double.Parse(sensor.Latitude);
+                double lon = double.Parse(sensor.Longitude);
+                double earthRadius = 6378137;
+                double n = 200;
+                double e = 200;
+                double s = -200;
+                double w = -200;
+
+                double uLat = n / earthRadius;
+                double uLon = e / (earthRadius * Math.Cos(Math.PI*lat/180));
+                double dLat = s / earthRadius;
+                double dLon = w / (earthRadius * Math.Cos(Math.PI*lat/180));
+
+                double nwLatPoint = lat + uLat * 180 / Math.PI;
+                double nwLonPoint = lon + uLon * 180 / Math.PI;
+
+                double seLatPoint = lat + dLat * 180 / Math.PI;
+                double seLonPoint = lon + dLon * 180 / Math.PI;
+
+                MapPoint NorthWest = new MapPoint(nwLatPoint.ToString("N6"),nwLonPoint.ToString("N6"), sensor.Name);
+                MapPoint SouthEast = new MapPoint(seLatPoint.ToString("N6"), seLonPoint.ToString("N6"), sensor.Name);
+
+                SensorBoundingBox sbb = new SensorBoundingBox(NorthWest, SouthEast);
+
+                sensorBoundings.Add(sbb);
+                
             }
 
-            double avgO3 = runningTotalO3 / datarows;
-            double avgPM25 = runningTotalPM25 / datarows;
-            
-            int O3AQI= FindBreakpointsO3(avgO3);
-            AQIs.Add(O3AQI);
-            int PM25AQI= FindBreakpointsPM25(avgPM25);
-            AQIs.Add(PM25AQI);
-
-            return AQIs;
+            return sensorBoundings;
         }
-        public int FindBreakpointsO3(double avgO3)
+
+        public double GetHourlyAvg(List<SensorsData> sensorData, string pollutant)
+        {
+            double dataPoint = 0.00;
+            //List<int> AQIs = new List<int>();
+           
+            int datarows = sensorData.Count();
+            double runningTotal = 0.00;
+
+            foreach(SensorsData s in sensorData)
+            {
+                if (pollutant == "O3_PPB")
+                {
+                    dataPoint = (double)s.O3_PPB;
+                    runningTotal += (dataPoint / 1000); // convert from ppb to ppm
+                }
+                else if(pollutant == "PM25_MicroGramPerCubicMeter")
+                {
+                    dataPoint = (int)s.PM25_MicroGramPerCubicMeter;
+                    runningTotal += dataPoint;
+                }
+            }
+
+            return runningTotal / sensorData.Count();
+        }
+  
+        public int CalcluateO3AQI(double avgO3)
         {
             double O3Min=0;
             double O3Max=0;
@@ -191,8 +223,6 @@ namespace RouteFinder.Controllers
                 O3Max = 0.059;
                 AQIMin = 0;
                 AQIMax = 50;
-                //double EquationResult = ((AQIMax - AQIMin) / (O3Max - O3Min)) * (avgO3 - O3Min) + AQIMin;
-                //int AQI = Convert.ToInt32(Math.Round(EquationResult));
             }
             if (avgO3 >= 0.060 && avgO3 < 0.075)
             {
@@ -200,7 +230,6 @@ namespace RouteFinder.Controllers
                 O3Max = 0.075;
                 AQIMin = 51;
                 AQIMax = 100;
-
             }
             if (avgO3 >= 0.076 && avgO3 < 0.095)
             {
@@ -231,13 +260,13 @@ namespace RouteFinder.Controllers
                 AQIMin = 301;
                 AQIMax = 500;
             }
-            int AQI=AQIEquation(AQIMax, AQIMin, O3Max, O3Min, avgO3);
+
+            int AQI = DoMath(AQIMax, AQIMin, O3Max, O3Min, avgO3);
             return AQI;
         }
 
-        public int FindBreakpointsPM25(double avgPM25)
+        public int CalcluatePM25AQI(double avgPM25)
         {
-
             double PM25Min=0;
             double PM25Max=0;
             int AQIMin = 0;
@@ -292,11 +321,12 @@ namespace RouteFinder.Controllers
                 AQIMin = 401;
                 AQIMax = 500;
             }
-            int AQI =AQIEquation(AQIMax, AQIMin, PM25Max, PM25Min, avgPM25);
+
+            int AQI = DoMath(AQIMax, AQIMin, PM25Max, PM25Min, avgPM25);
             return AQI;
         }
 
-        public int AQIEquation(int aqiMax, int aquMin, double pollutantMax, double pollutantMin, double pollutantreading)
+        public int DoMath(int aqiMax, int aquMin, double pollutantMax, double pollutantMin, double pollutantreading)
         {
             int AQI = Convert.ToInt32((((aqiMax - aquMin) / (pollutantMax - pollutantMin)) * (pollutantreading - pollutantMin)) + aquMin);
             return AQI;
@@ -319,5 +349,6 @@ namespace RouteFinder.Controllers
             }
             return caloriesBurned;
         }
+    
     }
 }
