@@ -14,7 +14,7 @@ namespace RouteFinder.Controllers
 
         public ActionResult Index()
         {
-            List<int> aqis = GetSensorAQIs();
+            
 
             return View();
         }
@@ -32,9 +32,11 @@ namespace RouteFinder.Controllers
             //Combine long and lat into single string
             string startPoint = $"{startLong},{startLat}";
             string endPoint = $"{endLong},{endLat}";
-
+            
+            //Get AQIs from for each sensor
+            List<int> aqis = GetSensorAQIs();
             //Pull list of sensors directly from database.
-            List<Sensor> sensors = GetListSensors();
+            List<Sensor> sensors = GetListSensors(aqis);
 
             //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
             List<SensorBoundingBox> sbb = AvoidSensor(sensors);
@@ -133,10 +135,14 @@ namespace RouteFinder.Controllers
             return aqis;    
         }
 
-        public List<Sensor> GetListSensors()
+        public List<Sensor> GetListSensors(List<int> aqis)
         {
             List<Sensor> sensors = db.Sensors.ToList();
-            sensors.ForEach(x => x.AQI = 100);
+            for(int i = 0; i < sensors.Count(); i++)
+            {
+                sensors[i].AQI = aqis[i];
+            }
+            //sensors.ForEach(x => x.AQI = 100);
 
             return sensors;
         }
@@ -178,7 +184,6 @@ namespace RouteFinder.Controllers
 
             return sensorBoundings;
         }
-    }
 
         public double GetHourlyAvg(List<SensorsData> sensorData, string pollutant)
         {
@@ -344,5 +349,6 @@ namespace RouteFinder.Controllers
             }
             return caloriesBurned;
         }
+    
     }
 }
