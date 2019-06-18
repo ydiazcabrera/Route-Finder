@@ -17,62 +17,81 @@ namespace RouteFinder.Models
             PM25, PM10, O3,
         }
 
-        public static DataTable ConcentrateTable()
+        public static int GetBreakPoint(double O3, int PM10, double PM25, DateTime time)
         {
-            DataTable concetration = new DataTable();
-            concetration.Columns.Add(new DataColumn()
+            double O3Min = 0;
+            double O3Max = 0;
+            int PM10Min = 0;
+            int PM10Max = 0;
+            double PM25Min = 0.0;
+            double PM25Max = 0.0;
+            int AQIMin = 0;
+            int AQIMax = 0;
+
+            if (O3 >= 0 || O3 < 0.059)
             {
-                ColumnName = "O3-8hr",
-                DataType = typeof(string)
-            });
-            concetration.Columns.Add(new DataColumn()
+                O3Min = 0;
+                O3Max = 0.059;
+                PM10Min = 0;
+                PM10Max = 54;
+                PM25Min = 0;
+                PM25Max = 15.4;
+                AQIMin = 0;
+                AQIMax = 50;
+                double EquationResult = ((AQIMax - AQIMin) / (O3Max - O3Min)) * (O3 - O3Min) + AQIMin;
+                int AQI = Convert.ToInt32(Math.Round(EquationResult));
+            }
+            if (O3 >= 0.060 || O3 < 0.075)
             {
-                ColumnName = "03-1hr",
-                DataType = typeof(string)
-            });
-            concetration.Columns.Add(new DataColumn()
+                O3Min = 0.060;
+                O3Max = 0.075;
+                PM10Min = 55;
+                PM10Max = 154;
+                PM25Min = 15.5;
+                PM25Max = 40.4;
+                AQIMin = 51;
+                AQIMax = 100;
+                double EquationResult = ((AQIMax - AQIMin) / (O3Max - O3Min)) * (O3 - O3Min) + AQIMin;
+                int AQI = Convert.ToInt32(Math.Round(EquationResult));
+            }
+            if (O3 >= 0.076 || O3 < 0.095)
             {
-                ColumnName = "PM10",
-                DataType = typeof(string)
-            });
-            concetration.Columns.Add(new DataColumn()
+                O3Min = 0.076;
+                O3Max = 0.095;
+                PM10Min = 155;
+                PM10Max = 254;
+                PM25Min = 40.5;
+                PM25Max = 65.4;
+                AQIMin = 101;
+                AQIMax = 150;
+                double EquationResult = ((AQIMax - AQIMin) / (O3Max - O3Min)) * (O3 - O3Min) + AQIMin;
+                int AQI = Convert.ToInt32(Math.Round(EquationResult));
+            }
+            if (O3 >= 0.096 || O3 < 0.115)
             {
-                ColumnName = "PM25",
-                DataType = typeof(string)
-            });
-            concetration.Columns.Add(new DataColumn()
-            {
-                ColumnName = "AQI",
-                DataType = typeof(string)
-            });
-            concetration.Columns.Add(new DataColumn()
-            {
-                ColumnName = "Category",
-                DataType = typeof(string)
-            });
+                O3Min = 0.096;
+                O3Max = 0.115;
+                PM10Min = 255;
+                PM10Max = 354;
+                PM25Min = Math.Pow(65.5, 3);
+                PM25Max = Math.Pow(150.4, 3);
+                AQIMin = 151;
+                AQIMax = 200;
+                double EquationResult = ((AQIMax - AQIMin) / (O3Max - O3Min)) * (O3 - O3Min) + AQIMin;
+                int AQI = Convert.ToInt32(Math.Round(EquationResult));
+            }
 
 
-            concetration.Rows.Add(new object[] { "0.000 - 0.059", "-", "0-54", "0.0-15.4", "0-50", "Good" });
-            concetration.Rows.Add(new object[] { "0.060 - 0.075", "-","55-154", "15.5 -40.4", "51-100", "Moderate" });
-            concetration.Rows.Add(new object[] { "0.076 - 0.095", "0.125 - 0.164", "155-254", "40.5-65.4", "101-150", "Unhealthy for Sensitive Groups" });
-            concetration.Rows.Add(new object[] { "0.096 - 0.115", "0.165 - 0.204", "255-354", "(65.5 - 150.4)3", "151-200", "Unhealthy" });
-            concetration.Rows.Add(new object[] { "0.116 - 0.374", "0.205 - 0.404", "355-424", "(150.5 - (250.4)3","201-300", "Very unhealthy" });
-            concetration.Rows.Add(new object[] { "()2", "0.405 - 0.504", "425 - 504", "(250.5-(350.4)3", "301-400", "Hazardous" });
-            concetration.Rows.Add(new object[] { "()2", "0.505 - 0.604", "505 - 604", "(350.5 - 500.4)3", "401-500", "Hazardous" });
 
-            return concetration;
+
+
+
+            //public  Pollutant(Pollutant pollutant, double concentration)
+            //{
+            //    if (Pollutant.PM10.equals(pollutant) || Pollutant.SO2.equals(pollutant) || Pollutant.NO2.equals(pollutant))
+            //    {
+            //        return Math.round(concentration);
+            //    }
+            //}
         }
-
-    
-
-    
-
-        //public  Pollutant(Pollutant pollutant, double concentration)
-        //{
-        //    if (Pollutant.PM10.equals(pollutant) || Pollutant.SO2.equals(pollutant) || Pollutant.NO2.equals(pollutant))
-        //    {
-        //        return Math.round(concentration);
-        //    }
-        //}
     }
-}
