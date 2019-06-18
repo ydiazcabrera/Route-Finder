@@ -58,7 +58,8 @@ namespace RouteFinder.Controllers
             for (int i = 0; i < sensors.Count; i++)
             {
                 markers += "{";
-                markers += string.Format("'title': '{0}',", sensors[i].Name);
+                markers += string.Format("'name': '{0}',", sensors[i].Name);
+                markers += string.Format("'aqi': '{0}',", sensors[i].AQI);
                 markers += string.Format("'lat': '{0}',", sensors[i].Latitude);
                 markers += string.Format("'lng': '{0}',", sensors[i].Longitude);
                 //markers += string.Format("'description': '{0}'", "AQI: 50"); // This doesn't seem to be working
