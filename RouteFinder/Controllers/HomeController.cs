@@ -180,10 +180,10 @@ namespace RouteFinder.Controllers
                     double lat = double.Parse(sensor.Latitude);
                     double lon = double.Parse(sensor.Longitude);
                     double earthRadius = 6378137;
-                    double n = 200;
-                    double e = 200;
-                    double s = -200;
-                    double w = -200;
+                    double n = 400;
+                    double e = 400;
+                    double s = -400;
+                    double w = -400;
 
                     double uLat = n / earthRadius;
                     double uLon = e / (earthRadius * Math.Cos(Math.PI * lat / 180));
