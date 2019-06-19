@@ -13,8 +13,6 @@ namespace RouteFinder.Controllers
 
         public ActionResult Index()
         {
-
-
             return View();
         }
 
@@ -251,14 +249,14 @@ namespace RouteFinder.Controllers
                 AQIMin = 0;
                 AQIMax = 50;
             }
-           else if (avgO3 >= 0.060 && avgO3 < 0.075)
+            else if (avgO3 >= 0.060 && avgO3 < 0.075)
             {
                 O3Min = 0.060;
                 O3Max = 0.075;
                 AQIMin = 51;
                 AQIMax = 100;
             }
-           else if (avgO3 >= 0.076 && avgO3 < 0.095)
+            else if (avgO3 >= 0.076 && avgO3 < 0.095)
             {
                 O3Min = 0.076;
                 O3Max = 0.095;
@@ -306,35 +304,35 @@ namespace RouteFinder.Controllers
                 AQIMin = 0;
                 AQIMax = 50;
             }
-           else if (avgPM25 >= 15.5 && avgPM25 < 40.4)
+            else if (avgPM25 >= 15.5 && avgPM25 < 40.4)
             {
                 PM25Min = 15.5;
                 PM25Max = 40.4;
                 AQIMin = 51;
                 AQIMax = 100;
             }
-           else if (avgPM25 >= 40.5 && avgPM25 < 65.4)
+            else if (avgPM25 >= 40.5 && avgPM25 < 65.4)
             {
                 PM25Min = 40.5;
                 PM25Max = 65.4;
                 AQIMin = 101;
                 AQIMax = 150;
             }
-          else  if (avgPM25 >= 65.5 && avgPM25 < 150.4)
+            else  if (avgPM25 >= 65.5 && avgPM25 < 150.4)
             {
                 PM25Min = 65.5;
                 PM25Max = 150.4;
                 AQIMin = 151;
                 AQIMax = 200;
             }
-           else if (avgPM25 >= 150.5 && avgPM25 < 250.4)
+            else if (avgPM25 >= 150.5 && avgPM25 < 250.4)
             {
                 PM25Min = 150.5;
                 PM25Max = 250.4;
                 AQIMin = 201;
                 AQIMax = 300;
             }
-           else if (avgPM25 >= 250.5 && avgPM25 < 350.4)
+            else if (avgPM25 >= 250.5 && avgPM25 < 350.4)
             {
                 PM25Min = 250.5;
                 PM25Max = 350.4;
@@ -376,6 +374,5 @@ namespace RouteFinder.Controllers
             }
             return caloriesBurned;
         }
-
     }
 }
