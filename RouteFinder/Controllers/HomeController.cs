@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Web.Mvc;
-using System.Data.Entity.Migrations;
 
 namespace RouteFinder.Controllers
 {
@@ -14,7 +13,7 @@ namespace RouteFinder.Controllers
 
         public ActionResult Index()
         {
-            
+
 
             return View();
         }
@@ -32,11 +31,15 @@ namespace RouteFinder.Controllers
             //Combine long and lat into single string
             string startPoint = $"{startLong},{startLat}";
             string endPoint = $"{endLong},{endLat}";
-            
+
             //Get AQIs from for each sensor
-            List<int> aqis = GetSensorAQIs();
+            //List<int> aqis = GetSensorAQIs();
+
             //Pull list of sensors directly from database.
-            List<Sensor> sensors = GetListSensors(aqis);
+            List<Sensor> sensors = GetListSensors();
+
+            // Set AQI's on sensors
+            sensors = GetSensorAQIs(sensors);
 
             //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
             List<SensorBoundingBox> sbb = AvoidSensor(sensors);
@@ -67,10 +70,15 @@ namespace RouteFinder.Controllers
             string route = "[";
             for (int i = 0; i < routeCoordinates.Count() - 1; i++)
             {
-                route += $"{{ lat: {routeCoordinates[i].Latitude}, lng: { routeCoordinates[i].Longitude} }},";
+                route += $"{{ lat: {routeCoordinates[i].Latitude}, lng: { routeCoordinates[i].Longitude} }}";
+
+                // This allows to put last coordinate without a ending comma and closes the array
+                if (i != routeCoordinates.Count - 1)
+                {
+                    route += ",";
+                }
             }
-            // This allows to put last coordinate without a ending comma and closes the array
-            route += $"{{ lat: {routeCoordinates[routeCoordinates.Count() - 1].Latitude}, lng: {routeCoordinates[routeCoordinates.Count() - 1].Longitude}}}];";
+            route += $"];";
 
             //Finds center of map. Probably need to find more elogant solution.
             RouteCoordinate centerCoordinate = routeCoordinates[(routeCoordinates.Count() / 2)];
@@ -95,32 +103,34 @@ namespace RouteFinder.Controllers
             return sensorsData;
         }
 
-        public List<int> GetSensorAQIs()
+        public List<Sensor> GetSensorAQIs(List<Sensor> sensors)
         {
-            List<int> aqis = new List<int>();
+            //List<int> aqis = new List<int>();
 
-            foreach(Sensor s in db.Sensors.ToList())
+            //foreach (Sensor s in db.Sensors.ToList())
+            foreach (Sensor sensor in sensors)
             {
                 int aqi = 0;
                 //Pull an hour of data from a sensor
-                List<SensorsData> sixtyMinSensorData = GetLastSixtyMinutesSensorData(s.Name);
+                List<SensorsData> sixtyMinSensorData = GetLastSixtyMinutesSensorData(sensor.Name);
 
                 if (sixtyMinSensorData.Count() == 0) //There was no data collected by the sensor for the time called
                 {
                     //There should probably be some sort of opoeration here...
-                    aqis.Add(0); // for testing purposes
+                    //aqis.Add(0); // for testing purposes
+                    sensor.AQI = 0;
                     continue;
                 }
 
                 // find the hourly average for ozone
-                double hourlyO3Avg = GetHourlyAvg(sixtyMinSensorData, "O3_PPB" );
+                double hourlyO3Avg = GetHourlyAvg(sixtyMinSensorData, "O3_PPB");
                 int aqiO3 = CalcluateO3AQI(hourlyO3Avg);
 
                 // find the hourly average for particulate matter
                 double hourlyPM25Avg = GetHourlyAvg(sixtyMinSensorData, "PM25_MicroGramPerCubicMeter");
                 int aqiPM25 = CalcluatePM25AQI(hourlyPM25Avg);
 
-                if(aqiO3 > aqiPM25)
+                if (aqiO3 > aqiPM25)
                 {
                     aqi = aqiO3;
                 }
@@ -129,59 +139,76 @@ namespace RouteFinder.Controllers
                     aqi = aqiPM25;
                 }
 
-                aqis.Add(aqi);
-                
+                //aqis.Add(aqi);
+                sensor.AQI = aqi;
+
             }
-            return aqis;    
+            //return aqis;
+            return sensors;
         }
 
-        public List<Sensor> GetListSensors(List<int> aqis)
+        //public List<Sensor> GetListSensors(List<int> aqis)
+        public List<Sensor> GetListSensors()
         {
-            List<Sensor> sensors = db.Sensors.ToList();
-            for(int i = 0; i < sensors.Count(); i++)
-            {
-                sensors[i].AQI = aqis[i];
-            }
+            //List<Sensor> sensors = db.Sensors.ToList();
+            //for(int i = 0; i < sensors.Count(); i++)
+            //{
+            //    sensors[i].AQI = aqis[i];
+            //}
             //sensors.ForEach(x => x.AQI = 100);
 
-            return sensors;
+            //return sensors;
+            try
+            {
+                return db.Sensors.ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
         }
 
         public List<SensorBoundingBox> AvoidSensor(List<Sensor> sensors)
         {
             List<SensorBoundingBox> sensorBoundings = new List<SensorBoundingBox>();
-           
+
             foreach (Sensor sensor in sensors)
             {
-                
-                double lat = double.Parse(sensor.Latitude);
-                double lon = double.Parse(sensor.Longitude);
-                double earthRadius = 6378137;
-                double n = 200;
-                double e = 200;
-                double s = -200;
-                double w = -200;
+                if (sensor.AQI > 100)
+                {
+                    double lat = double.Parse(sensor.Latitude);
+                    double lon = double.Parse(sensor.Longitude);
+                    double earthRadius = 6378137;
+                    double n = 200;
+                    double e = 200;
+                    double s = -200;
+                    double w = -200;
 
-                double uLat = n / earthRadius;
-                double uLon = e / (earthRadius * Math.Cos(Math.PI*lat/180));
-                double dLat = s / earthRadius;
-                double dLon = w / (earthRadius * Math.Cos(Math.PI*lat/180));
+                    double uLat = n / earthRadius;
+                    double uLon = e / (earthRadius * Math.Cos(Math.PI * lat / 180));
+                    double dLat = s / earthRadius;
+                    double dLon = w / (earthRadius * Math.Cos(Math.PI * lat / 180));
 
-                double nwLatPoint = lat + uLat * 180 / Math.PI;
-                double nwLonPoint = lon + uLon * 180 / Math.PI;
+                    double nwLatPoint = lat + uLat * 180 / Math.PI;
+                    double nwLonPoint = lon + uLon * 180 / Math.PI;
 
-                double seLatPoint = lat + dLat * 180 / Math.PI;
-                double seLonPoint = lon + dLon * 180 / Math.PI;
+                    double seLatPoint = lat + dLat * 180 / Math.PI;
+                    double seLonPoint = lon + dLon * 180 / Math.PI;
 
-                MapPoint NorthWest = new MapPoint(nwLatPoint.ToString("N6"),nwLonPoint.ToString("N6"), sensor.Name);
-                MapPoint SouthEast = new MapPoint(seLatPoint.ToString("N6"), seLonPoint.ToString("N6"), sensor.Name);
+                    MapPoint NorthWest = new MapPoint(nwLatPoint.ToString("N6"), nwLonPoint.ToString("N6"), sensor.Name);
+                    MapPoint SouthEast = new MapPoint(seLatPoint.ToString("N6"), seLonPoint.ToString("N6"), sensor.Name);
 
-                SensorBoundingBox sbb = new SensorBoundingBox(NorthWest, SouthEast);
+                    SensorBoundingBox sbb = new SensorBoundingBox(sensor, NorthWest, SouthEast);
 
-                sensorBoundings.Add(sbb);
-                
+                    sensorBoundings.Add(sbb);
+                }
+
             }
-
+            if (sensorBoundings.Count == 0)
+            {
+                sensorBoundings = null;
+            }
             return sensorBoundings;
         }
 
@@ -189,18 +216,18 @@ namespace RouteFinder.Controllers
         {
             double dataPoint = 0.00;
             //List<int> AQIs = new List<int>();
-           
+
             int datarows = sensorData.Count();
             double runningTotal = 0.00;
 
-            foreach(SensorsData s in sensorData)
+            foreach (SensorsData s in sensorData)
             {
                 if (pollutant == "O3_PPB")
                 {
                     dataPoint = (double)s.O3_PPB;
                     runningTotal += (dataPoint / 1000); // convert from ppb to ppm
                 }
-                else if(pollutant == "PM25_MicroGramPerCubicMeter")
+                else if (pollutant == "PM25_MicroGramPerCubicMeter")
                 {
                     dataPoint = (int)s.PM25_MicroGramPerCubicMeter;
                     runningTotal += dataPoint;
@@ -209,13 +236,13 @@ namespace RouteFinder.Controllers
 
             return runningTotal / sensorData.Count();
         }
-  
+
         public int CalcluateO3AQI(double avgO3)
         {
-            double O3Min=0;
-            double O3Max=0;
-            int AQIMin=0;
-            int AQIMax=0;
+            double O3Min = 0;
+            double O3Max = 0;
+            int AQIMin = 0;
+            int AQIMax = 0;
 
             if (avgO3 >= 0 && avgO3 < 0.059)
             {
@@ -224,14 +251,14 @@ namespace RouteFinder.Controllers
                 AQIMin = 0;
                 AQIMax = 50;
             }
-            if (avgO3 >= 0.060 && avgO3 < 0.075)
+           else if (avgO3 >= 0.060 && avgO3 < 0.075)
             {
                 O3Min = 0.060;
                 O3Max = 0.075;
                 AQIMin = 51;
                 AQIMax = 100;
             }
-            if (avgO3 >= 0.076 && avgO3 < 0.095)
+           else if (avgO3 >= 0.076 && avgO3 < 0.095)
             {
                 O3Min = 0.076;
                 O3Max = 0.095;
@@ -239,21 +266,21 @@ namespace RouteFinder.Controllers
                 AQIMax = 150;
 
             }
-            if (avgO3 >= 0.096 && avgO3 < 0.115)
+            else if (avgO3 >= 0.096 && avgO3 < 0.115)
             {
                 O3Min = 0.096;
                 O3Max = 0.115;
                 AQIMin = 151;
                 AQIMax = 200;
             }
-            if (avgO3 >= 0.116 && avgO3 < 0.374)
+            else if (avgO3 >= 0.116 && avgO3 < 0.374)
             {
                 O3Min = 0.116;
                 O3Max = 0.374;
                 AQIMin = 201;
                 AQIMax = 300;
             }
-            if (avgO3 >= 0.405)// this is a combination of two hazardous reading, might need to change
+            else if (avgO3 >= 0.405)// this is a combination of two hazardous reading, might need to change
             {
                 O3Min = 0.405;
                 O3Max = 0.604;
@@ -261,14 +288,14 @@ namespace RouteFinder.Controllers
                 AQIMax = 500;
             }
 
-            int AQI = DoMath(AQIMax, AQIMin, O3Max, O3Min, avgO3);
+            int AQI = CalculateAQI(AQIMax, AQIMin, O3Max, O3Min, avgO3);
             return AQI;
         }
 
         public int CalcluatePM25AQI(double avgPM25)
         {
-            double PM25Min=0;
-            double PM25Max=0;
+            double PM25Min = 0;
+            double PM25Max = 0;
             int AQIMin = 0;
             int AQIMax = 0;
 
@@ -279,42 +306,42 @@ namespace RouteFinder.Controllers
                 AQIMin = 0;
                 AQIMax = 50;
             }
-            if (avgPM25 >= 15.5 && avgPM25 < 40.4)
+           else if (avgPM25 >= 15.5 && avgPM25 < 40.4)
             {
                 PM25Min = 15.5;
                 PM25Max = 40.4;
                 AQIMin = 51;
                 AQIMax = 100;
             }
-            if (avgPM25 >= 40.5 && avgPM25 < 65.4)
+           else if (avgPM25 >= 40.5 && avgPM25 < 65.4)
             {
                 PM25Min = 40.5;
                 PM25Max = 65.4;
                 AQIMin = 101;
                 AQIMax = 150;
             }
-            if (avgPM25 >= 65.5 && avgPM25 < 150.4)
+          else  if (avgPM25 >= 65.5 && avgPM25 < 150.4)
             {
                 PM25Min = 65.5;
                 PM25Max = 150.4;
                 AQIMin = 151;
                 AQIMax = 200;
             }
-            if (avgPM25 >= 150.5 && avgPM25 < 250.4)
+           else if (avgPM25 >= 150.5 && avgPM25 < 250.4)
             {
                 PM25Min = 150.5;
                 PM25Max = 250.4;
                 AQIMin = 201;
                 AQIMax = 300;
             }
-            if (avgPM25 >= 250.5 && avgPM25 < 350.4)
+           else if (avgPM25 >= 250.5 && avgPM25 < 350.4)
             {
                 PM25Min = 250.5;
                 PM25Max = 350.4;
                 AQIMin = 301;
                 AQIMax = 400;
             }
-            if (avgPM25 >= 350.5)
+            else if (avgPM25 >= 350.5)
             {
                 PM25Min = 350.5;
                 PM25Max = 500.4;
@@ -322,24 +349,24 @@ namespace RouteFinder.Controllers
                 AQIMax = 500;
             }
 
-            int AQI = DoMath(AQIMax, AQIMin, PM25Max, PM25Min, avgPM25);
+            int AQI = CalculateAQI(AQIMax, AQIMin, PM25Max, PM25Min, avgPM25);
             return AQI;
         }
 
-        public int DoMath(int aqiMax, int aquMin, double pollutantMax, double pollutantMin, double pollutantreading)
+        public int CalculateAQI(int aqiMax, int aquMin, double pollutantMax, double pollutantMin, double pollutantReading)
         {
-            int AQI = Convert.ToInt32((((aqiMax - aquMin) / (pollutantMax - pollutantMin)) * (pollutantreading - pollutantMin)) + aquMin);
+            int AQI = Convert.ToInt32((((aqiMax - aquMin) / (pollutantMax - pollutantMin)) * (pollutantReading - pollutantMin)) + aquMin);
             return AQI;
         }
 
-        public int CaloriesBurnedWalked(int weight,int mile)
+        public int CaloriesBurnedWalked(int weight, int mile)
         {
             int caloriesBurned = 0;
-            if(weight >= 180)
+            if (weight >= 180)
             {
                 caloriesBurned = 100 * mile;
             }
-            else if(weight<180 && weight >= 120)
+            else if (weight < 180 && weight >= 120)
             {
                 caloriesBurned = 65 * mile;
             }
@@ -349,6 +376,6 @@ namespace RouteFinder.Controllers
             }
             return caloriesBurned;
         }
-    
+
     }
 }
