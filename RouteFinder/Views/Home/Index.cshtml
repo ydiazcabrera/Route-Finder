@@ -1,6 +1,25 @@
-﻿@if (ViewBag.APIText != null)
+﻿@{ Layout = null;
+    string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
+    }
+
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Simple Polylines</title>
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+                * element that contains the map. */
+        #map {
+            height: 70%;
+            width: 50%;
+        }
+    </style>
+</head>
+
+
+@if (ViewBag.APIText != null)
 {
-<img src="@ViewBag.APIText" alt="Alternate Text" />
+    <img src="@ViewBag.APIText" alt="Alternate Text" />
 
 }
 
@@ -8,6 +27,7 @@
     <div class="form-group">
         <label for="startLong">Starting Longitude: </label>
         <input class="form-control" type="text" name="startLong" id="startLong" placeholder="Enter Starting Longitude" value="42.955485" />
+        <input hidden="hidden" value= "0" id="startlng" />
         <label for="startLat">Starting Latitude: </label>
         <input class="form-control" type="text" name="startLat" id="startLat" placeholder="Enter Starting Latitude" value="-85.627450" />
     </div>
@@ -20,3 +40,63 @@
     <input type="submit" name="submit" value="Go" class="btn btn-success" />
 </form>
 
+<body>
+    <div id="map"></div>
+
+    <script>
+        var map;
+        function initMap() {
+            var startlat;
+            var startlng;
+
+            var opts = { 'center': new google.maps.LatLng(42.9634, -85.6681), 'zoom': 5, 'mapTypeId': google.maps.MapTypeId.ROADMAP }
+                map = new google.maps.Map(document.getElementById('map'), opts);
+
+                google.maps.event.addListener(map, 'click', function (event) {
+                    startlat = event.latLng.lat();
+                    startlng = event.latLng.lng();
+                    var marker = new google.maps.Marker({
+                    position: { lat: startlat, lng: startlng },
+                    map: map
+
+                    });
+                  alert("Latitude: " + event.latLng.lat() + " " + ", longitude: " + event.latLng.lng());
+
+                    var startlngValue = document.getElementById(startlng);
+                    startlngValue.textContent(starlng);
+
+                 });
+                    
+
+        }
+        google.maps.event.addDomListener(window, 'load', init_map);
+    </script>
+
+    @*<script>
+            function initMap() {
+                //Create a new map
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 12,
+                    center: @Html.Raw(ViewBag.MapCenter),
+                    mapTypeId: 'terrain' });
+
+
+                google.maps.event.addListener(map, "click", function (e) {
+
+                 //lat and lng is available in e object
+                 var latLng = e.latLng;
+
+                });
+
+                var marker = new google.maps.Marker({
+                    position: latlng,
+                    map: map
+                });
+            }
+
+        </script>*@
+
+    <script async defer
+            src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
+    </script>
+</body>

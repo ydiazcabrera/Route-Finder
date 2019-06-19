@@ -13,6 +13,9 @@ namespace RouteFinder.Controllers
 
         public ActionResult Index()
         {
+            string mapCenter = "{ lat: " + 42.9634 + ", lng: " + -85.6681 + " }";
+            ViewBag.MapCenter = mapCenter;
+
             return View();
         }
 
