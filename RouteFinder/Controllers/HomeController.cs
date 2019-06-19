@@ -30,8 +30,8 @@ namespace RouteFinder.Controllers
                 return RedirectToAction("Index");
             }
             //Combine long and lat into single string
-            string startPoint = $"{startLong},{startLat}";
-            string endPoint = $"{endLong},{endLat}";
+            string startPoint = $"{startLat},{startLong}";
+            string endPoint = $"{endLat},{endLong}";
 
             //Get AQIs from for each sensor
             //List<int> aqis = GetSensorAQIs();
@@ -47,8 +47,8 @@ namespace RouteFinder.Controllers
 
             // Hard-coded start/end points and a square to avoid. This will eventually pull in values from the user and sensor AQIs
             //List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap("42.906722,-85.725006", "42.960974,-85.605329", "42.969954,-85.639754", "42.927074,-85.609183");
-            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap(startPoint, endPoint, sbb, modeOfT);
-
+            Route safeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sbb, modeOfT);
+            List<RouteCoordinate> routeCoordinates = safeRoute.RouteCoordinates;
 
             // This section builds a string, which is passed to the view and used by the JS script to display the sensors
             //ToDo - Find a way to display the name of the sensor / the AQI on the map without having to hover over the marker
