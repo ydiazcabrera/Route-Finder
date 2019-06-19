@@ -26,6 +26,9 @@
 </head>
 <body>
     <div id="map"></div>
+    <div id="content">
+        Hello World! <!--Maybe use Viewbag to pass Sensor AQI-->
+    </div>
     <script>
 
         var sensors = @Html.Raw(ViewBag.Sensors);
@@ -61,21 +64,63 @@
                     map: map,
                     title: data.title,
                     scaledSize: new google.maps.Size(50, 50),
-                    icon: 'http://maps.google.com/mapfiles/kml/pal4/icon57.png',
+                    icon: data.aqi/*'http://maps.google.com/mapfiles/kml/pal4/icon57.png'*/,
                     label: data.aqi,
                 });
 
-                var sensorBuffer = new google.maps.Circle({
-                    strokeColor: '#FF0000',
-                    strokeOpacity: 0.8,
-                    strokeWeight: 1,
-                    fillColor: '#FF0000',
-                    fillOpacity: 0.35,
-                    map: map,
-                    center: myLatlng,
-                    radius: 400,
-                    label: data.name,
-                });
+                if (data.aqi >= 151 && data.aqi <= 200) {
+                    var sensorBuffer = new google.maps.Circle({
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 1,
+                        fillColor: '#FF0000',
+                        fillOpacity: 0.35,
+                        map: map,
+                        center: myLatlng,
+                        radius: 300,
+                        label: data.name,
+                    });
+                }
+                else if (data.aqi >= 101 && data.aqi <= 150) {
+                    var sensorBuffer = new google.maps.Circle({
+                        strokeColor: '#E17E00',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 1,
+                        fillColor: '#E17E00',
+                        fillOpacity: 0.35,
+                        map: map,
+                        center: myLatlng,
+                        radius: 300,
+                        label: data.name,
+                    });
+                }
+                else if (data.aqi >= 51 && data.aqi <= 100)
+                {
+                    var sensorBuffer = new google.maps.Circle({
+                        strokeColor: '#E1E100',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 1,
+                        fillColor: '#E1E100',
+                        fillOpacity: 0.35,
+                        map: map,
+                        center: myLatlng,
+                        radius: 300,
+                        label: data.name,
+                    });
+                }
+                else if (data.aqi <= 50) {
+                    var sensorBuffer = new google.maps.Circle({
+                        strokeColor: '#00E400',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 1,
+                        fillColor: '#00E400',
+                        fillOpacity: 0.35,
+                        map: map,
+                        center: myLatlng,
+                        radius: 300,
+                        label: data.name,
+                    });
+                }
 
 
             }
@@ -84,6 +129,8 @@
         }
 
     </script>
+
+    <!--Legend Styling-->
     <style type='text/css'>
         .my-legend .legend-title {
             text-align: left;

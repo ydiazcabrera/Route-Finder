@@ -1,22 +1,102 @@
-﻿@if (ViewBag.APIText != null)
-{
-<img src="@ViewBag.APIText" alt="Alternate Text" />
-
+﻿@{
+    Layout = null;
+    string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
 }
 
-<form action="~/Home/RouteMap" method="post">
-    <div class="form-group">
-        <label for="startLong">Starting Longitude: </label>
-        <input class="form-control" type="text" name="startLong" id="startLong" placeholder="Enter Starting Longitude" value="42.955485" />
-        <label for="startLat">Starting Latitude: </label>
-        <input class="form-control" type="text" name="startLat" id="startLat" placeholder="Enter Starting Latitude" value="-85.627450" />
-    </div>
-    <div class="form-group">
-        <label for="endLong">Ending Longitude: </label>
-        <input class="form-control" type="text" name="endLong" placeholder="Enter Ending Longitude" value="42.933697" />
-        <label for="endLat">Ending Latitude: </label>
-        <input class="form-control" type="text" name="endLat" placeholder="Enter Ending Latitude" value="-85.699788" />
-    </div>
-    <input type="submit" name="submit" value="Go" class="btn btn-success" />
-</form>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Simple Polylines</title>
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+                * element that contains the map. */
+        #map {
+            height: 70%;
+            width: 50%;
+        }
+    </style>
+</head>
 
+<body>
+    <div id="map"></div>
+
+    <script>
+        var map;
+        function initMap() {
+            var startlat;
+            var startlng;
+
+            var opts = { 'center': new google.maps.LatLng(42.9634, -85.6681), 'zoom': 12, 'mapTypeId': google.maps.MapTypeId.ROADMAP }
+            map = new google.maps.Map(document.getElementById('map'), opts);
+
+            google.maps.event.addListener(map, 'click', function (event) {
+                var startlatValue = document.getElementById('startLat');
+                var startlngValue = document.getElementById('startLong');
+
+                var endlatValue = document.getElementById('endLat');
+                var endlngValue = document.getElementById('endLong');
+
+                if (startlatValue.value == "") {
+                    startlat = event.latLng.lat();
+                    startlng = event.latLng.lng();
+                    startlatValue.value = startlat;
+                    startlngValue.value = startlng;
+                }
+                else if (endlngValue.value == "") {
+                    endlat = event.latLng.lat();
+                    endlng = event.latLng.lng();
+                    endlatValue.value = endlat;
+                    endlngValue.value = endlng;
+                }
+                else {
+                    alert("You already entered a start and end point.\nRefresh page to start over.");
+                }
+
+                var marker = new google.maps.Marker({
+                    position: { lat: startlat, lng: startlng },
+                    map: map
+                });
+            });
+        }
+        google.maps.event.addDomListener(window, 'load', init_map);
+
+    </script>
+
+    <p><input type="button" value="Clear coordinates" onclick='refreshPage()' /></p>
+
+    <script type="text/javascript">
+
+        function refreshPage() {
+            if (confirm("Are you sure, want to clear?")) {
+                location.reload();
+            }
+        }
+    </script>
+    <script async defer
+            src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
+    </script>
+    ﻿<form action="~/Home/RouteMap" method="post">
+
+        <div class="form-group">
+            <label for="startLat">Starting Latitude: </label>
+            <input class="form-control" type="text" name="startLat" id="startLat" placeholder="Enter Starting Latitude" value="" />
+            <label for="startLong">Starting Longitude: </label>
+            <input class="form-control" type="text" name="startLong" id="startLong" placeholder="Enter Starting Longitude" value="" />
+        </div>
+        <div class="form-group">
+            <label for="endLat">Ending Latitude: </label>
+            <input class="form-control" type="text" name="endLat" id="endLat" placeholder="Enter Ending Latitude" value="" />
+            <label for="endLong">Ending Longitude: </label>
+            <input class="form-control" type="text" name="endLong" id="endLong" placeholder="Enter Ending Longitude" value="" />
+        </div>
+        <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-primary active focus">
+                <input type="radio" name="modeOfT" id="walk" value="pedestrian" onclick="setWalkChecked()" checked> Walk
+            </label>
+            <label class="btn btn-primary">
+                <input type="radio" name="modeOfT" id="bike" value="bicycle" onclick="setBikeChecked()"> Bike
+            </label>
+        </div>
+        <input type="submit" name="submit" value="Go" class="btn btn-success" />
+    </form>
+</body>
