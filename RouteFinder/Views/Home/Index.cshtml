@@ -1,6 +1,7 @@
-﻿@{ Layout = null;
+﻿@{ 
+    Layout = null;
     string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
-    }
+ }
 
 <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
@@ -20,22 +21,20 @@
 @if (ViewBag.APIText != null)
 {
     <img src="@ViewBag.APIText" alt="Alternate Text" />
-
 }
 
 <form action="~/Home/RouteMap" method="post">
     <div class="form-group">
-        <label for="startLong">Starting Longitude: </label>
-        <input class="form-control" type="text" name="startLong" id="startLong" placeholder="Enter Starting Longitude" value="42.955485" />
-        <input hidden="hidden" value= "0" id="startlng" />
         <label for="startLat">Starting Latitude: </label>
-        <input class="form-control" type="text" name="startLat" id="startLat" placeholder="Enter Starting Latitude" value="-85.627450" />
+        <input class="form-control" type="text" name="startLat" id="startLat" placeholder="Enter Starting Latitude" value="" />
+        <label for="startLong">Starting Longitude: </label>
+        <input class="form-control" type="text" name="startLong" id="startLong" placeholder="Enter Starting Longitude" value="" />
     </div>
     <div class="form-group">
-        <label for="endLong">Ending Longitude: </label>
-        <input class="form-control" type="text" name="endLong" placeholder="Enter Ending Longitude" value="42.933697" />
         <label for="endLat">Ending Latitude: </label>
-        <input class="form-control" type="text" name="endLat" placeholder="Enter Ending Latitude" value="-85.699788" />
+        <input class="form-control" type="text" name="endLat" id="endLat" placeholder="Enter Ending Latitude" value="" />
+        <label for="endLong">Ending Longitude: </label>
+        <input class="form-control" type="text" name="endLong" id="endLong" placeholder="Enter Ending Longitude" value="" />
     </div>
     <input type="submit" name="submit" value="Go" class="btn btn-success" />
 </form>
@@ -49,53 +48,57 @@
             var startlat;
             var startlng;
 
-            var opts = { 'center': new google.maps.LatLng(42.9634, -85.6681), 'zoom': 5, 'mapTypeId': google.maps.MapTypeId.ROADMAP }
-                map = new google.maps.Map(document.getElementById('map'), opts);
+            var opts = { 'center': new google.maps.LatLng(42.9634, -85.6681), 'zoom': 12, 'mapTypeId': google.maps.MapTypeId.ROADMAP }
+            map = new google.maps.Map(document.getElementById('map'), opts);
 
-                google.maps.event.addListener(map, 'click', function (event) {
+            google.maps.event.addListener(map, 'click', function (event) {
+                var startlatValue = document.getElementById('startLat');
+                var startlngValue = document.getElementById('startLong');
+
+                var endlatValue = document.getElementById('endLat');
+                var endlngValue = document.getElementById('endLong');
+
+                if (startlatValue.value == "") {
                     startlat = event.latLng.lat();
                     startlng = event.latLng.lng();
-                    var marker = new google.maps.Marker({
-                    position: { lat: startlat, lng: startlng },
-                    map: map
-
-                    });
-                  alert("Latitude: " + event.latLng.lat() + " " + ", longitude: " + event.latLng.lng());
-
-                    var startlngValue = document.getElementById(startlng);
-                    startlngValue.textContent(starlng);
-
-                 });
-                    
-
-        }
-        google.maps.event.addDomListener(window, 'load', init_map);
-    </script>
-
-    @*<script>
-            function initMap() {
-                //Create a new map
-                var map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: 12,
-                    center: @Html.Raw(ViewBag.MapCenter),
-                    mapTypeId: 'terrain' });
+                    startlatValue.value = startlat;
+                    startlngValue.value = startlng;
+                }
+                else if (endlngValue.value == "") {
+                    endlat = event.latLng.lat();
+                    endlng = event.latLng.lng();
+                    endlatValue.value = endlat;
+                    endlngValue.value = endlng;
+                } else {
+                    alert("You already entered a start and end point.\nRefresh page to start over.")
+                }
 
 
-                google.maps.event.addListener(map, "click", function (e) {
-
-                 //lat and lng is available in e object
-                 var latLng = e.latLng;
-
-                });
+                //startlat = event.latLng.lat();
+                //startlng = event.latLng.lng();
+                //startlatValue.value = startlat;
+                //startlngValue.value = startlng;
 
                 var marker = new google.maps.Marker({
-                    position: latlng,
+                    position: { lat: startlat, lng: startlng },
                     map: map
                 });
+            });
+        }
+        google.maps.event.addDomListener(window, 'load', init_map);
+
+    </script>
+
+    <p><input type="button" value="Clear coordinates" onclick='refreshPage()' /></p>
+
+    <script type="text/javascript">
+
+        function refreshPage() {
+            if (confirm("Are you sure, want to clear?")) {
+                location.reload();
             }
-
-        </script>*@
-
+        }
+    </script>
     <script async defer
             src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
     </script>
