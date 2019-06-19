@@ -199,7 +199,7 @@ namespace RouteFinder.Controllers
                     MapPoint NorthWest = new MapPoint(nwLatPoint.ToString("N6"), nwLonPoint.ToString("N6"), sensor.Name);
                     MapPoint SouthEast = new MapPoint(seLatPoint.ToString("N6"), seLonPoint.ToString("N6"), sensor.Name);
 
-                    SensorBoundingBox sbb = new SensorBoundingBox(NorthWest, SouthEast);
+                    SensorBoundingBox sbb = new SensorBoundingBox(sensor, NorthWest, SouthEast);
 
                     sensorBoundings.Add(sbb);
                 }
@@ -251,14 +251,14 @@ namespace RouteFinder.Controllers
                 AQIMin = 0;
                 AQIMax = 50;
             }
-            if (avgO3 >= 0.060 && avgO3 < 0.075)
+           else if (avgO3 >= 0.060 && avgO3 < 0.075)
             {
                 O3Min = 0.060;
                 O3Max = 0.075;
                 AQIMin = 51;
                 AQIMax = 100;
             }
-            if (avgO3 >= 0.076 && avgO3 < 0.095)
+           else if (avgO3 >= 0.076 && avgO3 < 0.095)
             {
                 O3Min = 0.076;
                 O3Max = 0.095;
@@ -266,21 +266,21 @@ namespace RouteFinder.Controllers
                 AQIMax = 150;
 
             }
-            if (avgO3 >= 0.096 && avgO3 < 0.115)
+            else if (avgO3 >= 0.096 && avgO3 < 0.115)
             {
                 O3Min = 0.096;
                 O3Max = 0.115;
                 AQIMin = 151;
                 AQIMax = 200;
             }
-            if (avgO3 >= 0.116 && avgO3 < 0.374)
+            else if (avgO3 >= 0.116 && avgO3 < 0.374)
             {
                 O3Min = 0.116;
                 O3Max = 0.374;
                 AQIMin = 201;
                 AQIMax = 300;
             }
-            if (avgO3 >= 0.405)// this is a combination of two hazardous reading, might need to change
+            else if (avgO3 >= 0.405)// this is a combination of two hazardous reading, might need to change
             {
                 O3Min = 0.405;
                 O3Max = 0.604;
@@ -288,7 +288,7 @@ namespace RouteFinder.Controllers
                 AQIMax = 500;
             }
 
-            int AQI = DoMath(AQIMax, AQIMin, O3Max, O3Min, avgO3);
+            int AQI = CalculateAQI(AQIMax, AQIMin, O3Max, O3Min, avgO3);
             return AQI;
         }
 
@@ -306,42 +306,42 @@ namespace RouteFinder.Controllers
                 AQIMin = 0;
                 AQIMax = 50;
             }
-            if (avgPM25 >= 15.5 && avgPM25 < 40.4)
+           else if (avgPM25 >= 15.5 && avgPM25 < 40.4)
             {
                 PM25Min = 15.5;
                 PM25Max = 40.4;
                 AQIMin = 51;
                 AQIMax = 100;
             }
-            if (avgPM25 >= 40.5 && avgPM25 < 65.4)
+           else if (avgPM25 >= 40.5 && avgPM25 < 65.4)
             {
                 PM25Min = 40.5;
                 PM25Max = 65.4;
                 AQIMin = 101;
                 AQIMax = 150;
             }
-            if (avgPM25 >= 65.5 && avgPM25 < 150.4)
+          else  if (avgPM25 >= 65.5 && avgPM25 < 150.4)
             {
                 PM25Min = 65.5;
                 PM25Max = 150.4;
                 AQIMin = 151;
                 AQIMax = 200;
             }
-            if (avgPM25 >= 150.5 && avgPM25 < 250.4)
+           else if (avgPM25 >= 150.5 && avgPM25 < 250.4)
             {
                 PM25Min = 150.5;
                 PM25Max = 250.4;
                 AQIMin = 201;
                 AQIMax = 300;
             }
-            if (avgPM25 >= 250.5 && avgPM25 < 350.4)
+           else if (avgPM25 >= 250.5 && avgPM25 < 350.4)
             {
                 PM25Min = 250.5;
                 PM25Max = 350.4;
                 AQIMin = 301;
                 AQIMax = 400;
             }
-            if (avgPM25 >= 350.5)
+            else if (avgPM25 >= 350.5)
             {
                 PM25Min = 350.5;
                 PM25Max = 500.4;
@@ -349,13 +349,13 @@ namespace RouteFinder.Controllers
                 AQIMax = 500;
             }
 
-            int AQI = DoMath(AQIMax, AQIMin, PM25Max, PM25Min, avgPM25);
+            int AQI = CalculateAQI(AQIMax, AQIMin, PM25Max, PM25Min, avgPM25);
             return AQI;
         }
 
-        public int DoMath(int aqiMax, int aquMin, double pollutantMax, double pollutantMin, double pollutantreading)
+        public int CalculateAQI(int aqiMax, int aquMin, double pollutantMax, double pollutantMin, double pollutantReading)
         {
-            int AQI = Convert.ToInt32((((aqiMax - aquMin) / (pollutantMax - pollutantMin)) * (pollutantreading - pollutantMin)) + aquMin);
+            int AQI = Convert.ToInt32((((aqiMax - aquMin) / (pollutantMax - pollutantMin)) * (pollutantReading - pollutantMin)) + aquMin);
             return AQI;
         }
 

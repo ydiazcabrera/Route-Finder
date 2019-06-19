@@ -11,11 +11,11 @@ namespace RouteFinder.Models
         public MapPoint NorthWest { get; set; }
         public MapPoint SouthEast { get; set; }
 
-        public SensorBoundingBox(MapPoint northWest, MapPoint southEast)
+        public SensorBoundingBox(Sensor sensor, MapPoint northWest, MapPoint southEast)
         {
             NorthWest = northWest;
             SouthEast = southEast;
-
+            Sensor = sensor;
         }
 
         public SensorBoundingBox()
