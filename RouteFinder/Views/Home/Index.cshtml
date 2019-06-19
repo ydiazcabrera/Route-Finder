@@ -1,3 +1,4 @@
+
 ﻿@{ 
     Layout = null;
     string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
@@ -18,12 +19,9 @@
 </head>
 
 
-@if (ViewBag.APIText != null)
-{
-    <img src="@ViewBag.APIText" alt="Alternate Text" />
-}
 
-<form action="~/Home/RouteMap" method="post">
+﻿<form action="~/Home/RouteMap" method="post">
+
     <div class="form-group">
         <label for="startLat">Starting Latitude: </label>
         <input class="form-control" type="text" name="startLat" id="startLat" placeholder="Enter Starting Latitude" value="" />
@@ -35,6 +33,14 @@
         <input class="form-control" type="text" name="endLat" id="endLat" placeholder="Enter Ending Latitude" value="" />
         <label for="endLong">Ending Longitude: </label>
         <input class="form-control" type="text" name="endLong" id="endLong" placeholder="Enter Ending Longitude" value="" />
+    </div>
+    <div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-primary active focus">
+            <input type="radio" name="modeOfT" id="walk" value="pedestrian" onclick="setWalkChecked()" checked> Walk
+        </label>
+        <label class="btn btn-primary">
+            <input type="radio" name="modeOfT" id="bike" value="bicycle" onclick="setBikeChecked()"> Bike
+        </label>
     </div>
     <input type="submit" name="submit" value="Go" class="btn btn-success" />
 </form>

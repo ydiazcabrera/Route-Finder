@@ -20,7 +20,7 @@ namespace RouteFinder.Controllers
         }
 
         [HttpPost]
-        public ActionResult RouteMap(string startLong, string startLat, string endLong, string endLat)
+        public ActionResult RouteMap(string startLong, string startLat, string endLong, string endLat, string modeOfT)
         {
             // Makes sure data is entered in form, but doesn't account for invalid data.
             // Need to add validation in action or in the api call. I would assume we could make sure
@@ -47,7 +47,7 @@ namespace RouteFinder.Controllers
 
             // Hard-coded start/end points and a square to avoid. This will eventually pull in values from the user and sensor AQIs
             //List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap("42.906722,-85.725006", "42.960974,-85.605329", "42.969954,-85.639754", "42.927074,-85.609183");
-            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap(startPoint, endPoint, sbb);
+            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap(startPoint, endPoint, sbb, modeOfT);
 
 
             // This section builds a string, which is passed to the view and used by the JS script to display the sensors
@@ -181,10 +181,10 @@ namespace RouteFinder.Controllers
                     double lat = double.Parse(sensor.Latitude);
                     double lon = double.Parse(sensor.Longitude);
                     double earthRadius = 6378137;
-                    double n = 200;
-                    double e = 200;
-                    double s = -200;
-                    double w = -200;
+                    double n = 400;
+                    double e = 400;
+                    double s = -400;
+                    double w = -400;
 
                     double uLat = n / earthRadius;
                     double uLon = e / (earthRadius * Math.Cos(Math.PI * lat / 180));
