@@ -62,24 +62,28 @@ namespace RouteFinder.Models
             string AppCode = ConfigReaderDAL.ReadSetting("app_code");
             string AppId = ConfigReaderDAL.ReadSetting("app_id");
 
-            string URL = $"https://route.api.here.com/routing/7.2/calculateroute.json?app_id={AppId}&app_code={AppCode}&waypoint0=geo!{startPoint}&waypoint1=geo!{endPoint}&mode=fastest;car;traffic:disabled&avoidareas=";
+            string URL = $"https://route.api.here.com/routing/7.2/calculateroute.json?app_id={AppId}&app_code={AppCode}&waypoint0=geo!{startPoint}&waypoint1=geo!{endPoint}&mode=fastest;car;traffic:disabled";
 
-            for (int i = 0; i < sensorsToAvoid.Count; i++)
+            if (sensorsToAvoid != null)
             {
-                string sensor = sensorsToAvoid[i].NorthWest.Latitude;
-                sensor += "," + sensorsToAvoid[i].NorthWest.Longitude;
-               
-                sensor += ";";
-
-                sensor += sensorsToAvoid[i].SouthEast.Latitude;
-                sensor += "," + sensorsToAvoid[i].SouthEast.Longitude;
-
-                if(i != sensorsToAvoid.Count - 1)
+                URL += "&avoidareas=";
+                for (int i = 0; i < sensorsToAvoid.Count; i++)
                 {
-                    sensor += "!";
-                }
+                    string sensor = sensorsToAvoid[i].NorthWest.Latitude;
+                    sensor += "," + sensorsToAvoid[i].NorthWest.Longitude;
 
-                URL += sensor;
+                    sensor += ";";
+
+                    sensor += sensorsToAvoid[i].SouthEast.Latitude;
+                    sensor += "," + sensorsToAvoid[i].SouthEast.Longitude;
+
+                    if (i != sensorsToAvoid.Count - 1)
+                    {
+                        sensor += "!";
+                    }
+
+                    URL += sensor;
+                }
             }
 
             URL += "&routeattributes=shape";
