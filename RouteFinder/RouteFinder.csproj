@@ -130,6 +130,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Maneuver.cs" />
+    <Compile Include="Models\Route.cs" />
     <Compile Include="Models\RouteCoordinate.cs" />
     <Compile Include="Models\MapPoint.cs" />
     <Compile Include="Models\Sensor.cs" />

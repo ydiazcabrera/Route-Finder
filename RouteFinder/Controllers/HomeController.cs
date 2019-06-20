@@ -13,7 +13,8 @@ namespace RouteFinder.Controllers
 
         public ActionResult Index()
         {
-
+            string mapCenter = "{ lat: " + 42.9634 + ", lng: " + -85.6681 + " }";
+            ViewBag.MapCenter = mapCenter;
 
             return View();
         }
@@ -29,8 +30,8 @@ namespace RouteFinder.Controllers
                 return RedirectToAction("Index");
             }
             //Combine long and lat into single string
-            string startPoint = $"{startLong},{startLat}";
-            string endPoint = $"{endLong},{endLat}";
+            string startPoint = $"{startLat},{startLong}";
+            string endPoint = $"{endLat},{endLong}";
 
             //Get AQIs from for each sensor
             //List<int> aqis = GetSensorAQIs();
@@ -46,8 +47,8 @@ namespace RouteFinder.Controllers
 
             // Hard-coded start/end points and a square to avoid. This will eventually pull in values from the user and sensor AQIs
             //List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap("42.906722,-85.725006", "42.960974,-85.605329", "42.969954,-85.639754", "42.927074,-85.609183");
-            List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap(startPoint, endPoint, sbb, modeOfT);
-
+            Route safeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sbb, modeOfT);
+            List<RouteCoordinate> routeCoordinates = safeRoute.RouteCoordinates;
 
             // This section builds a string, which is passed to the view and used by the JS script to display the sensors
             //ToDo - Find a way to display the name of the sensor / the AQI on the map without having to hover over the marker
@@ -180,10 +181,10 @@ namespace RouteFinder.Controllers
                     double lat = double.Parse(sensor.Latitude);
                     double lon = double.Parse(sensor.Longitude);
                     double earthRadius = 6378137;
-                    double n = 200;
-                    double e = 200;
-                    double s = -200;
-                    double w = -200;
+                    double n = 400;
+                    double e = 400;
+                    double s = -400;
+                    double w = -400;
 
                     double uLat = n / earthRadius;
                     double uLon = e / (earthRadius * Math.Cos(Math.PI * lat / 180));
@@ -251,14 +252,14 @@ namespace RouteFinder.Controllers
                 AQIMin = 0;
                 AQIMax = 50;
             }
-           else if (avgO3 >= 0.060 && avgO3 < 0.075)
+            else if (avgO3 >= 0.060 && avgO3 < 0.075)
             {
                 O3Min = 0.060;
                 O3Max = 0.075;
                 AQIMin = 51;
                 AQIMax = 100;
             }
-           else if (avgO3 >= 0.076 && avgO3 < 0.095)
+            else if (avgO3 >= 0.076 && avgO3 < 0.095)
             {
                 O3Min = 0.076;
                 O3Max = 0.095;
@@ -306,35 +307,35 @@ namespace RouteFinder.Controllers
                 AQIMin = 0;
                 AQIMax = 50;
             }
-           else if (avgPM25 >= 15.5 && avgPM25 < 40.4)
+            else if (avgPM25 >= 15.5 && avgPM25 < 40.4)
             {
                 PM25Min = 15.5;
                 PM25Max = 40.4;
                 AQIMin = 51;
                 AQIMax = 100;
             }
-           else if (avgPM25 >= 40.5 && avgPM25 < 65.4)
+            else if (avgPM25 >= 40.5 && avgPM25 < 65.4)
             {
                 PM25Min = 40.5;
                 PM25Max = 65.4;
                 AQIMin = 101;
                 AQIMax = 150;
             }
-          else  if (avgPM25 >= 65.5 && avgPM25 < 150.4)
+            else  if (avgPM25 >= 65.5 && avgPM25 < 150.4)
             {
                 PM25Min = 65.5;
                 PM25Max = 150.4;
                 AQIMin = 151;
                 AQIMax = 200;
             }
-           else if (avgPM25 >= 150.5 && avgPM25 < 250.4)
+            else if (avgPM25 >= 150.5 && avgPM25 < 250.4)
             {
                 PM25Min = 150.5;
                 PM25Max = 250.4;
                 AQIMin = 201;
                 AQIMax = 300;
             }
-           else if (avgPM25 >= 250.5 && avgPM25 < 350.4)
+            else if (avgPM25 >= 250.5 && avgPM25 < 350.4)
             {
                 PM25Min = 250.5;
                 PM25Max = 350.4;
@@ -376,6 +377,5 @@ namespace RouteFinder.Controllers
             }
             return caloriesBurned;
         }
-
     }
 }
