@@ -48,15 +48,45 @@ namespace RouteFinder.Controllers
             sensors = GetSensorAQIs(sensors);
 
             //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
-            List<SensorBoundingBox> sbb = AvoidSensor(sensors);
+            List<SensorBoundingBox> sbb = GetSensorsToAvoid(sensors);
 
-            // Hard-coded start/end points and a square to avoid. This will eventually pull in values from the user and sensor AQIs
-            //List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap("42.906722,-85.725006", "42.960974,-85.605329", "42.969954,-85.639754", "42.927074,-85.609183");
             Route safeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sbb, modeOfT);
-            List<RouteCoordinate> routeCoordinates = safeRoute.RouteCoordinates;
+            List<RouteCoordinate> safeRouteCoordinates = safeRoute.RouteCoordinates;
 
+            Route riskyRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, modeOfT);
+            List<RouteCoordinate> riskyRouteCoordinates = riskyRoute.RouteCoordinates;
+
+            //build map marker string for sensors on Google MAP API
+            string sensorMarkers = GetMarkers(sensors);
+
+            //Map center is imperfect because the middle coordinate isn't necessarily the middle of the map.
+            // It also doesn't address the zoom level. We could probably use a C# or .NET geography library to find the 
+            // distance between the two furthest points to set distance and zoom.
+
+            // Risky Map Route
+            ViewBag.RiskyMapCenter = GetMapCenter(riskyRouteCoordinates);
+            ViewBag.RiskyMapSensors = sensorMarkers;
+            ViewBag.RiskyMapRoute = GetRoute(riskyRouteCoordinates);
+
+            //Safe Map Route
+            ViewBag.MapCenter = GetMapCenter(safeRouteCoordinates);
+            ViewBag.Sensors = sensorMarkers;
+            ViewBag.Route = GetRoute(safeRouteCoordinates);
+
+            return View();
+        }
+
+        public string GetMapCenter(List<RouteCoordinate> routeCoordinates)
+        {
+            //Finds center of map. Probably need to find more elogant solution.
+            RouteCoordinate centerCoordinate = routeCoordinates[(routeCoordinates.Count() / 2)];
+
+            return "{ lat: " + centerCoordinate.Latitude + ", lng: " + centerCoordinate.Longitude + " }";
+        }
+
+        public string GetMarkers(List<Sensor> sensors)
+        {
             // This section builds a string, which is passed to the view and used by the JS script to display the sensors
-            //ToDo - Find a way to display the name of the sensor / the AQI on the map without having to hover over the marker
             // https://forums.asp.net/t/2120631.aspx?Using+Razor+in+javascript+to+create+Google+map <= Citation
             string markers = "[";
             for (int i = 0; i < sensors.Count; i++)
@@ -71,7 +101,11 @@ namespace RouteFinder.Controllers
             }
             markers += "];";
 
+            return markers;
+        }
 
+        public string GetRoute(List<RouteCoordinate> routeCoordinates)
+        {
             // This section builds a string, which is passed to the view and used by the JS script to display the route
             string route = "[";
             for (int i = 0; i < routeCoordinates.Count() - 1; i++)
@@ -86,18 +120,7 @@ namespace RouteFinder.Controllers
             }
             route += $"];";
 
-            //Finds center of map. Probably need to find more elogant solution.
-            RouteCoordinate centerCoordinate = routeCoordinates[(routeCoordinates.Count() / 2)];
-            string mapCenter = "{ lat: " + centerCoordinate.Latitude + ", lng: " + centerCoordinate.Longitude + " }";
-
-            //Map center is imperfect because the middle coordinate isn't necessarily the middle of the map.
-            // It also doesn't address the zoom level. We could probably use a C# or .NET geography library to find the 
-            // distance between the two furthest points to set distance and zoom.
-            ViewBag.MapCenter = mapCenter;
-            ViewBag.Sensors = markers;
-            ViewBag.Route = route;
-
-            return View();
+            return route;
         }
 
         public List<SensorsData> GetLastSixtyMinutesSensorData(string sensorName)
@@ -111,9 +134,6 @@ namespace RouteFinder.Controllers
 
         public List<Sensor> GetSensorAQIs(List<Sensor> sensors)
         {
-            //List<int> aqis = new List<int>();
-
-            //foreach (Sensor s in db.Sensors.ToList())
             foreach (Sensor sensor in sensors)
             {
                 int aqi = 0;
@@ -122,8 +142,6 @@ namespace RouteFinder.Controllers
 
                 if (sixtyMinSensorData.Count() == 0) //There was no data collected by the sensor for the time called
                 {
-                    //There should probably be some sort of opoeration here...
-                    //aqis.Add(0); // for testing purposes
                     sensor.AQI = 0;
                     continue;
                 }
@@ -156,14 +174,6 @@ namespace RouteFinder.Controllers
         //public List<Sensor> GetListSensors(List<int> aqis)
         public List<Sensor> GetListSensors()
         {
-            //List<Sensor> sensors = db.Sensors.ToList();
-            //for(int i = 0; i < sensors.Count(); i++)
-            //{
-            //    sensors[i].AQI = aqis[i];
-            //}
-            //sensors.ForEach(x => x.AQI = 100);
-
-            //return sensors;
             try
             {
                 return db.Sensors.ToList();
@@ -175,7 +185,7 @@ namespace RouteFinder.Controllers
 
         }
 
-        public List<SensorBoundingBox> AvoidSensor(List<Sensor> sensors)
+        public List<SensorBoundingBox> GetSensorsToAvoid(List<Sensor> sensors)
         {
             List<SensorBoundingBox> sensorBoundings = new List<SensorBoundingBox>();
 
@@ -183,39 +193,49 @@ namespace RouteFinder.Controllers
             {
                 if (sensor.AQI > 100)
                 {
-                    double lat = double.Parse(sensor.Latitude);
-                    double lon = double.Parse(sensor.Longitude);
-                    double earthRadius = 6378137;
-                    double n = 400;
-                    double e = 400;
-                    double s = -400;
-                    double w = -400;
-
-                    double uLat = n / earthRadius;
-                    double uLon = e / (earthRadius * Math.Cos(Math.PI * lat / 180));
-                    double dLat = s / earthRadius;
-                    double dLon = w / (earthRadius * Math.Cos(Math.PI * lat / 180));
-
-                    double nwLatPoint = lat + uLat * 180 / Math.PI;
-                    double nwLonPoint = lon + uLon * 180 / Math.PI;
-
-                    double seLatPoint = lat + dLat * 180 / Math.PI;
-                    double seLonPoint = lon + dLon * 180 / Math.PI;
-
-                    MapPoint NorthWest = new MapPoint(nwLatPoint.ToString("N6"), nwLonPoint.ToString("N6"), sensor.Name);
-                    MapPoint SouthEast = new MapPoint(seLatPoint.ToString("N6"), seLonPoint.ToString("N6"), sensor.Name);
-
-                    SensorBoundingBox sbb = new SensorBoundingBox(sensor, NorthWest, SouthEast);
-
-                    sensorBoundings.Add(sbb);
+                    sensorBoundings.Add(GetSensorBoundingBox(sensor));
                 }
 
             }
+
             if (sensorBoundings.Count == 0)
             {
                 sensorBoundings = null;
             }
+
             return sensorBoundings;
+        }
+
+        public SensorBoundingBox GetSensorBoundingBox(Sensor sensor)
+        {
+
+            double lat = double.Parse(sensor.Latitude);
+            double lon = double.Parse(sensor.Longitude);
+            double earthRadius = 6378137;
+            double n = 300;
+            double e = 300;
+            double s = -300;
+            double w = -300;
+
+            double uLat = n / earthRadius;
+            double uLon = e / (earthRadius * Math.Cos(Math.PI * lat / 180));
+            double dLat = s / earthRadius;
+            double dLon = w / (earthRadius * Math.Cos(Math.PI * lat / 180));
+
+            double nwLatPoint = lat + uLat * 180 / Math.PI;
+            double nwLonPoint = lon + uLon * 180 / Math.PI;
+
+            double seLatPoint = lat + dLat * 180 / Math.PI;
+            double seLonPoint = lon + dLon * 180 / Math.PI;
+
+            MapPoint NorthWest = new MapPoint(nwLatPoint.ToString("N6"), nwLonPoint.ToString("N6"), sensor.Name + "_NorthWest");
+            MapPoint SouthEast = new MapPoint(seLatPoint.ToString("N6"), seLonPoint.ToString("N6"), sensor.Name + "_SouthEast");
+            MapPoint NorthEast = new MapPoint(seLatPoint.ToString("N6"), nwLonPoint.ToString("N6"), sensor.Name + "_NorthEast");
+            MapPoint SouthWest = new MapPoint(nwLatPoint.ToString("N6"), seLonPoint.ToString("N6"), sensor.Name + "_SouthWest");
+
+            SensorBoundingBox sbb = new SensorBoundingBox(sensor, NorthWest, SouthEast, NorthEast, SouthWest);
+
+            return sbb;
         }
 
         public double GetHourlyAvg(List<SensorsData> sensorData, string pollutant)
@@ -326,7 +346,7 @@ namespace RouteFinder.Controllers
                 AQIMin = 101;
                 AQIMax = 150;
             }
-            else  if (avgPM25 >= 65.5 && avgPM25 < 150.4)
+            else if (avgPM25 >= 65.5 && avgPM25 < 150.4)
             {
                 PM25Min = 65.5;
                 PM25Max = 150.4;
