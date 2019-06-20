@@ -59,6 +59,7 @@
 
             // Holds the route coordinates in the correct format to be displayed on the map when used in flightPath
             var routeCoordinates = @Html.Raw(ViewBag.Route);
+            var fastestCoordinates = @Html.Raw(ViewBag.RiskyMapRoute);
 
             //Create a line from the routeCoordinates
             var routePath = new google.maps.Polyline({
@@ -69,10 +70,24 @@
                 strokeWeight: 2
             });
 
+            //Create a line from the fastestRouteCoordinates
+            var fastRoutePath = new google.maps.Polyline({
+                path: fastestCoordinates,
+                geodesic: true,
+                strokeColor: '#00FF00',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+            });
+
+
             //Displays the sensors that were passed in as "ViewBag.Markers"
             for (i = 0; i < sensors.length; i++) {
                 var data = sensors[i]
                 var myLatlng = new google.maps.LatLng(data.lat, data.lng);
+                var north = null;
+                var south = null;
+                var east = null;
+                var west = null;
                 var marker = new google.maps.Marker({
                     //opacity: 0,
                     labelAnchor: { x: 0, y: 30 },
@@ -83,6 +98,23 @@
                     icon: data.aqi/*'http://maps.google.com/mapfiles/kml/pal4/icon57.png'*/,
                     label: data.aqi,
                 });
+
+                //var sensorBuffer = new google.maps.Rectangle({
+                //    strokeColor: '#FF0000',
+                //    strokeOpacity: 0.8,
+                //    strokeWeight: 1,
+                //    fillColor: '#FF0000',
+                //    fillOpacity: 0.35,
+                //    map: map,
+                //    bounds: {
+                //        north: ,
+                //        south: ,
+                //        east: ,
+                //        west:
+                //    }
+                //    label: data.name,
+                //});
+
 
                 if (data.aqi >= 151 && data.aqi <= 200) {
                     var sensorBuffer = new google.maps.Circle({
