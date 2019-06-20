@@ -1,4 +1,4 @@
-
+﻿
 @using RouteFinder.Models
 @model RouteFinder.Models.RouteViewModel 
 
@@ -253,8 +253,10 @@
         <div class='legend-source'>Source: <a href="#link to source">Name of source</a></div>
     </div>
 
-    @{int TotalTime = (int)Model.SafestRoute.TotalTravelTime / 60; }
-    @{int Distance = (int)Model.SafestRoute.TotalDistance}
+    @{
+        int TotalTime = (int)Model.SafeRoute.TotalTravelTime / 60;
+        int Distance = (int)Model.SafeRoute.TotalDistance;
+    }
 
     <div class="row">
 
