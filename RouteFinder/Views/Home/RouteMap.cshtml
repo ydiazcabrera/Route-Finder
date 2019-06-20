@@ -1,4 +1,6 @@
-﻿@{
+﻿@model RouteFinder.Models.Route
+@using RouteFinder.Models
+@{
     Layout = null;
     ViewBag.Title = "RouteMap";
     string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
@@ -65,7 +67,7 @@
             var routePath = new google.maps.Polyline({
                 path: routeCoordinates,
                 geodesic: true,
-                strokeColor: '#FF0000',
+                strokeColor: '#00FF00',
                 strokeOpacity: .5,
                 strokeWeight: 2.5
             });
@@ -74,7 +76,7 @@
             var fastRoutePath = new google.maps.Polyline({
                 path: fastestCoordinates,
                 geodesic: true,
-                strokeColor: '#00FF00',
+                strokeColor: '#FF0000',
                 strokeOpacity: .5,
                 strokeWeight: 2.5
             });
@@ -169,18 +171,14 @@
                         label: data.name,
                     });
                 }
-
-
             }
-           
-                fastRoutePath.setMap(map);
+
+
                 routePath.setMap(map);
-           
-           
-           
-            
+                fastRoutePath.setMap(map);
+
         }
-        
+
 
     </script>
 
@@ -254,9 +252,25 @@
         </div>
         <div class='legend-source'>Source: <a href="#link to source">Name of source</a></div>
     </div>
+
+    @{int TotalTime = (int)@Model.TotalTravelTime / 60; }
+    @{int Distance = (int)Model.TotalDistance}
+
     <div class="row">
-        <div class=""></div>
-        
+        <div class="col-lg-6">
+
+            @*@foreach(Maneuver m in Model.Maneuvers)
+                {
+                    <p>@m.TravelTime</p>
+
+                }*@
+        </div>
+        <div class="col-lg-6">
+
+
+            <p>@TotalTime</p>
+        </div>
+
     </div>
 
 

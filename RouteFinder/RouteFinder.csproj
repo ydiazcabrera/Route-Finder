@@ -179,6 +179,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\RouteMap.cshtml" />
     <Content Include="Views\Home\ConcentrationTable.cshtml" />
+    <Content Include="Views\Home\FinalMap.cshtml" />
     <None Include="Web.Secrets.config" />
   </ItemGroup>
   <ItemGroup>

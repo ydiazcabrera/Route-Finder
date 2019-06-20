@@ -73,7 +73,7 @@ namespace RouteFinder.Controllers
             ViewBag.Sensors = sensorMarkers;
             ViewBag.Route = GetRoute(safeRouteCoordinates);
 
-            return View();
+            return View(safeRoute);
         }
 
         public string GetMapCenter(List<RouteCoordinate> routeCoordinates)
