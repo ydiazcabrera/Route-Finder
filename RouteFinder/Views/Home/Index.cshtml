@@ -15,12 +15,8 @@
             width: 50%;
         }
     </style>
-</head>
-
-<body>
-    <div id="map"></div>
-
     <script>
+
         var map;
         function initMap() {
             var lat;
@@ -68,42 +64,113 @@
         google.maps.event.addDomListener(window, 'load', init_map);
 
     </script>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
 
-    <p><input type="button" value="Clear coordinates" onclick='refreshPage()' /></p>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        <div id="map"></div>
 
-    <script type="text/javascript">
+        <script async defer
+                src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
+        </script>
+        @*<div class="container">*@
+        ﻿<form action="~/Home/RouteMap" method="post" class="form-inline">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-primary active focus">
+                            <input type="radio" name="modeOfT" id="walk" value="pedestrian" onclick="setWalkChecked()" checked> Walk
+                        </label>
+                        <label class="btn btn-primary">
+                            <input type="radio" name="modeOfT" id="bike" value="bicycle" onclick="setBikeChecked()"> Bike
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 5px;">
+                @*<div class="form-group">*@
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <label for="startLat">&nbsp;&nbsp;&nbsp;Starting Latitude:</label>
+                        </span>
+                        <input class="form-control" type="text" name="startLat" id="startLat" placeholder="Enter Starting Latitude" value="" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <label for="endLat">&nbsp;&nbsp;&nbsp;Ending Latitude:</label>
+                        </span>
+                        <input class="form-control" type="text" name="endLat" id="endLat" placeholder="Enter Ending Latitude" value="" />
+                    </div>
+                </div>
+                @*</div>*@
+            </div>
+            <div class="row" style="margin-bottom: 5px;">
+                @*<div class="form-group">*@
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <label for="startLong">Starting Longitude:</label>
+                        </span>
+                        <input class="form-control" type="text" name="startLong" id="startLong" placeholder="Enter Starting Longitude" value="" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <label for="endLong">Ending Longitude:</label>
+                        </span>
+                        <input class="form-control" type="text" name="endLong" id="endLong" placeholder="Enter Ending Longitude" value="" />
+                    </div>
+                </div>
+                @*</div>*@
+            </div>
+            <div class="row" style="margin-bottom: 5px;">
+                <div class="col-md-3">
+                    <div class="btn-group">
+                        <input type="button" value="Clear coordinates" onclick='refreshPage()' class="btn btn-warning" />
+                        <input type="submit" name="submit" value="Go" class="btn btn-success" />
+                    </div>
+                </div>
+            </div>
 
-        function refreshPage() {
-            if (confirm("Are you sure, want to clear?")) {
-                location.reload();
+        </form>
+        <p></p>
+
+        <script type="text/javascript">
+
+            function refreshPage() {
+                if (confirm("Are you sure, want to clear?")) {
+                    location.reload();
+                }
             }
-        }
-    </script>
-    <script async defer
-            src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
-    </script>
-    ﻿<form action="~/Home/RouteMap" method="post">
+        </script>
+        @*</div>*@
+    </div>
 
-        <div class="form-group">
-            <label for="startLat">Starting Latitude: </label>
-            <input class="form-control" type="text" name="startLat" id="startLat" placeholder="Enter Starting Latitude" value="" />
-            <label for="startLong">Starting Longitude: </label>
-            <input class="form-control" type="text" name="startLong" id="startLong" placeholder="Enter Starting Longitude" value="" />
-        </div>
-        <div class="form-group">
-            <label for="endLat">Ending Latitude: </label>
-            <input class="form-control" type="text" name="endLat" id="endLat" placeholder="Enter Ending Latitude" value="" />
-            <label for="endLong">Ending Longitude: </label>
-            <input class="form-control" type="text" name="endLong" id="endLong" placeholder="Enter Ending Longitude" value="" />
-        </div>
-        <div class="btn-group" data-toggle="buttons">
-            <label class="btn btn-primary active focus">
-                <input type="radio" name="modeOfT" id="walk" value="pedestrian" onclick="setWalkChecked()" checked> Walk
-            </label>
-            <label class="btn btn-primary">
-                <input type="radio" name="modeOfT" id="bike" value="bicycle" onclick="setBikeChecked()"> Bike
-            </label>
-        </div>
-        <input type="submit" name="submit" value="Go" class="btn btn-success" />
-    </form>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
 </body>
