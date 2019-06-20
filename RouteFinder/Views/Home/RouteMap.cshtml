@@ -66,8 +66,8 @@
                 path: routeCoordinates,
                 geodesic: true,
                 strokeColor: '#FF0000',
-                strokeOpacity: 1.0,
-                strokeWeight: 2
+                strokeOpacity: .5,
+                strokeWeight: 2.5
             });
 
             //Create a line from the fastestRouteCoordinates
@@ -75,8 +75,8 @@
                 path: fastestCoordinates,
                 geodesic: true,
                 strokeColor: '#00FF00',
-                strokeOpacity: 1.0,
-                strokeWeight: 2
+                strokeOpacity: .5,
+                strokeWeight: 2.5
             });
 
 
@@ -172,9 +172,15 @@
 
 
             }
-
-            routePath.setMap(map);
+           
+                fastRoutePath.setMap(map);
+                routePath.setMap(map);
+           
+           
+           
+            
         }
+        
 
     </script>
 
