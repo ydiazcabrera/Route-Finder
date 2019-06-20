@@ -123,6 +123,27 @@ namespace RouteFinder.Models
             return routeCoordinates;
         }
 
+        public static List<Maneuver> GetManeuvers(string APIText)
+        {
+            List<Maneuver> maneuvers = new List<Maneuver>();
+
+            JToken json = JToken.Parse(APIText);
+            List<JToken> jsonTokens = json["response"]["route"][0]["leg"][0]["maneuver"].ToList();
+
+            for(int i = 0; i < jsonTokens.Count; i++)
+            {
+                JToken token;
+                string mToken = token.ToString();
+                string[] m = mToken.Split(',');
+                Maneuver man = new Maneuver(m);
+                maneuvers.Add(man);
+            }
+
+            return maneuvers;
+        }
+
+
+
         public static double GetTotalTravelTime(string APIText)
         {
             List<RouteCoordinate> routeCoordinates = new List<RouteCoordinate>();
