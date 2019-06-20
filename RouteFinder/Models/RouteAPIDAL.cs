@@ -95,6 +95,7 @@ namespace RouteFinder.Models
             route.RouteCoordinates = GetCoordinates(APIText);
             route.TotalTravelTime = GetTotalTravelTime(APIText);
             route.TotalDistance = GetTotalDistance(APIText);
+            route.Maneuvers = GetManeuvers(APIText);
 
             return route;
         }
@@ -122,6 +123,24 @@ namespace RouteFinder.Models
 
             return routeCoordinates;
         }
+
+        public static List<Maneuver> GetManeuvers(string APIText)
+        {
+            List<Maneuver> maneuvers = new List<Maneuver>();
+            JToken json = JToken.Parse(APIText);
+            List<JToken> jsonTokens = json["response"]["route"][0]["leg"][0]["maneuver"].ToList();
+            for (int i = 0; i < jsonTokens.Count; i++)
+            {
+
+                string instruction = jsonTokens[i]["instruction"].ToString();
+                double travelTime = double.Parse(jsonTokens[i]["travelTime"].ToString());
+                double distance = double.Parse(jsonTokens[i]["length"].ToString());
+                Maneuver man = new Maneuver(travelTime, distance, instruction);
+                maneuvers.Add(man);
+            }
+            return maneuvers;
+        }
+
 
         public static double GetTotalTravelTime(string APIText)
         {
