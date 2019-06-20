@@ -34,29 +34,24 @@ namespace RouteFinder.Controllers
             {
                 return RedirectToAction("Index");
             }
+
             //Combine long and lat into single string
             string startPoint = $"{startLat},{startLong}";
             string endPoint = $"{endLat},{endLong}";
 
-            //Get AQIs from for each sensor
-            //List<int> aqis = GetSensorAQIs();
-
             //Pull list of sensors directly from database.
-            List<Sensor> sensors = GetListSensors();
-
-            // Set AQI's on sensors
-            sensors = GetSensorAQIs(sensors);
+            List<Sensor> sensors = GetSensors();
 
             //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
-            List<SensorBoundingBox> sbb = GetSensorsToAvoid(sensors);
+            List<Sensor> sensorsAboveAQIThreshold = GetSensorsAboveAQIThreshold(sensors);
 
-            Route safeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sbb, modeOfT);
+            Route safeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sensorsAboveAQIThreshold, modeOfT);
             safeRoute.RouteCoordinatesString = GetRoute(safeRoute.RouteCoordinates);
             Session["SafeRoute"] = safeRoute;
 
             Route riskyRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, modeOfT);
             riskyRoute.RouteCoordinatesString = GetRoute(riskyRoute.RouteCoordinates);
-            
+
             //build map marker string for sensors on Google MAP API
             string sensorMarkers = GetMarkers(sensors);
 
@@ -75,7 +70,7 @@ namespace RouteFinder.Controllers
             ViewBag.RiskyMapSensors = sensorMarkers;
             //ViewBag.RiskyMapRoute = GetRoute(riskyRouteCoordinates);
 
-            RouteViewModel rvm = new RouteViewModel(safeRoute, riskyRoute); 
+            RouteViewModel rvm = new RouteViewModel(safeRoute, riskyRoute, sensors);
             return View(rvm);
         }
 
@@ -99,6 +94,10 @@ namespace RouteFinder.Controllers
                 markers += string.Format("'aqi': '{0}',", sensors[i].AQI);
                 markers += string.Format("'lat': '{0}',", sensors[i].Latitude);
                 markers += string.Format("'lng': '{0}',", sensors[i].Longitude);
+                markers += string.Format("'north': '{0}',", sensors[i].BoundingBox.NorthEast.Longitude);
+                markers += string.Format("'south': '{0}',", sensors[i].BoundingBox.SouthEast.Longitude);
+                markers += string.Format("'east': '{0}',", sensors[i].BoundingBox.NorthEast.Latitude);
+                markers += string.Format("'west': '{0}',", sensors[i].BoundingBox.NorthWest.Latitude);
                 //markers += string.Format("'description': '{0}'", "AQI: 50"); // This doesn't seem to be working
                 markers += "},";
             }
@@ -135,47 +134,55 @@ namespace RouteFinder.Controllers
             return sensorsData;
         }
 
-        public List<Sensor> GetSensorAQIs(List<Sensor> sensors)
+        public int GetSensorAQI(Sensor sensor)
         {
-            foreach (Sensor sensor in sensors)
+            int aqi = 0;
+            //Pull an hour of data from a sensor
+            List<SensorsData> sixtyMinSensorData = GetLastSixtyMinutesSensorData(sensor.Name);
+
+            if (sixtyMinSensorData.Count() == 0) //There was no data collected by the sensor for the time called
             {
-                int aqi = 0;
-                //Pull an hour of data from a sensor
-                List<SensorsData> sixtyMinSensorData = GetLastSixtyMinutesSensorData(sensor.Name);
 
-                if (sixtyMinSensorData.Count() == 0) //There was no data collected by the sensor for the time called
-                {
-                    sensor.AQI = 0;
-                    continue;
-                }
+                return 0;
+            }
 
-                // find the hourly average for ozone
-                double hourlyO3Avg = GetHourlyAvg(sixtyMinSensorData, "O3_PPB");
-                int aqiO3 = CalcluateO3AQI(hourlyO3Avg);
+            // find the hourly average for ozone
+            double hourlyO3Avg = GetHourlyAvg(sixtyMinSensorData, "O3_PPB");
+            int aqiO3 = CalcluateO3AQI(hourlyO3Avg);
 
-                // find the hourly average for particulate matter
-                double hourlyPM25Avg = GetHourlyAvg(sixtyMinSensorData, "PM25_MicroGramPerCubicMeter");
-                int aqiPM25 = CalcluatePM25AQI(hourlyPM25Avg);
+            // find the hourly average for particulate matter
+            double hourlyPM25Avg = GetHourlyAvg(sixtyMinSensorData, "PM25_MicroGramPerCubicMeter");
+            int aqiPM25 = CalcluatePM25AQI(hourlyPM25Avg);
 
-                if (aqiO3 > aqiPM25)
-                {
-                    aqi = aqiO3;
-                }
-                else
-                {
-                    aqi = aqiPM25;
-                }
+            if (aqiO3 > aqiPM25)
+            {
+                aqi = aqiO3;
+            }
+            else
+            {
+                aqi = aqiPM25;
+            }
 
-                //aqis.Add(aqi);
-                sensor.AQI = aqi;
+            //return aqi;
+            return aqi;
+        }
+
+        public List<Sensor> GetSensors()
+        {
+            List<Sensor> sensors = GetSensorsFromDatabase();
+
+            for (int i = 0; i < sensors.Count; i++)
+            {
+                sensors[i].BoundingBox = GetSensorBoundingBox(sensors[i]);
+                sensors[i].AQI = GetSensorAQI(sensors[i]);
 
             }
-            //return aqis;
+
             return sensors;
         }
 
         //public List<Sensor> GetListSensors(List<int> aqis)
-        public List<Sensor> GetListSensors()
+        public List<Sensor> GetSensorsFromDatabase()
         {
             try
             {
@@ -188,25 +195,25 @@ namespace RouteFinder.Controllers
 
         }
 
-        public List<SensorBoundingBox> GetSensorsToAvoid(List<Sensor> sensors)
+        public List<Sensor> GetSensorsAboveAQIThreshold(List<Sensor> sensors)
         {
-            List<SensorBoundingBox> sensorBoundings = new List<SensorBoundingBox>();
+            List<Sensor> sensorsAboveAQIThreshold = new List<Sensor>();
 
             foreach (Sensor sensor in sensors)
             {
                 if (sensor.AQI > 100)
                 {
-                    sensorBoundings.Add(GetSensorBoundingBox(sensor));
+                    sensorsAboveAQIThreshold.Add(sensor);
                 }
 
             }
 
-            if (sensorBoundings.Count == 0)
+            if (sensorsAboveAQIThreshold.Count == 0)
             {
-                sensorBoundings = null;
+                sensorsAboveAQIThreshold = null;
             }
 
-            return sensorBoundings;
+            return sensorsAboveAQIThreshold;
         }
 
         public SensorBoundingBox GetSensorBoundingBox(Sensor sensor)
