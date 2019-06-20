@@ -19,6 +19,11 @@ namespace RouteFinder.Controllers
             return View();
         }
 
+        public ActionResult About()
+        {
+            return View();
+        }
+
         [HttpPost]
         public ActionResult RouteMap(string startLong, string startLat, string endLong, string endLat, string modeOfT)
         {
