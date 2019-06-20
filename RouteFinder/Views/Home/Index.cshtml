@@ -23,8 +23,8 @@
     <script>
         var map;
         function initMap() {
-            var startlat;
-            var startlng;
+            var lat;
+            var lng;
 
             var opts = { 'center': new google.maps.LatLng(42.9634, -85.6681), 'zoom': 12, 'mapTypeId': google.maps.MapTypeId.ROADMAP }
             map = new google.maps.Map(document.getElementById('map'), opts);
@@ -36,26 +36,33 @@
                 var endlatValue = document.getElementById('endLat');
                 var endlngValue = document.getElementById('endLong');
 
+
                 if (startlatValue.value == "") {
-                    startlat = event.latLng.lat();
-                    startlng = event.latLng.lng();
-                    startlatValue.value = startlat;
-                    startlngValue.value = startlng;
+                    lat = event.latLng.lat();
+                    lng = event.latLng.lng();
+                    startlatValue.value = lat;
+                    startlngValue.value = lng;
+                    var marker = new google.maps.Marker({
+                        position: { lat: lat, lng: lng },
+                        map: map,
+                        label: 'Start'
+                    });
                 }
                 else if (endlngValue.value == "") {
-                    endlat = event.latLng.lat();
-                    endlng = event.latLng.lng();
-                    endlatValue.value = endlat;
-                    endlngValue.value = endlng;
+                    lat = event.latLng.lat();
+                    lng = event.latLng.lng();
+                    endlatValue.value = lat;
+                    endlngValue.value = lng;
+                    var marker = new google.maps.Marker({
+                        position: { lat: lat, lng: lng },
+                        map: map,
+                        label: 'End'
+                    });
                 }
                 else {
-                    alert("You already entered a start and end point.\nRefresh page to start over.");
+                    alert("You already entered a start and end point.\nClear coordinates to start over.");
                 }
 
-                var marker = new google.maps.Marker({
-                    position: { lat: startlat, lng: startlng },
-                    map: map
-                });
             });
         }
         google.maps.event.addDomListener(window, 'load', init_map);

@@ -45,13 +45,10 @@ namespace RouteFinder.Controllers
             //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
             List<SensorBoundingBox> sbb = AvoidSensor(sensors);
 
-            // Hard-coded start/end points and a square to avoid. This will eventually pull in values from the user and sensor AQIs
-            //List<RouteCoordinate> routeCoordinates = RouteAPIDAL.DisplayMap("42.906722,-85.725006", "42.960974,-85.605329", "42.969954,-85.639754", "42.927074,-85.609183");
             Route safeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sbb, modeOfT);
             List<RouteCoordinate> routeCoordinates = safeRoute.RouteCoordinates;
 
             // This section builds a string, which is passed to the view and used by the JS script to display the sensors
-            //ToDo - Find a way to display the name of the sensor / the AQI on the map without having to hover over the marker
             // https://forums.asp.net/t/2120631.aspx?Using+Razor+in+javascript+to+create+Google+map <= Citation
             string markers = "[";
             for (int i = 0; i < sensors.Count; i++)
@@ -81,7 +78,7 @@ namespace RouteFinder.Controllers
             }
             route += $"];";
 
-            //Finds center of map. Probably need to find more elogant solution.
+            //Finds center of map. Probably need to find more elegant solution.
             RouteCoordinate centerCoordinate = routeCoordinates[(routeCoordinates.Count() / 2)];
             string mapCenter = "{ lat: " + centerCoordinate.Latitude + ", lng: " + centerCoordinate.Longitude + " }";
 
