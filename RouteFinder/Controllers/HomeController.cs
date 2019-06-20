@@ -51,11 +51,12 @@ namespace RouteFinder.Controllers
             List<SensorBoundingBox> sbb = GetSensorsToAvoid(sensors);
 
             Route safeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sbb, modeOfT);
-            List<RouteCoordinate> safeRouteCoordinates = safeRoute.RouteCoordinates;
+            safeRoute.RouteCoordinatesString = GetRoute(safeRoute.RouteCoordinates);
+            Session["SafeRoute"] = safeRoute;
 
             Route riskyRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, modeOfT);
-            List<RouteCoordinate> riskyRouteCoordinates = riskyRoute.RouteCoordinates;
-
+            riskyRoute.RouteCoordinatesString = GetRoute(riskyRoute.RouteCoordinates);
+            
             //build map marker string for sensors on Google MAP API
             string sensorMarkers = GetMarkers(sensors);
 
@@ -63,17 +64,19 @@ namespace RouteFinder.Controllers
             // It also doesn't address the zoom level. We could probably use a C# or .NET geography library to find the 
             // distance between the two furthest points to set distance and zoom.
 
-            // Risky Map Route
-            ViewBag.RiskyMapCenter = GetMapCenter(riskyRouteCoordinates);
-            ViewBag.RiskyMapSensors = sensorMarkers;
-            ViewBag.RiskyMapRoute = GetRoute(riskyRouteCoordinates);
-
             //Safe Map Route
-            ViewBag.MapCenter = GetMapCenter(safeRouteCoordinates);
+            ViewBag.MapCenter = GetMapCenter(safeRoute.RouteCoordinates);
             ViewBag.Sensors = sensorMarkers;
-            ViewBag.Route = GetRoute(safeRouteCoordinates);
+            ViewBag.SafeRoute = safeRoute.RouteCoordinatesString;
+            //ViewBag.Route = GetRoute(safeRouteCoordinates);
 
-            return View();
+            // Risky Map Route
+            ViewBag.RiskyMapCenter = GetMapCenter(riskyRoute.RouteCoordinates);
+            ViewBag.RiskyMapSensors = sensorMarkers;
+            //ViewBag.RiskyMapRoute = GetRoute(riskyRouteCoordinates);
+
+            RouteViewModel rvm = new RouteViewModel(safeRoute, riskyRoute); 
+            return View(rvm);
         }
 
         public string GetMapCenter(List<RouteCoordinate> routeCoordinates)
