@@ -172,9 +172,19 @@
 
 
             }
-
-            routePath.setMap(map);
+            if (fastRoutePath.length < routePath.length)
+            {
+                routePath.setMap(map);
+                fastRoutePath.setMap(map);
+            }
+            else
+            {
+                routePath.setMap(map);
+            }
+           
+            
         }
+        
 
     </script>
 
