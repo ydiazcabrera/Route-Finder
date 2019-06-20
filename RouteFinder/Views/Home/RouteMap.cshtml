@@ -1,8 +1,10 @@
-﻿@{
+﻿@model RouteFinder.Models.RouteViewModel 
+@{
     Layout = null;
     ViewBag.Title = "RouteMap";
     string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
 }
+
 
 <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
@@ -58,16 +60,16 @@
             });
 
             // Holds the route coordinates in the correct format to be displayed on the map when used in flightPath
-            var routeCoordinates = @Html.Raw(ViewBag.Route);
-            var fastestCoordinates = @Html.Raw(ViewBag.RiskyMapRoute);
+            var routeCoordinates = @Html.Raw(Model.SafeRoute.RouteCoordinatesString);
+            var fastestCoordinates = @Html.Raw(Model.FastRoute.RouteCoordinatesString);
 
             //Create a line from the routeCoordinates
             var routePath = new google.maps.Polyline({
                 path: routeCoordinates,
                 geodesic: true,
                 strokeColor: '#FF0000',
-                strokeOpacity: 1.0,
-                strokeWeight: 2
+                strokeOpacity: .5,
+                strokeWeight: 2.5
             });
 
             //Create a line from the fastestRouteCoordinates
@@ -75,8 +77,8 @@
                 path: fastestCoordinates,
                 geodesic: true,
                 strokeColor: '#00FF00',
-                strokeOpacity: 1.0,
-                strokeWeight: 2
+                strokeOpacity: .5,
+                strokeWeight: 2.5
             });
 
 
@@ -169,11 +171,9 @@
                         label: data.name,
                     });
                 }
-
-
             }
-
-            routePath.setMap(map);
+                fastRoutePath.setMap(map);
+                routePath.setMap(map);
         }
 
     </script>
@@ -250,9 +250,7 @@
     </div>
     <div class="row">
         <div class=""></div>
-        
     </div>
-
 
     @*<div>
             <img src="https://mde.maryland.gov/programs/Air/AirQualityMonitoring/PublishingImages/Widget/AQI.png" alt="Alternate Text" />
