@@ -295,24 +295,33 @@
         int FastDistance = (int)Model.FastRoute.TotalDistance;
         string FastModeOfTransportation = (string)Model.FastRoute.ModeOfTransportation;
     }
-
-    <div class="row">
-
-        <div class="col-lg-6">
-
-            @*@foreach(Maneuver m in Model.Maneuvers)
-                {
-                    <p>@m.TravelTime</p>
-
-                }*@
+    <div>
+        <div class="row">
+            <div class="col-sm-2">Mode Of T</div>
+            <div class="col-sm-4">Walk</div>
+            <div class="col-sm-4">Bike</div>
         </div>
-        <div class="col-lg-6">
-
-
-            <p>@TotalTime</p>
+        <div class="row">
+            <div class="col-sm-2">Route</div>
+            <div class="col-sm-2">Safe</div>
+            <div class="col-sm-2">Fast</div>
+            <div class="col-sm-2">Safe</div>
+            <div class="col-sm-2">Fast</div>
         </div>
-
-
+        <div class="row">
+            <div class="col-sm-2">Distance</div>
+            <div class="col-sm-2">@Distance</div>
+            <div class="col-sm-2">@FastDistance</div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-2"></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">Time</div>
+            <div class="col-sm-2"><p>@TotalTime</p></div>
+            <div class="col-sm-2"><p>@FastTotalTime</p></div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-2"></div>
+        </div>
     </div>
 
     @*<div>
