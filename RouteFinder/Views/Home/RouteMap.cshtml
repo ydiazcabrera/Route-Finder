@@ -219,7 +219,36 @@
 
           fastRoutePath.setMap(map);
           routePath.setMap(map);
+            }
+        var circle = new google.maps.Circle({
+            strokeColor: '#00E400',
+            strokeOpacity: 0.8,
+            strokeWeight: 1,
+            fillColor: '#00E400',
+            fillOpacity: 0.35,
+            map: map,
+            center: myLatlng,
+            radius: 300,
+            label: data.name,
+        });
+        var icons = {
+            Sensor: {
+                name: 'Sensor',
+                icon: circle
+            }
+
+        };
+
+        var legend = document.getElementById('legend');
+        for (var key in icons) {
+            var type = icons[key];
+            var name = type.name;
+            var icon = type.icon;
+            var div = document.createElement('div');
+            div.innerHTML = '<img src="' + icon + '"> ' + name;
+            legend.appendChild(div);
         }
+        
 
 
 
@@ -312,6 +341,9 @@
         <div class='legend-source'>Source: <a href="#link to source">Name of source</a></div>
     </div>
 
+    
+   
+
     @{
         double TotalTime = (double)Model.SafeWalkRoute.TotalTravelTime / 60;
         double Distance = (double)Model.SafeWalkRoute.TotalDistance / 1609;
@@ -360,10 +392,10 @@
                     <div class="btn-group">
 
                         @*<input type="hidden" name="startLong" value="@Model.SafeRoute.RouteCoordinates[0].Longitude" />
-                                      <input type="hidden" name="startLat" value="@Model.SafeRoute.RouteCoordinates[0].Latitude" />
-                        <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
-                        <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
-                        <input type="hidden" name="modeOfT" value="@Model.SafeRoute.ModeOfTransportation" />*@
+                                          <input type="hidden" name="startLat" value="@Model.SafeRoute.RouteCoordinates[0].Latitude" />
+                            <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
+                            <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
+                            <input type="hidden" name="modeOfT" value="@Model.SafeRoute.ModeOfTransportation" />*@
 
 
                         <input type="submit" name="finalMap" value="CheckoutMap" class="btn btn-warning" />
@@ -384,7 +416,7 @@
             </form>
 
         </div>
-            <div class="row">
+        <div class="row">
 
         </div>
         <div class="row">
@@ -440,4 +472,6 @@
     </script>
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+
+    <div id="legend"><p>Legend</p></div>
 </body>
