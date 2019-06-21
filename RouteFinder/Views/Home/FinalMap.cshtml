@@ -1,19 +1,57 @@
-﻿@model RouteFinder.Models.RouteViewModel
+﻿@using RouteFinder.Models
+@model RouteFinder.Models.RouteViewModel
+
+
 @{
-    Layout = null;
+    int TotalTime = (int)Model.SafeRoute.TotalTravelTime / 60;
+    int Distance = (int)Model.SafeRoute.TotalDistance;
+    string ModeOfTransportation = (string)Model.SafeRoute.ModeOfTransportation;
+
+    int FastTotalTime = (int)Model.FastRoute.TotalTravelTime / 60;
+    int FastDistance = (int)Model.FastRoute.TotalDistance;
+    string FastModeOfTransportation = (string)Model.FastRoute.ModeOfTransportation;
+
+    //int TotalTime = (int)Model.SafeRoute.TotalTravelTime / 60;
+    //int Distance = (int)Model.SafeRoute.TotalDistance;
+    //string ModeOfTransportation = (string)Model.SafeRoute.ModeOfTransportation;
+
+    //int FastTotalTime = (int)Model.FastRoute.TotalTravelTime / 60;
+    //int FastDistance = (int)Model.FastRoute.TotalDistance;
+    //string FastModeOfTransportation = (string)Model.FastRoute.ModeOfTransportation;
 }
 
-<!DOCTYPE html>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title></title>
-</head>
-<body>
-    <div>
-    <h1>Under Construction...</h1>
-        <p>Deal with it</p>
-    </div>
-</body>
-</html>
+<div class="row">
+    <div class="col-sm-2">Mode Of T</div>
+    <div class="col-sm-4">Walk</div>
+    <div class="col-sm-4">Bike</div>
+</div>
+<div class="row">
+    <div class="col-sm-2">Route</div>
+    <div class="col-sm-2">Safe</div>
+    <div class="col-sm-2">Fast</div>
+    <div class="col-sm-2">Safe</div>
+    <div class="col-sm-2">Fast</div>
+</div>
+<div class="row">
+    <div class="col-sm-2">Distance</div>
+    <div class="col-sm-2">@Distance</div>
+    <div class="col-sm-2">@FastDistance</div>
+    <div class="col-sm-2"></div>
+    <div class="col-sm-2"></div>
+</div>
+<div class="row">
+    <div class="col-sm-2">Time</div>
+    <div class="col-sm-2"><p>@TotalTime</p></div>
+    <div class="col-sm-2"><p>@FastTotalTime</p></div>
+    <div class="col-sm-2"></div>
+    <div class="col-sm-2"></div>
+</div>
+
+
+
+@foreach (Maneuver m in Model.Maneuvers)
+{
+    <p>@m.TravelTime</p>
+
+}
