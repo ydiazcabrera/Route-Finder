@@ -319,40 +319,48 @@
 
     @{
 
-        int TotalTime = (int)Model.SafeRoute.TotalTravelTime / 60;
-        int Distance = (int)Model.SafeRoute.TotalDistance;
-        string ModeOfTransportation = (string)Model.SafeRoute.ModeOfTransportation;
+        int TotalTime = (int)Model.SafeWalkRoute.TotalTravelTime / 60;
+        int Distance = (int)Model.SafeWalkRoute.TotalDistance;
+        string ModeOfTransportation = (string)Model.SafeWalkRoute.ModeOfTransportation;
 
-        int FastTotalTime = (int)Model.FastRoute.TotalTravelTime / 60;
-        int FastDistance = (int)Model.FastRoute.TotalDistance;
-        string FastModeOfTransportation = (string)Model.FastRoute.ModeOfTransportation;
+        int FastTotalTime = (int)Model.FastWalkRoute.TotalTravelTime / 60;
+        int FastDistance = (int)Model.FastWalkRoute.TotalDistance;
+        string FastModeOfTransportation = (string)Model.FastWalkRoute.ModeOfTransportation;
+
+        int BikeTotalTime = (int)Model.SafeBikeRoute.TotalTravelTime / 60;
+        int BikeDistance = (int)Model.SafeBikeRoute.TotalDistance;
+        string BikeModeOfTransportation = (string)Model.SafeBikeRoute.ModeOfTransportation;
+
+        int BikeFastTotalTime = (int)Model.FastBikeRoute.TotalTravelTime / 60;
+        int BikeFastDistance = (int)Model.FastBikeRoute.TotalDistance;
+        string BikeFastModeOfTransportation = (string)Model.FastBikeRoute.ModeOfTransportation;
     }
-    <div class="container" style="border:solid 1px black;width:100%;height:100%;">
-        <div class="row" style="height:10%;border:solid 1px red;background-color:gray;">
+    <div class="container" >
+        <div class="row" >
             <div class="col-sm-2">Mode Of T</div>
             <div class="col-sm-4">Walk</div>
             <div class="col-sm-4">Bike</div>
         </div>
-        <div class="row" style="height:10%;border:solid 1px black; background-color: lightgreen;">
+        <div class="row" >
             <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Route</div>
             <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Safe</div>
             <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Fast</div>
             <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Safe</div>
             <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Fast</div>
         </div>
-        <div class="row" style="height:10%;border:solid 1px red;">
+        <div class="row" >
             <div class="col-sm-2">Distance</div>
             <div class="col-sm-2">@Distance</div>
             <div class="col-sm-2">@FastDistance</div>
-            <div class="col-sm-2"></div>
-            <div class="col-sm-2"></div>
+            <div class="col-sm-2">@BikeDistance</div>
+            <div class="col-sm-2">@BikeFastDistance</div>
         </div>
-        <div class="row" style="height:10%;border:solid 1px red;">
+        <div class="row" >
             <div class="col-sm-2">Time</div>
             <div class="col-sm-2"><p>@TotalTime</p></div>
             <div class="col-sm-2"><p>@FastTotalTime</p></div>
-            <div class="col-sm-2"></div>
-            <div class="col-sm-2"></div>
+            <div class="col-sm-2">@BikeTotalTime</div>
+            <div class="col-sm-2">@BikeFastTotalTime</div>
         </div>
     </div>
 
