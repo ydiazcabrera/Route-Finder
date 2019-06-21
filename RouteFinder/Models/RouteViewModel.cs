@@ -7,16 +7,20 @@ namespace RouteFinder.Models
 {
     public class RouteViewModel
     {
-        public Route SafeRoute { get; set; }
-        public Route FastRoute { get; set; }
+        public Route SafeBikeRoute { get; set; }
+        public Route FastBikeRoute { get; set; }
+        public Route SafeWalkRoute { get; set; }
+        public Route FastWalkRoute { get; set; }
         public List<Sensor> Sensors { get; set; }
         public List<Maneuver> Maneuvers { get; set; }
 
 
-        public RouteViewModel(Route safeRoute, Route fastRoute, List<Sensor> sensors)
+        public RouteViewModel(Route safeBikeRoute, Route fastBikeRoute, Route safeWalkRoute, Route fastWalkRoute, List<Sensor> sensors)
         {
-            SafeRoute = safeRoute;
-            FastRoute = fastRoute;
+            SafeBikeRoute = safeBikeRoute;
+            FastBikeRoute = fastBikeRoute;
+            SafeWalkRoute = safeWalkRoute;
+            FastWalkRoute = fastWalkRoute;
             Sensors = sensors;
         }
 
