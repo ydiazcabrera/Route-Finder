@@ -12,5 +12,6 @@ namespace RouteFinder.Models
         public double TotalDistance { get; set; }
         public List<Maneuver> Maneuvers { get; set; }
         public List<RouteCoordinate> RouteCoordinates { get; set; }
+        public string RouteCoordinatesString { get; set; }
     }
 }
