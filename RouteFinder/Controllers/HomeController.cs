@@ -99,11 +99,12 @@ namespace RouteFinder.Controllers
         //public ActionResult FinalMap(int id)
         //public ActionResult FinalMap(RouteViewModel finalMap)
         //public ActionResult FinalMap(string startLong, string startLat, string endLong, string endLat, string modeOfT, string routeSelected)
-        //{
-        //    return View();
-        //}
+        public ActionResult FinalMap()
+        {
+            return View();
+        }
 
-        public string GetMapCenter(List<RouteCoordinate> routeCoordinates)
+    public string GetMapCenter(List<RouteCoordinate> routeCoordinates)
         {
             //Finds center of map. Probably need to find more elogant solution.
             RouteCoordinate centerCoordinate = routeCoordinates[(routeCoordinates.Count() / 2)];
