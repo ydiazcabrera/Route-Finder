@@ -34,7 +34,7 @@ namespace RouteFinder.Models
         /// <param name="avoidTopLeftCoordinates">Long/Lat of top left corner of square to avoid</param>
         /// <param name="avoidBottomRightCoordinates">Long/Lat of bottom right corner of square to avoid</param>
         /// <returns>Image URL</returns>
-        public static Route DisplayMap(string startPoint, string endPoint, List<SensorBoundingBox> sensorsToAvoid = null, string mode = "pedestrian")
+        public static Route DisplayMap(string startPoint, string endPoint, List<Sensor> sensorsToAvoid = null, string mode = "pedestrian")
         {
             Route route = GetRoute(startPoint, endPoint, sensorsToAvoid, mode);
 
@@ -57,7 +57,7 @@ namespace RouteFinder.Models
         /// <param name="avoidTopLeftCoordinates">Long/Lat of top left corner of square to avoid</param>
         /// <param name="avoidBottomRightCoordinates">Long/Lat of bottom right corner of square to avoid</param>
         /// <returns> A list of coordinates for route</returns>
-        public static Route GetRoute(string startPoint, string endPoint, List<SensorBoundingBox> sensorsToAvoid = null, string mode = "pedestrian")
+        public static Route GetRoute(string startPoint, string endPoint, List<Sensor> sensorsToAvoid = null, string mode = "pedestrian")
         {
             Route route = new Route();
             route.ModeOfTransportation = mode;
@@ -71,13 +71,13 @@ namespace RouteFinder.Models
                 URL += "&avoidareas=";
                 for (int i = 0; i < sensorsToAvoid.Count; i++)
                 {
-                    string sensor = sensorsToAvoid[i].NorthWest.Latitude;
-                    sensor += "," + sensorsToAvoid[i].NorthWest.Longitude;
+                    string sensor = sensorsToAvoid[i].BoundingBox.NorthWest.Latitude;
+                    sensor += "," + sensorsToAvoid[i].BoundingBox.NorthWest.Longitude;
 
                     sensor += ";";
 
-                    sensor += sensorsToAvoid[i].SouthEast.Latitude;
-                    sensor += "," + sensorsToAvoid[i].SouthEast.Longitude;
+                    sensor += sensorsToAvoid[i].BoundingBox.SouthEast.Latitude;
+                    sensor += "," + sensorsToAvoid[i].BoundingBox.SouthEast.Longitude;
 
                     if (i != sensorsToAvoid.Count - 1)
                     {
