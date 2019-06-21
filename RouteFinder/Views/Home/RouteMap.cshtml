@@ -290,15 +290,10 @@
         <div class="row" style="margin-bottom: 5px;">
             <div class="col-md-3">
                 <div class="btn-group">
-                    
-                    @*<input type="hidden" name="startLong" value="@Model.SafeRoute.RouteCoordinates[0].Longitude" />
-                    <input type="hidden" name="startLat" value="@Model.SafeRoute.RouteCoordinates[0].Latitude" />
-                    <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
-                    <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
-                    <input type="hidden" name="modeOfT" value="@Model.SafeRoute.ModeOfTransportation" />*@
-                    <input type="radio" name="FastOrSafe" value="Fast" /> Fast Route
-                    <input type="radio" name="FastOrSafe" value="Safe" /> Safe Route
-                    <input type="submit" name="finalMap" value="CheckoutMap" class="btn btn-warning" />
+                    <input type="hidden" name="modeOfTransportation" value="@selectedModeOfTransportation" />
+                    <input type="radio" name="safeOrFast" value="fast" /> Fast Route
+                    <input type="radio" name="safeOrFast" value="safe" /> Safe Route
+                    <input type="submit" name="finalMap" value="checkoutMap" class="btn btn-warning" />
                 </div>
             </div>
         </div>
