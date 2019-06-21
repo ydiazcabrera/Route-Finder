@@ -1,6 +1,6 @@
 ﻿
 @using RouteFinder.Models
-@model RouteFinder.Models.RouteViewModel 
+@model RouteFinder.Models.RouteViewModel
 
 @{
     Layout = null;
@@ -89,10 +89,10 @@
             for (i = 0; i < sensors.length; i++) {
                 var data = sensors[i]
                 var myLatlng = new google.maps.LatLng(data.lat, data.lng);
-                var north = null;
-                var south = null;
-                var east = null;
-                var west = null;
+                var north = sensors[i].north;
+                var south = sensors[i].south;
+                var east = sensors[i].east;
+                var west = sensors[i].west;
                 var marker = new google.maps.Marker({
                     //opacity: 0,
                     labelAnchor: { x: 0, y: 30 },
@@ -122,16 +122,31 @@
 
 
                 if (data.aqi >= 151 && data.aqi <= 200) {
-                    var sensorBuffer = new google.maps.Circle({
+                    //var sensorBuffer = new google.maps.Circle({
+                    //    strokeColor: '#FF0000',
+                    //    strokeOpacity: 0.8,
+                    //    strokeWeight: 1,
+                    //    fillColor: '#FF0000',
+                    //    fillOpacity: 0.35,
+                    //    map: map,
+                    //    center: myLatlng,
+                    //    radius: 300,
+                    //    label: data.name,
+                    //});
+                    var sensorBuffer = new google.maps.Rectangle({
                         strokeColor: '#FF0000',
                         strokeOpacity: 0.8,
                         strokeWeight: 1,
                         fillColor: '#FF0000',
                         fillOpacity: 0.35,
                         map: map,
-                        center: myLatlng,
-                        radius: 300,
-                        label: data.name,
+                        bounds: {
+                            north: north,
+                            south: south,
+                            east: east,
+                            west: west
+                        }
+                        //label: data.name
                     });
                 }
                 else if (data.aqi >= 101 && data.aqi <= 150) {
@@ -180,6 +195,8 @@
           routePath.setMap(map);
         }
 
+
+
     </script>
 
     <!--Legend Styling-->
@@ -227,18 +244,34 @@
             color: #777;
         }
     </style>
-    <div class="row">
-        <div class="col-md-2">
-            <div class="btn-group" data-toggle="buttons">
-                <label class="btn btn-primary active focus">
-                    <input type="radio" name="modeOfT" id="walk" value="pedestrian" onclick="setWalkChecked()" checked> Walk
-                </label>
-                <label class="btn btn-primary">
-                    <input type="radio" name="modeOfT" id="bike" value="bicycle" onclick="setBikeChecked()"> Bike
-                </label>
+    <form action="~/Home/RouteMap" method="post" id="routeMapForm" style="margin-top: 5px;">
+        <div class="row" style="margin-bottom: 5px;">
+            <div class="col-md-3">
+                <div class="btn-group">
+                    <input type="hidden" name="startLong" value="@Model.SafeRoute.RouteCoordinates[0].Longitude" />
+                    <input type="hidden" name="startLat" value="@Model.SafeRoute.RouteCoordinates[0].Latitude" />
+                    <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
+                    <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
+                    <input type="submit" name="modeOfT" value="pedestrian" class="btn btn-warning" />
+                    <input type="submit" name="modeOfT" value="bicycle" class="btn btn-success" />
+                </div>
             </div>
         </div>
-    </div>
+    </form>
+    <form action="~/Home/RouteMap" method="post" style="margin-top: 5px;">
+        <div class="row" style="margin-bottom: 5px;">
+            <div class="col-md-3">
+                <div class="btn-group">
+                    <input type="hidden" name="startLong" value="@Model.SafeRoute.RouteCoordinates[0].Longitude" />
+                    <input type="hidden" name="startLat" value="@Model.SafeRoute.RouteCoordinates[0].Latitude" />
+                    <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
+                    <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
+                    <input type="hidden" name="modeOfT" value="@Model.SafeRoute.ModeOfTransportation" />
+                    <input type="submit" name="finalMap" value="yes" class="btn btn-warning" />
+                </div>
+            </div>
+        </div>
+    </form>
     <div class='my-legend'>
         <div class='legend-title'>AQI Index</div>
         <div class='legend-scale'>
@@ -265,19 +298,19 @@
 
     <div class="row">
 
-      <div class="col-lg-6">
+        <div class="col-lg-6">
 
-          @*@foreach(Maneuver m in Model.Maneuvers)
-              {
-                  <p>@m.TravelTime</p>
+            @*@foreach(Maneuver m in Model.Maneuvers)
+                {
+                    <p>@m.TravelTime</p>
 
-              }*@
-      </div>
-      <div class="col-lg-6">
+                }*@
+        </div>
+        <div class="col-lg-6">
 
 
-          <p>@TotalTime</p>
-      </div>
+            <p>@TotalTime</p>
+        </div>
 
 
     </div>
@@ -287,6 +320,9 @@
         </div>*@
     <script async defer
             src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
+        document.getElementById('routeMapForm').addEventListener("click", (e) => {
+            this.forms.submit();
+        });
     </script>
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
