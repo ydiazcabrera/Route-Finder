@@ -92,16 +92,43 @@ namespace RouteFinder.Controllers
             Session["ModeOfTransportation"] = modeOfT;
 
             RouteViewModel rvm = new RouteViewModel(safeBikeRoute, fastBikeRoute, safeWalkRoute, fastWalkRoute, sensors);
-
+            Session["rvm"] = rvm;
             return View(rvm);
         }
 
         //public ActionResult FinalMap(int id)
         //public ActionResult FinalMap(RouteViewModel finalMap)
         //public ActionResult FinalMap(string startLong, string startLat, string endLong, string endLat, string modeOfT, string routeSelected)
-        public ActionResult FinalMap()
+        public ActionResult FinalMap(string modeOfTransportation, string safeOrFast)
         {
-            return View();
+            Route route = new Route();
+            RouteViewModel rvm = (RouteViewModel)Session["rvm"];
+            if(modeOfTransportation == "pedestrian")
+            {
+                if(safeOrFast == "safe")
+                {
+                    route = rvm.SafeWalkRoute;
+                }
+                else
+                {
+                    route = rvm.FastWalkRoute;
+                }
+            }
+            else
+            {
+                if(safeOrFast == "safe")
+                {
+                    route = rvm.SafeBikeRoute;
+                }
+                else
+                {
+                    route = rvm.FastBikeRoute;
+                }
+            }
+
+            ViewBag.MapCenter = GetMapCenter(route.RouteCoordinates);
+
+            return View(route);
         }
 
     public string GetMapCenter(List<RouteCoordinate> routeCoordinates)
