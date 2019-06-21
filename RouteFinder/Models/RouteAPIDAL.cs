@@ -9,23 +9,6 @@ namespace RouteFinder.Models
 {
     public class RouteAPIDAL
     {
-        ////instantiate entity db class of sensors instead of hardcoding them in here
-        //public List<Sensor> sensors = new List<Sensor>
-        //{
-        //        new Sensor( "42.9420703", "-85.6847243", "106", "OST"),
-        //        new Sensor( "42.9547237", "-85.6824347", "107", "OST"),
-        //        new Sensor( "42.9274400", "-85.6604877", "111", "OST"),
-        //        new Sensor( "42.984136", "-85.671280", "101", "OST"),
-        //        new Sensor( "42.9372291", ":-85.6669082", "115", "OST"),
-        //        new Sensor( "42.92732229883891", "-85.64665123059183", "24358c", "SIMMS"),
-        //        new Sensor( "42.904438", "-85.5814071", "232915", "SIMMS"),
-        //        new Sensor( "42.9414937",  "-85.658029", "23339e", "SIMMS"),
-        //        new Sensor( "42.9472356", "-85.6822996", "105", "OST"),
-        //        new Sensor( "42.9201462", "-85.6476561", "108", "OST"),
-        //        new Sensor( "42.984136", "-85.671280", "23acbc", "SIMMS"),
-        //        new Sensor( "42.9467373", "-85.6843539", "117", "OST")
-        //};
-
         /// <summary>
         /// Method to get a map to display
         /// </summary>
@@ -99,7 +82,6 @@ namespace RouteFinder.Models
 
             return route;
         }
-
 
         /// <summary>
         /// Parses Json to get coordinates from APIText String
