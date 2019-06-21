@@ -17,5 +17,10 @@ namespace RouteFinder.Models
             FastRoute = fastRoute;
             Sensors = sensors;
         }
+
+        public RouteViewModel()
+        {
+
+        }
     }
 }

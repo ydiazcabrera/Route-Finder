@@ -25,7 +25,7 @@ namespace RouteFinder.Controllers
         }
 
         [HttpPost]
-        public ActionResult RouteMap(string startLong, string startLat, string endLong, string endLat, string modeOfT)
+        public ActionResult RouteMap(string startLong, string startLat, string endLong, string endLat, string modeOfT, string finalMap = "no")
         {
             // Makes sure data is entered in form, but doesn't account for invalid data.
             // Need to add validation in action or in the api call. I would assume we could make sure
@@ -71,7 +71,18 @@ namespace RouteFinder.Controllers
             //ViewBag.RiskyMapRoute = GetRoute(riskyRouteCoordinates);
 
             RouteViewModel rvm = new RouteViewModel(safeRoute, riskyRoute, sensors);
+            
+            if(finalMap == "yes")
+            {
+                return RedirectToAction("FinalMap", new { RVM = rvm });
+            }
+
             return View(rvm);
+        }
+
+        public ActionResult FinalMap(RouteViewModel RVM)
+        {
+            return View(RVM);
         }
 
         public string GetMapCenter(List<RouteCoordinate> routeCoordinates)

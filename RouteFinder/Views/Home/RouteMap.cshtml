@@ -258,6 +258,20 @@
             </div>
         </div>
     </form>
+    <form action="~/Home/RouteMap" method="post" style="margin-top: 5px;">
+        <div class="row" style="margin-bottom: 5px;">
+            <div class="col-md-3">
+                <div class="btn-group">
+                    <input type="hidden" name="startLong" value="@Model.SafeRoute.RouteCoordinates[0].Longitude" />
+                    <input type="hidden" name="startLat" value="@Model.SafeRoute.RouteCoordinates[0].Latitude" />
+                    <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
+                    <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
+                    <input type="hidden" name="modeOfT" value="@Model.SafeRoute.ModeOfTransportation" />
+                    <input type="submit" name="finalMap" value="yes" class="btn btn-warning" />
+                </div>
+            </div>
+        </div>
+    </form>
     <div class='my-legend'>
         <div class='legend-title'>AQI Index</div>
         <div class='legend-scale'>
