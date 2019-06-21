@@ -256,6 +256,11 @@
     @{
         int TotalTime = (int)Model.SafeRoute.TotalTravelTime / 60;
         int Distance = (int)Model.SafeRoute.TotalDistance;
+        string ModeOfTransportation = (string)Model.SafeRoute.ModeOfTransportation;
+
+        int FastTotalTime = (int)Model.FastRoute.TotalTravelTime / 60;
+        int FastDistance = (int)Model.FastRoute.TotalDistance;
+        string FastModeOfTransportation = (string)Model.FastRoute.ModeOfTransportation;
     }
 
     <div class="row">
