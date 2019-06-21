@@ -12,6 +12,8 @@ namespace RouteFinder.Models
         public Route SafeWalkRoute { get; set; }
         public Route FastWalkRoute { get; set; }
         public List<Sensor> Sensors { get; set; }
+        public List<Maneuver> Maneuvers { get; set; }
+
 
         public RouteViewModel(Route safeBikeRoute, Route fastBikeRoute, Route safeWalkRoute, Route fastWalkRoute, List<Sensor> sensors)
         {
