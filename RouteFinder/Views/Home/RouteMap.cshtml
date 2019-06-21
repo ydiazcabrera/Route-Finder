@@ -1,11 +1,24 @@
-﻿
-@using RouteFinder.Models
+﻿@*@using RouteFinder.Models*@
 @model RouteFinder.Models.RouteViewModel
 
 @{
     Layout = null;
     ViewBag.Title = "RouteMap";
     string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
+    string selectedModeOfTransportation = (string)Session["ModeOfTransportation"];
+    string safeRoute = "";
+    string fastRoute = "";
+
+    if ( selectedModeOfTransportation == "pedestrian")
+    {
+        safeRoute = Model.SafeWalkRoute.RouteCoordinatesString;
+        fastRoute = Model.FastWalkRoute.RouteCoordinatesString;
+    }
+    else
+    {
+        safeRoute = Model.SafeBikeRoute.RouteCoordinatesString;
+        fastRoute = Model.FastBikeRoute.RouteCoordinatesString;
+    }
 }
 
 
@@ -52,7 +65,7 @@
     <div id="map"></div>
     <script>
 
-        var sensors = @Html.Raw(ViewBag.Sensors);
+        var sensors = @Html.Raw(ViewBag.Sensors) //ToDo - Change this to come in from ViewModel
 
         function initMap() {
             //Create a new map
@@ -63,8 +76,8 @@
             });
 
             // Holds the route coordinates in the correct format to be displayed on the map when used in flightPath
-            var routeCoordinates = @Html.Raw(Model.SafeRoute.RouteCoordinatesString);
-            var fastestCoordinates = @Html.Raw(Model.FastRoute.RouteCoordinatesString);
+            var routeCoordinates = @Html.Raw(safeRoute);
+            var fastestCoordinates = @Html.Raw(fastRoute);
 
             //Create a line from the routeCoordinates
             var routePath = new google.maps.Polyline({
@@ -248,30 +261,33 @@
         <div class="row" style="margin-bottom: 5px;">
             <div class="col-md-3">
                 <div class="btn-group">
-                    <input type="hidden" name="startLong" value="@Model.SafeRoute.RouteCoordinates[0].Longitude" />
-                    <input type="hidden" name="startLat" value="@Model.SafeRoute.RouteCoordinates[0].Latitude" />
-                    <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
-                    <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
+                    <input type="hidden" name="startLong" value="@Model.SafeWalkRoute.RouteCoordinates[0].Longitude" />
+                    <input type="hidden" name="startLat" value="@Model.SafeWalkRoute.RouteCoordinates[0].Latitude" />
+                    <input type="hidden" name="endLong" value="@Model.SafeWalkRoute.RouteCoordinates[Model.SafeWalkRoute.RouteCoordinates.Count - 1].Longitude" />
+                    <input type="hidden" name="endLat" value="@Model.SafeWalkRoute.RouteCoordinates[Model.SafeWalkRoute.RouteCoordinates.Count - 1].Latitude" />
                     <input type="submit" name="modeOfT" value="pedestrian" class="btn btn-warning" />
                     <input type="submit" name="modeOfT" value="bicycle" class="btn btn-success" />
+                    @selectedModeOfTransportation
                 </div>
             </div>
         </div>
     </form>
-    <form action="~/Home/RouteMap" method="post" style="margin-top: 5px;">
+
+    @*<form action="~/Home/FinalMap" method="post" style="margin-top: 5px;">
         <div class="row" style="margin-bottom: 5px;">
             <div class="col-md-3">
                 <div class="btn-group">
+                    
                     <input type="hidden" name="startLong" value="@Model.SafeRoute.RouteCoordinates[0].Longitude" />
                     <input type="hidden" name="startLat" value="@Model.SafeRoute.RouteCoordinates[0].Latitude" />
                     <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
                     <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
                     <input type="hidden" name="modeOfT" value="@Model.SafeRoute.ModeOfTransportation" />
-                    <input type="submit" name="finalMap" value="yes" class="btn btn-warning" />
+                    <input type="submit" name="finalMap" value="CheckoutMap" class="btn btn-warning" />
                 </div>
             </div>
         </div>
-    </form>
+    </form>*@
     <div class='my-legend'>
         <div class='legend-title'>AQI Index</div>
         <div class='legend-scale'>
@@ -287,8 +303,8 @@
     </div>
 
     @{
-        int TotalTime = (int)Model.SafeRoute.TotalTravelTime / 60;
-        int Distance = (int)Model.SafeRoute.TotalDistance;
+        int TotalTime = (int)Model.SafeBikeRoute.TotalTravelTime / 60;
+        int Distance = (int)Model.SafeBikeRoute.TotalDistance;
     }
 
     <div class="row">
