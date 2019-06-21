@@ -313,49 +313,119 @@
     </div>
 
     @{
-
-        int TotalTime = (int)Model.SafeWalkRoute.TotalTravelTime / 60;
-        int Distance = (int)Model.SafeWalkRoute.TotalDistance;
+        double TotalTime = (double)Model.SafeWalkRoute.TotalTravelTime / 60;
+        double Distance = (double)Model.SafeWalkRoute.TotalDistance / 1609;
+        double Calories = Distance * 100;
+        double Steps = Distance * 1500;
         string ModeOfTransportation = (string)Model.SafeWalkRoute.ModeOfTransportation;
 
-        int FastTotalTime = (int)Model.FastWalkRoute.TotalTravelTime / 60;
-        int FastDistance = (int)Model.FastWalkRoute.TotalDistance;
+        double FastTotalTime = (double)Model.FastWalkRoute.TotalTravelTime / 60;
+        double FastDistance = (double)Model.FastWalkRoute.TotalDistance / 1609;
+        double FastCalories = FastDistance * 100;
+        double FastSteps = Distance * 1500;
         string FastModeOfTransportation = (string)Model.FastWalkRoute.ModeOfTransportation;
 
-        int BikeTotalTime = (int)Model.SafeBikeRoute.TotalTravelTime / 60;
-        int BikeDistance = (int)Model.SafeBikeRoute.TotalDistance;
+        double BikeTotalTime = (double)Model.SafeBikeRoute.TotalTravelTime / 60;
+        double BikeDistance = (double)Model.SafeBikeRoute.TotalDistance / 1609;
+        double BikeCalories = BikeDistance * 48;
+        double BikeSteps = 0;
         string BikeModeOfTransportation = (string)Model.SafeBikeRoute.ModeOfTransportation;
 
-        int BikeFastTotalTime = (int)Model.FastBikeRoute.TotalTravelTime / 60;
-        int BikeFastDistance = (int)Model.FastBikeRoute.TotalDistance;
+        double BikeFastTotalTime = (double)Model.FastBikeRoute.TotalTravelTime / 60;
+        double BikeFastDistance = (double)Model.FastBikeRoute.TotalDistance / 1609;
+        double BikeFastCalories = BikeFastDistance * 48;
+        double BikeFastSteps = 0;
         string BikeFastModeOfTransportation = (string)Model.FastBikeRoute.ModeOfTransportation;
     }
-    <div class="container" >
-        <div class="row" >
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class='my-legend'>
+                    <div class='legend-title'>AQI Index</div>
+                    <div class='legend-scale'>
+                        <ul class='legend-labels'>
+                            <li><span style='background:#00E400;'></span>Good</li>
+                            <li><span style='background:#E1E100;'></span>Moderate</li>
+                            <li><span style='background:#E17E00;'></span>Unhealthy for Sensitive Groups</li>
+                            <li><span style='background:#FF0000;'></span>Unhealthy</li>
+                            <li><span style='background:#8F3F97;'></span>Very Unhealthy</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 5px;">
+                <div class="col-md-3">
+                    <div class="btn-group">
+
+                        @*<input type="hidden" name="startLong" value="@Model.SafeRoute.RouteCoordinates[0].Longitude" />
+                                      <input type="hidden" name="startLat" value="@Model.SafeRoute.RouteCoordinates[0].Latitude" />
+                        <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
+                        <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
+                        <input type="hidden" name="modeOfT" value="@Model.SafeRoute.ModeOfTransportation" />*@
+
+
+                        <input type="submit" name="finalMap" value="CheckoutMap" class="btn btn-warning" />
+                    </div>
+                </div>
+            </div>
+
+            <form action="~/Home/FinalMap" method="post" style="margin-top: 5px;">
+                <div class="col-md-5">
+                    <div class="row" style="margin-top: 50px;"> <input type="radio" name="FastOrSafe" value="Safe" /> Safe Route</div>
+                    <div class="row">table goes here: </div>
+
+                </div>
+                <div class="col-md-5">
+                    <div class="row" style="margin-top: 50px;"> <input type="radio" name="FastOrSafe" value="Fast" /> Fast Route</div>
+                    <div class="row">table goes here: </div>
+                </div>
+            </form>
+
+        </div>
+            <div class="row">
+
+        </div>
+        <div class="row">
             <div class="col-sm-2">Mode Of T</div>
             <div class="col-sm-4">Walk</div>
             <div class="col-sm-4">Bike</div>
         </div>
-        <div class="row" >
+        <div class="row">
             <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Route</div>
             <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Safe</div>
             <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Fast</div>
             <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Safe</div>
             <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Fast</div>
         </div>
-        <div class="row" >
+        <div class="row">
             <div class="col-sm-2">Distance</div>
             <div class="col-sm-2">@Distance</div>
             <div class="col-sm-2">@FastDistance</div>
             <div class="col-sm-2">@BikeDistance</div>
             <div class="col-sm-2">@BikeFastDistance</div>
         </div>
-        <div class="row" >
+        <div class="row">
             <div class="col-sm-2">Time</div>
             <div class="col-sm-2"><p>@TotalTime</p></div>
             <div class="col-sm-2"><p>@FastTotalTime</p></div>
             <div class="col-sm-2">@BikeTotalTime</div>
             <div class="col-sm-2">@BikeFastTotalTime</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">Calories</div>
+            <div class="col-sm-2"><p>@Calories</p></div>
+            <div class="col-sm-2"><p>@FastCalories</p></div>
+            <div class="col-sm-2">@BikeCalories</div>
+            <div class="col-sm-2">@BikeFastCalories</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">Steps</div>
+            <div class="col-sm-2"><p>@Steps</p></div>
+            <div class="col-sm-2"><p>@FastSteps</p></div>
+            <div class="col-sm-2">@BikeSteps</div>
+            <div class="col-sm-2">@BikeFastSteps</div>
         </div>
     </div>
 
