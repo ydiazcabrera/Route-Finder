@@ -1,11 +1,24 @@
-﻿
-@using RouteFinder.Models
-@model RouteFinder.Models.RouteViewModel 
+﻿@*@using RouteFinder.Models*@
+@model RouteFinder.Models.RouteViewModel
 
 @{
     Layout = null;
     ViewBag.Title = "RouteMap";
     string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
+    string selectedModeOfTransportation = (string)Session["ModeOfTransportation"];
+    string safeRoute = "";
+    string fastRoute = "";
+
+    if ( selectedModeOfTransportation == "pedestrian")
+    {
+        safeRoute = Model.SafeWalkRoute.RouteCoordinatesString;
+        fastRoute = Model.FastWalkRoute.RouteCoordinatesString;
+    }
+    else
+    {
+        safeRoute = Model.SafeBikeRoute.RouteCoordinatesString;
+        fastRoute = Model.FastBikeRoute.RouteCoordinatesString;
+    }
 }
 
 
@@ -52,7 +65,7 @@
     <div id="map"></div>
     <script>
 
-        var sensors = @Html.Raw(ViewBag.Sensors);
+        var sensors = @Html.Raw(ViewBag.Sensors) //ToDo - Change this to come in from ViewModel
 
         function initMap() {
             //Create a new map
@@ -63,25 +76,25 @@
             });
 
             // Holds the route coordinates in the correct format to be displayed on the map when used in flightPath
-            var routeCoordinates = @Html.Raw(Model.SafeRoute.RouteCoordinatesString);
-            var fastestCoordinates = @Html.Raw(Model.FastRoute.RouteCoordinatesString);
+            var routeCoordinates = @Html.Raw(safeRoute);
+            var fastestCoordinates = @Html.Raw(fastRoute);
 
             //Create a line from the routeCoordinates
             var routePath = new google.maps.Polyline({
                 path: routeCoordinates,
                 geodesic: true,
-                strokeColor: '#00FF00',
+                strokeColor: '#5600FF',
                 strokeOpacity: .5,
-                strokeWeight: 2.5
+                strokeWeight: 3
             });
 
             //Create a line from the fastestRouteCoordinates
             var fastRoutePath = new google.maps.Polyline({
                 path: fastestCoordinates,
                 geodesic: true,
-                strokeColor: '#FF0000',
+                strokeColor: '#FFDB00',
                 strokeOpacity: .5,
-                strokeWeight: 2.5
+                strokeWeight: 3
             });
 
 
@@ -89,10 +102,10 @@
             for (i = 0; i < sensors.length; i++) {
                 var data = sensors[i]
                 var myLatlng = new google.maps.LatLng(data.lat, data.lng);
-                var north = null;
-                var south = null;
-                var east = null;
-                var west = null;
+                var north = sensors[i].north;
+                var south = sensors[i].south;
+                var east = sensors[i].east;
+                var west = sensors[i].west;
                 var marker = new google.maps.Marker({
                     //opacity: 0,
                     labelAnchor: { x: 0, y: 30 },
@@ -122,16 +135,31 @@
 
 
                 if (data.aqi >= 151 && data.aqi <= 200) {
-                    var sensorBuffer = new google.maps.Circle({
+                    //var sensorBuffer = new google.maps.Circle({
+                    //    strokeColor: '#FF0000',
+                    //    strokeOpacity: 0.8,
+                    //    strokeWeight: 1,
+                    //    fillColor: '#FF0000',
+                    //    fillOpacity: 0.35,
+                    //    map: map,
+                    //    center: myLatlng,
+                    //    radius: 300,
+                    //    label: data.name,
+                    //});
+                    var sensorBuffer = new google.maps.Rectangle({
                         strokeColor: '#FF0000',
                         strokeOpacity: 0.8,
                         strokeWeight: 1,
                         fillColor: '#FF0000',
                         fillOpacity: 0.35,
                         map: map,
-                        center: myLatlng,
-                        radius: 300,
-                        label: data.name,
+                        bounds: {
+                            north: north,
+                            south: south,
+                            east: east,
+                            west: west
+                        }
+                        //label: data.name
                     });
                 }
                 else if (data.aqi >= 101 && data.aqi <= 150) {
@@ -161,7 +189,20 @@
                         label: data.name,
                     });
                 }
-                else if (data.aqi <= 50) {
+                else if (data.aqi >= 30 && data.aqi <= 50) {
+                    var sensorBuffer = new google.maps.Circle({
+                        strokeColor: '#E1E100',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 1,
+                        fillColor: '#E1E100',
+                        fillOpacity: 0.35,
+                        map: map,
+                        center: myLatlng,
+                        radius: 300,
+                        label: data.name,
+                    });
+                }
+                else if (data.aqi <= 30) {
                     var sensorBuffer = new google.maps.Circle({
                         strokeColor: '#00E400',
                         strokeOpacity: 0.8,
@@ -179,6 +220,8 @@
           fastRoutePath.setMap(map);
           routePath.setMap(map);
         }
+
+
 
     </script>
 
@@ -227,18 +270,39 @@
             color: #777;
         }
     </style>
-    <div class="row">
-        <div class="col-md-2">
-            <div class="btn-group" data-toggle="buttons">
-                <label class="btn btn-primary active focus">
-                    <input type="radio" name="modeOfT" id="walk" value="pedestrian" onclick="setWalkChecked()" checked> Walk
-                </label>
-                <label class="btn btn-primary">
-                    <input type="radio" name="modeOfT" id="bike" value="bicycle" onclick="setBikeChecked()"> Bike
-                </label>
+    <form action="~/Home/RouteMap" method="post" id="routeMapForm" style="margin-top: 5px;">
+        <div class="row" style="margin-bottom: 5px;">
+            <div class="col-md-3">
+                <div class="btn-group">
+                    <input type="hidden" name="startLong" value="@Model.SafeWalkRoute.RouteCoordinates[0].Longitude" />
+                    <input type="hidden" name="startLat" value="@Model.SafeWalkRoute.RouteCoordinates[0].Latitude" />
+                    <input type="hidden" name="endLong" value="@Model.SafeWalkRoute.RouteCoordinates[Model.SafeWalkRoute.RouteCoordinates.Count - 1].Longitude" />
+                    <input type="hidden" name="endLat" value="@Model.SafeWalkRoute.RouteCoordinates[Model.SafeWalkRoute.RouteCoordinates.Count - 1].Latitude" />
+                    <input type="submit" name="modeOfT" value="pedestrian" class="btn btn-warning" />
+                    <input type="submit" name="modeOfT" value="bicycle" class="btn btn-success" />
+                    @selectedModeOfTransportation
+                </div>
             </div>
         </div>
-    </div>
+    </form>
+
+    <form action="~/Home/FinalMap" method="post" style="margin-top: 5px;">
+        <div class="row" style="margin-bottom: 5px;">
+            <div class="col-md-3">
+                <div class="btn-group">
+                    
+                    @*<input type="hidden" name="startLong" value="@Model.SafeRoute.RouteCoordinates[0].Longitude" />
+                    <input type="hidden" name="startLat" value="@Model.SafeRoute.RouteCoordinates[0].Latitude" />
+                    <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
+                    <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
+                    <input type="hidden" name="modeOfT" value="@Model.SafeRoute.ModeOfTransportation" />*@
+                    <input type="radio" name="FastOrSafe" value="Fast" /> Fast Route
+                    <input type="radio" name="FastOrSafe" value="Safe" /> Safe Route
+                    <input type="submit" name="finalMap" value="CheckoutMap" class="btn btn-warning" />
+                </div>
+            </div>
+        </div>
+    </form>
     <div class='my-legend'>
         <div class='legend-title'>AQI Index</div>
         <div class='legend-scale'>
@@ -254,27 +318,50 @@
     </div>
 
     @{
-        int TotalTime = (int)Model.SafeRoute.TotalTravelTime / 60;
-        int Distance = (int)Model.SafeRoute.TotalDistance;
+
+        int TotalTime = (int)Model.SafeWalkRoute.TotalTravelTime / 60;
+        int Distance = (int)Model.SafeWalkRoute.TotalDistance;
+        string ModeOfTransportation = (string)Model.SafeWalkRoute.ModeOfTransportation;
+
+        int FastTotalTime = (int)Model.FastWalkRoute.TotalTravelTime / 60;
+        int FastDistance = (int)Model.FastWalkRoute.TotalDistance;
+        string FastModeOfTransportation = (string)Model.FastWalkRoute.ModeOfTransportation;
+
+        int BikeTotalTime = (int)Model.SafeBikeRoute.TotalTravelTime / 60;
+        int BikeDistance = (int)Model.SafeBikeRoute.TotalDistance;
+        string BikeModeOfTransportation = (string)Model.SafeBikeRoute.ModeOfTransportation;
+
+        int BikeFastTotalTime = (int)Model.FastBikeRoute.TotalTravelTime / 60;
+        int BikeFastDistance = (int)Model.FastBikeRoute.TotalDistance;
+        string BikeFastModeOfTransportation = (string)Model.FastBikeRoute.ModeOfTransportation;
     }
-
-    <div class="row">
-
-      <div class="col-lg-6">
-
-          @*@foreach(Maneuver m in Model.Maneuvers)
-              {
-                  <p>@m.TravelTime</p>
-
-              }*@
-      </div>
-      <div class="col-lg-6">
-
-
-          <p>@TotalTime</p>
-      </div>
-
-
+    <div class="container" >
+        <div class="row" >
+            <div class="col-sm-2">Mode Of T</div>
+            <div class="col-sm-4">Walk</div>
+            <div class="col-sm-4">Bike</div>
+        </div>
+        <div class="row" >
+            <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Route</div>
+            <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Safe</div>
+            <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Fast</div>
+            <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Safe</div>
+            <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Fast</div>
+        </div>
+        <div class="row" >
+            <div class="col-sm-2">Distance</div>
+            <div class="col-sm-2">@Distance</div>
+            <div class="col-sm-2">@FastDistance</div>
+            <div class="col-sm-2">@BikeDistance</div>
+            <div class="col-sm-2">@BikeFastDistance</div>
+        </div>
+        <div class="row" >
+            <div class="col-sm-2">Time</div>
+            <div class="col-sm-2"><p>@TotalTime</p></div>
+            <div class="col-sm-2"><p>@FastTotalTime</p></div>
+            <div class="col-sm-2">@BikeTotalTime</div>
+            <div class="col-sm-2">@BikeFastTotalTime</div>
+        </div>
     </div>
 
     @*<div>
@@ -282,6 +369,9 @@
         </div>*@
     <script async defer
             src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
+        document.getElementById('routeMapForm').addEventListener("click", (e) => {
+            this.forms.submit();
+        });
     </script>
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
