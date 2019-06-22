@@ -12,7 +12,7 @@
                 * element that contains the map. */
         #map {
             height: 70%;
-            width: 50%;
+            width: 100%;
         }
     </style>
     <script>
@@ -22,7 +22,7 @@
             var lat;
             var lng;
 
-            var opts = { 'center': new google.maps.LatLng(42.9634, -85.6681), 'zoom': 12, 'mapTypeId': google.maps.MapTypeId.ROADMAP }
+            var opts = { 'center': new google.maps.LatLng(42.9634, -85.6681), 'zoom': 12, mapTypeId: 'terrain' };
             map = new google.maps.Map(document.getElementById('map'), opts);
 
             google.maps.event.addListener(map, 'click', function (event) {
@@ -88,9 +88,9 @@
             </div>
         </div>
     </div>
-    <div class="container body-content">
-        <div id="map"></div>
 
+    <div id="map"></div>
+    <div class="container body-content">
         <script async defer
                 src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
         </script>
