@@ -12,88 +12,111 @@ namespace RouteFinder.Controllers
     {
         SensorDbContext db = new SensorDbContext();
 
+        //Action for Index view
         public ActionResult Index()
         {
             string mapCenter = "{ lat: " + 42.9634 + ", lng: " + -85.6681 + " }";
             ViewBag.MapCenter = mapCenter;
 
+            //reset sessions for new route
+            Session["ModeOfTransportation"] = null;
+            Session["rvm"] = null;
+
             return View();
         }
 
+        //Action for Index view
         public ActionResult About()
         {
             return View();
         }
 
+        public ActionResult RouteMap()
+        {
+            return RedirectToAction("Index");
+        }
+
+        //Displays RouteMap from a form post
         [HttpPost]
         public ActionResult RouteMap(string startLong, string startLat, string endLong, string endLat, string modeOfT, string finalMap = "no")
         {
             // Makes sure data is entered in form, but doesn't account for invalid data.
             // Need to add validation in action or in the api call. I would assume we could make sure
             // it is a valid number between. Might want to write a validation method for Longitude and Latitude
-            if (startLong == "" || startLat == "" || endLong == "" || endLat == "")
+            if ((startLong == "" || startLat == "" || endLong == "" || endLat == "" || modeOfT == "" || finalMap == "") && Session["rvm"] == null)
             {
                 return RedirectToAction("Index");
             }
 
-            //Combine long and lat into single string
-            string startPoint = $"{startLat},{startLong}";
-            string endPoint = $"{endLat},{endLong}";
+            if (Session["rvm"] == null)
+            {
 
-            //Pull list of sensors directly from database.
-            List<Sensor> sensors = GetSensors();
+                //Combine long and lat into single string
+                string startPoint = $"{startLat},{startLong}";
+                string endPoint = $"{endLat},{endLong}";
 
-            //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
-            List<Sensor> sensorsAboveAQIThreshold = GetSensorsAboveAQIThreshold(sensors);
+                //Pull list of sensors directly from database.
+                List<Sensor> sensors = GetSensors();
 
-            Route safeWalkRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sensorsAboveAQIThreshold, "pedestrian");
-            safeWalkRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
-            //Session["SafeWalkRoute"] = safeWalkRoute;
-            safeWalkRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
+                //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
+                List<Sensor> sensorsAboveAQIThreshold = GetSensorsAboveAQIThreshold(sensors);
 
-
-            Route safeBikeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sensorsAboveAQIThreshold, "bicycle");
-            safeBikeRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
-            //Session["SafeBikeRoute"] = safeWalkRoute;
-            safeBikeRoute.RouteCoordinatesString = GetRoute(safeBikeRoute.RouteCoordinates);
-
-            Route fastWalkRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, "pedestrian");
-            fastWalkRoute.RouteCoordinatesString = GetRoute(fastWalkRoute.RouteCoordinates);
-            //Session["FastWalkRoute"] = fastWalkRoute;
-            fastWalkRoute.RouteCoordinatesString = GetRoute(fastWalkRoute.RouteCoordinates);
+                Route safeWalkRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sensorsAboveAQIThreshold, "pedestrian");
+                safeWalkRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
+                safeWalkRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
 
 
-            Route fastBikeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, "bicycle");
-            fastBikeRoute.RouteCoordinatesString = GetRoute(fastBikeRoute.RouteCoordinates);
-            //Session["FastBikeRoute"] = fastWalkRoute;
-            fastBikeRoute.RouteCoordinatesString = GetRoute(fastBikeRoute.RouteCoordinates);
+                Route safeBikeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sensorsAboveAQIThreshold, "bicycle");
+                safeBikeRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
+                safeBikeRoute.RouteCoordinatesString = GetRoute(safeBikeRoute.RouteCoordinates);
 
-            //Route riskyRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, modeOfT);
-            //riskyRoute.RouteCoordinatesString = GetRoute(riskyRoute.RouteCoordinates);
+                Route fastWalkRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, "pedestrian");
+                fastWalkRoute.RouteCoordinatesString = GetRoute(fastWalkRoute.RouteCoordinates);
+                fastWalkRoute.RouteCoordinatesString = GetRoute(fastWalkRoute.RouteCoordinates);
 
-            //build map marker string for sensors on Google MAP API
-            string sensorMarkers = GetMarkers(sensors);
 
-            // Map center is imperfect because the middle coordinate isn't necessarily the middle of the map.
-            // It also doesn't address the zoom level. We could probably use a C# or .NET geography library to find the 
-            // distance between the two furthest points to set distance and zoom.
+                Route fastBikeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, "bicycle");
+                fastBikeRoute.RouteCoordinatesString = GetRoute(fastBikeRoute.RouteCoordinates);
+                fastBikeRoute.RouteCoordinatesString = GetRoute(fastBikeRoute.RouteCoordinates);
 
-            //Safe Map Route
-            ViewBag.MapCenter = GetMapCenter(safeWalkRoute.RouteCoordinates);
-            ViewBag.Sensors = sensorMarkers;
-            //ViewBag.SafeRoute = safeWalkRoute.RouteCoordinatesString;
-            //ViewBag.Route = GetRoute(safeRouteCoordinates);
+                //build map marker string for sensors on Google MAP API
+                string sensorMarkers = GetMarkers(sensors);
 
-            // Risky Map Route
-            //ViewBag.RiskyMapCenter = GetMapCenter(riskyRoute.RouteCoordinates);
-            //ViewBag.RiskyMapSensors = sensorMarkers;
-            //ViewBag.RiskyMapRoute = GetRoute(riskyRouteCoordinates);
+                // Map center is imperfect because the middle coordinate isn't necessarily the middle of the map.
+                // It also doesn't address the zoom level. We could probably use a C# or .NET geography library to find the 
+                // distance between the two furthest points to set distance and zoom.
 
-            Session["ModeOfTransportation"] = modeOfT;
+                //Sets center of map
+                ViewBag.MapCenter = GetMapCenter(safeWalkRoute.RouteCoordinates);
 
-            RouteViewModel rvm = new RouteViewModel(safeBikeRoute, fastBikeRoute, safeWalkRoute, fastWalkRoute, sensors);
-            Session["rvm"] = rvm;
-            return View(rvm);
+                //Builds Javascript object string to display markers on google API map.
+                ViewBag.Sensors = sensorMarkers;
+
+                // Store currently selected mode of transportation walk/bike
+                Session["ModeOfTransportation"] = modeOfT;
+
+                // Routes for all paths and sensors data
+                RouteViewModel rvm = new RouteViewModel(safeBikeRoute, fastBikeRoute, safeWalkRoute, fastWalkRoute, sensors);
+
+                // Store route view model in session for use on final route choice page
+                Session["rvm"] = rvm;
+                return View(rvm);
+            } else
+            {
+                RouteViewModel rvm = (RouteViewModel)Session["rvm"];
+
+                //Sets center of map
+                ViewBag.MapCenter = GetMapCenter(rvm.SafeWalkRoute.RouteCoordinates);
+
+                //Builds Javascript object string to display markers on google API map.
+                ViewBag.Sensors = GetMarkers(rvm.Sensors);
+
+                // Store currently selected mode of transportation walk/bike
+                Session["ModeOfTransportation"] = modeOfT;
+                return View(rvm);
+            }
+            // Pass Route View Model to view
+            
         }
 
         //public ActionResult FinalMap(int id)
@@ -101,7 +124,13 @@ namespace RouteFinder.Controllers
         //public ActionResult FinalMap(string startLong, string startLat, string endLong, string endLat, string modeOfT, string routeSelected)
         public ActionResult FinalMap(string modeOfTransportation, string safeOrFast)
         {
+            if (String.IsNullOrEmpty(modeOfTransportation) || String.IsNullOrEmpty(safeOrFast))
+            {
+                return RedirectToAction("RouteMap");
+            }
             Route route = new Route();
+
+            // Get Route View Model from session
             RouteViewModel rvm = (RouteViewModel)Session["rvm"];
             if(modeOfTransportation == "pedestrian")
             {
@@ -199,17 +228,16 @@ namespace RouteFinder.Controllers
 
             if (sixtyMinSensorData.Count() == 0) //There was no data collected by the sensor for the time called
             {
-
                 return 0;
             }
 
             // find the hourly average for ozone
-            double hourlyO3Avg = GetHourlyAvg(sixtyMinSensorData, "O3_PPB");
-            int aqiO3 = CalcluateO3AQI(hourlyO3Avg);
+            double hourlyO3Avg = AQI_Calculator.GetHourlyAvg(sixtyMinSensorData, "O3_PPB");
+            int aqiO3 = AQI_Calculator.CalcluateO3AQI(hourlyO3Avg);
 
             // find the hourly average for particulate matter
-            double hourlyPM25Avg = GetHourlyAvg(sixtyMinSensorData, "PM25_MicroGramPerCubicMeter");
-            int aqiPM25 = CalcluatePM25AQI(hourlyPM25Avg);
+            double hourlyPM25Avg = AQI_Calculator.GetHourlyAvg(sixtyMinSensorData, "PM25_MicroGramPerCubicMeter");
+            int aqiPM25 = AQI_Calculator.CalcluatePM25AQI(hourlyPM25Avg);
 
             if (aqiO3 > aqiPM25)
             {
@@ -220,7 +248,6 @@ namespace RouteFinder.Controllers
                 aqi = aqiPM25;
             }
 
-            //return aqi;
             return aqi;
         }
 
@@ -303,153 +330,6 @@ namespace RouteFinder.Controllers
             SensorBoundingBox sbb = new SensorBoundingBox(sensor, NorthWest, SouthEast, NorthEast, SouthWest);
 
             return sbb;
-        }
-
-        public double GetHourlyAvg(List<SensorsData> sensorData, string pollutant)
-        {
-            double dataPoint = 0.00;
-            //List<int> AQIs = new List<int>();
-
-            int datarows = sensorData.Count();
-            double runningTotal = 0.00;
-
-            foreach (SensorsData s in sensorData)
-            {
-                if (pollutant == "O3_PPB")
-                {
-                    dataPoint = (double)s.O3_PPB;
-                    runningTotal += (dataPoint / 1000); // convert from ppb to ppm
-                }
-                else if (pollutant == "PM25_MicroGramPerCubicMeter")
-                {
-                    dataPoint = (int)s.PM25_MicroGramPerCubicMeter;
-                    runningTotal += dataPoint;
-                }
-            }
-
-            return runningTotal / sensorData.Count();
-        }
-
-        public int CalcluateO3AQI(double avgO3)
-        {
-            double O3Min = 0;
-            double O3Max = 0;
-            int AQIMin = 0;
-            int AQIMax = 0;
-
-            if (avgO3 >= 0 && avgO3 < 0.059)
-            {
-                O3Min = 0;
-                O3Max = 0.059;
-                AQIMin = 0;
-                AQIMax = 50;
-            }
-            else if (avgO3 >= 0.060 && avgO3 < 0.075)
-            {
-                O3Min = 0.060;
-                O3Max = 0.075;
-                AQIMin = 51;
-                AQIMax = 100;
-            }
-            else if (avgO3 >= 0.076 && avgO3 < 0.095)
-            {
-                O3Min = 0.076;
-                O3Max = 0.095;
-                AQIMin = 101;
-                AQIMax = 150;
-
-            }
-            else if (avgO3 >= 0.096 && avgO3 < 0.115)
-            {
-                O3Min = 0.096;
-                O3Max = 0.115;
-                AQIMin = 151;
-                AQIMax = 200;
-            }
-            else if (avgO3 >= 0.116 && avgO3 < 0.374)
-            {
-                O3Min = 0.116;
-                O3Max = 0.374;
-                AQIMin = 201;
-                AQIMax = 300;
-            }
-            else if (avgO3 >= 0.405)// this is a combination of two hazardous reading, might need to change
-            {
-                O3Min = 0.405;
-                O3Max = 0.604;
-                AQIMin = 301;
-                AQIMax = 500;
-            }
-
-            int AQI = CalculateAQI(AQIMax, AQIMin, O3Max, O3Min, avgO3);
-            return AQI;
-        }
-
-        public int CalcluatePM25AQI(double avgPM25)
-        {
-            double PM25Min = 0;
-            double PM25Max = 0;
-            int AQIMin = 0;
-            int AQIMax = 0;
-
-            if (avgPM25 >= 0 && avgPM25 < 15.4)
-            {
-                PM25Min = 0;
-                PM25Max = 15.4;
-                AQIMin = 0;
-                AQIMax = 50;
-            }
-            else if (avgPM25 >= 15.5 && avgPM25 < 40.4)
-            {
-                PM25Min = 15.5;
-                PM25Max = 40.4;
-                AQIMin = 51;
-                AQIMax = 100;
-            }
-            else if (avgPM25 >= 40.5 && avgPM25 < 65.4)
-            {
-                PM25Min = 40.5;
-                PM25Max = 65.4;
-                AQIMin = 101;
-                AQIMax = 150;
-            }
-            else if (avgPM25 >= 65.5 && avgPM25 < 150.4)
-            {
-                PM25Min = 65.5;
-                PM25Max = 150.4;
-                AQIMin = 151;
-                AQIMax = 200;
-            }
-            else if (avgPM25 >= 150.5 && avgPM25 < 250.4)
-            {
-                PM25Min = 150.5;
-                PM25Max = 250.4;
-                AQIMin = 201;
-                AQIMax = 300;
-            }
-            else if (avgPM25 >= 250.5 && avgPM25 < 350.4)
-            {
-                PM25Min = 250.5;
-                PM25Max = 350.4;
-                AQIMin = 301;
-                AQIMax = 400;
-            }
-            else if (avgPM25 >= 350.5)
-            {
-                PM25Min = 350.5;
-                PM25Max = 500.4;
-                AQIMin = 401;
-                AQIMax = 500;
-            }
-
-            int AQI = CalculateAQI(AQIMax, AQIMin, PM25Max, PM25Min, avgPM25);
-            return AQI;
-        }
-
-        public int CalculateAQI(int aqiMax, int aquMin, double pollutantMax, double pollutantMin, double pollutantReading)
-        {
-            int AQI = Convert.ToInt32((((aqiMax - aquMin) / (pollutantMax - pollutantMin)) * (pollutantReading - pollutantMin)) + aquMin);
-            return AQI;
         }
 
         public int CaloriesBurnedWalked(int weight, int mile)

@@ -115,9 +115,9 @@ namespace RouteFinder.Models
             {
 
                 string instruction = jsonTokens[i]["instruction"].ToString();
-                double travelTime = double.Parse(jsonTokens[i]["travelTime"].ToString());
-                double distance = double.Parse(jsonTokens[i]["length"].ToString());
-                Maneuver man = new Maneuver(travelTime, distance, instruction);
+                double travelTime = double.Parse(jsonTokens[i]["travelTime"].ToString())/60;
+                double distance = double.Parse(jsonTokens[i]["length"].ToString())/1690;
+                                Maneuver man = new Maneuver(travelTime, distance, instruction);
                 maneuvers.Add(man);
             }
             return maneuvers;
@@ -130,7 +130,7 @@ namespace RouteFinder.Models
 
             JToken json = JToken.Parse(APIText);
 
-            return double.Parse(json["response"]["route"][0]["leg"][0]["travelTime"].ToString());
+            return double.Parse(json["response"]["route"][0]["leg"][0]["travelTime"].ToString())/60;
         }
 
         public static double GetTotalDistance(string APIText)
@@ -139,7 +139,7 @@ namespace RouteFinder.Models
 
             JToken json = JToken.Parse(APIText);
 
-            return double.Parse(json["response"]["route"][0]["leg"][0]["length"].ToString());
+            return double.Parse(json["response"]["route"][0]["leg"][0]["length"].ToString())/1690;
         }
 
         /// <summary>
