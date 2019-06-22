@@ -130,13 +130,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="HelperClasses\AQI Calculator.cs" />
     <Compile Include="Models\Maneuver.cs" />
     <Compile Include="Models\Route.cs" />
     <Compile Include="Models\RouteCoordinate.cs" />
     <Compile Include="Models\MapPoint.cs" />
     <Compile Include="Models\RouteViewModel.cs" />
     <Compile Include="Models\Sensor.cs" />
-    <Compile Include="HelperClasses\AQI Calculator.cs" />
     <Compile Include="Models\ConfigReaderDAL.cs" />
     <Compile Include="Models\RouteAPIDAL.cs" />
     <Compile Include="Models\SensorBoundingBox.cs" />
