@@ -313,26 +313,26 @@
     </div>
 
     @{
-        double TotalTime = (double)Model.SafeWalkRoute.TotalTravelTime / 60;
-        double Distance = (double)Model.SafeWalkRoute.TotalDistance / 1609;
+        double TotalTime = (double)Model.SafeWalkRoute.TotalTravelTime ;
+        double Distance = (double)Model.SafeWalkRoute.TotalDistance ;
         double Calories = Distance * 100;
         double Steps = Distance * 1500;
         string ModeOfTransportation = (string)Model.SafeWalkRoute.ModeOfTransportation;
 
-        double FastTotalTime = (double)Model.FastWalkRoute.TotalTravelTime / 60;
-        double FastDistance = (double)Model.FastWalkRoute.TotalDistance / 1609;
+        double FastTotalTime = (double)Model.FastWalkRoute.TotalTravelTime;
+        double FastDistance = (double)Model.FastWalkRoute.TotalDistance ;
         double FastCalories = FastDistance * 100;
         double FastSteps = Distance * 1500;
         string FastModeOfTransportation = (string)Model.FastWalkRoute.ModeOfTransportation;
 
-        double BikeTotalTime = (double)Model.SafeBikeRoute.TotalTravelTime / 60;
-        double BikeDistance = (double)Model.SafeBikeRoute.TotalDistance / 1609;
+        double BikeTotalTime = (double)Model.SafeBikeRoute.TotalTravelTime;
+        double BikeDistance = (double)Model.SafeBikeRoute.TotalDistance ;
         double BikeCalories = BikeDistance * 48;
         double BikeSteps = 0;
         string BikeModeOfTransportation = (string)Model.SafeBikeRoute.ModeOfTransportation;
 
-        double BikeFastTotalTime = (double)Model.FastBikeRoute.TotalTravelTime / 60;
-        double BikeFastDistance = (double)Model.FastBikeRoute.TotalDistance / 1609;
+        double BikeFastTotalTime = (double)Model.FastBikeRoute.TotalTravelTime;
+        double BikeFastDistance = (double)Model.FastBikeRoute.TotalDistance;
         double BikeFastCalories = BikeFastDistance * 48;
         double BikeFastSteps = 0;
         string BikeFastModeOfTransportation = (string)Model.FastBikeRoute.ModeOfTransportation;
