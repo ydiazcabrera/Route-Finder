@@ -2,11 +2,14 @@
 @{
     Layout = null;
     string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
+    var TotalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
+    var TotalTimeFormat = TotalTime.ToString(@"h\:mm");
+    
 }
 
 <p>Mode of Transportation @Model.ModeOfTransportation</p>
-<p>Total Distance @Model.TotalDistance</p>
-<p>Total Time @Model.TotalTravelTime</p>
+<p >Total Distance @Math.Round(@Model.TotalDistance,1) Miles</p>
+<p>Total Time @TotalTimeFormat HR</p>
 
 
 <head>
@@ -55,6 +58,13 @@
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
+
+<div>
+
+    <p> Directctions</p>
+    <p>@Model.Maneuvers</p>
+
+</div>
 
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
