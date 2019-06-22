@@ -136,7 +136,7 @@
     <Compile Include="Models\MapPoint.cs" />
     <Compile Include="Models\RouteViewModel.cs" />
     <Compile Include="Models\Sensor.cs" />
-    <Compile Include="HelperClasses\AQI Calculator.cs" />
+    <Compile Include="HelperClasses\AQICalculator.cs" />
     <Compile Include="Models\ConfigReaderDAL.cs" />
     <Compile Include="Models\RouteAPIDAL.cs" />
     <Compile Include="Models\SensorBoundingBox.cs" />
