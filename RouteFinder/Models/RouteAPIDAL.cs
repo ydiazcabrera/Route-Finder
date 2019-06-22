@@ -22,15 +22,8 @@ namespace RouteFinder.Models
             Route route = GetRoute(startPoint, endPoint, sensorsToAvoid, mode);
 
             return route;
-            //string mapImage = GetMap(routeCoordinates);
-            //return mapImage;
         }
-
-        internal static List<string> GetCoordinates()
-        {
-            throw new NotImplementedException();
-        }
-
+        
         /// <summary>
         /// Method to Call Routing API from here.com that generates route
         /// from users start and endpoint while avoiding areas of bad AQI
