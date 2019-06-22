@@ -119,7 +119,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("Prime Path", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -144,145 +144,160 @@
     <div class="container">
         <div class="row text-center">
             <div class="col-md-6">
-                @if (ModeOfTransportation == "pedestrian")
+                @if (selectedModeOfTransportation == "pedestrian")
                 {
-                    <input type="submit" value="pedestrian" class="btn btn-primary active" form="showWalkPath" />@ModeOfTransportation
+                    <input type="submit" value="Walk Paths Selected" class="btn btn-primary active" form="showWalkPath" disabled />
                 }
                 else
                 {
-                    <input type="submit" value="pedestrian" class="btn btn-primary" form="showWalkPath " />@ModeOfTransportation
+                    <input type="submit" value="Show Walk Paths" class="btn btn-primary" form="showWalkPath" />
                 }
             </div>
             <div class="col-md-6">
-                @if (ModeOfTransportation == "bicycle")
+                @if (selectedModeOfTransportation == "bicycle")
                 {
-                    <input type="submit" value="bicycle" class="btn btn-primary active" form="showBikePath" />
+                    <input type="submit" value="Bike Paths Selected" class="btn btn-primary active" form="showBikePath" disabled />
                 }
                 else
                 {
-                    <input type="submit" value="bicycle" class="btn btn-primary" form="showBikePath" />
+                    <input type="submit" value="Show Bike Pathss" class="btn btn-primary" form="showBikePath" />
                 }
             </div>
         </div>
         <div class="row">
             <div class="col-md-3">
-                <form action="~/Home/FinalMap" method="post" id="SafeWalk" style="margin-top: 5px;">
-                    <table class="table table-condensed table-bordered table-striped" id="Walk">
-                        <tr class="text-center">
-                            <td colspan="2">Walk Safest</td>
-                        </tr>
-                        <tr>
-                            <td>Distance</td>
-                            <td>@Distance Mi</td>
-                        </tr>
-                        <tr>
-                            <td>Time</td>
-                            <td>@TotalTime Hr</td>
-                        </tr>
-                        <tr>
-                            <td>Calories</td>
-                            <td>@Calories</td>
-                        </tr>
-                        <tr>
-                            <td>Steps</td>
-                            <td>@Steps</td>
-                        </tr>
+                <form action="~/Home/FinalMap" method="post" id="SafeWalk" style="margin: 5px;">
+                    <div class="row">
+                        <table class="table table-condensed table-bordered" id="Walk" style="margin-bottom: 2px;">
+                            <tr class="text-center success">
+                                <td colspan="2">Healthiest Walk Path Statistics</td>
+                            </tr>
+                            <tr>
+                                <td>Distance</td>
+                                <td>@Distance Mi</td>
+                            </tr>
+                            <tr>
+                                <td>Time</td>
+                                <td>@TotalTime Hr</td>
+                            </tr>
+                            <tr>
+                                <td>Calories</td>
+                                <td>@Calories</td>
+                            </tr>
+                            <tr>
+                                <td>Steps</td>
+                                <td>@Steps</td>
+                            </tr>
 
-                    </table>
-                    <input type="hidden" name="modeOfTransportation" value="pedestrian" />
-                    <input type="hidden" name="safeOrFast" value="safe" />
+                        </table>
+                        <input type="hidden" name="modeOfTransportation" value="pedestrian" />
+                        <input type="hidden" name="safeOrFast" value="safe" />
+                    </div>
+                    <div class="row text-center" style="margin-top: 0px;">
+                        <input type="submit" value="Take Healthiest Walk" class="btn btn-success" />
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-md-3">
+                <form action="~/Home/FinalMap" method="post" id="FastWalk" style="margin: 5px;">
+                    <div class="row">
+                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 2px;">
+                            <tr class="text-center warning">
+                                <td colspan="2">Fastest Walk Path Statistics</td>
+                            </tr>
+                            <tr>
+                                <td>Distance</td>
+                                <td>@FastDistance Mi</td>
+                            </tr>
+                            <tr>
+                                <td>Time</td>
+                                <td>@FastTotalTime</td>
+                            </tr>
+                            <tr>
+                                <td>Calories</td>
+                                <td>@FastCalories</td>
+                            </tr>
+                            <tr>
+                                <td>Steps</td>
+                                <td>@FastSteps</td>
+                            </tr>
+
+                        </table>
+                        <input type="hidden" name="modeOfTransportation" value="pedestrian" />
+                        <input type="hidden" name="safeOrFast" value="fast" />
+                    </div>
+                    <div class="row text-center" style="margin-top: 0px;">
+                        <input type="submit" value="Take Healthiest Walk" class="btn btn-success" />
+                    </div>
                 </form>
             </div>
             <div class="col-md-3">
-                <form action="~/Home/FinalMap" method="post" id="FastWalk" style="margin-top: 5px;">
-                    <table class="table table-condensed table-bordered table-striped" id="Walk">
-                        <tr class="text-center">
-                            <td colspan="2">Walk Fastest</td>
-                        </tr>
-                        <tr>
-                            <td>Distance</td>
-                            <td>@FastDistance Mi</td>
-                        </tr>
-                        <tr>
-                            <td>Time</td>
-                            <td>@FastTotalTime</td>
-                        </tr>
-                        <tr>
-                            <td>Calories</td>
-                            <td>@FastCalories</td>
-                        </tr>
-                        <tr>
-                            <td>Steps</td>
-                            <td>@FastSteps</td>
-                        </tr>
+                <form action="~/Home/FinalMap" method="post" id="SafeBike" style="margin: 5px;">
+                    <div class="row">
+                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 2px;">
+                            <tr class="text-center success">
+                                <td colspan="2">Healthiest Bike Path Statistics</td>
+                            </tr>
+                            <tr>
+                                <td>Distance</td>
+                                <td>@BikeDistance Mi</td>
+                            </tr>
+                            <tr>
+                                <td>Time</td>
+                                <td>@BikeTotalTime</td>
+                            </tr>
+                            <tr>
+                                <td>Calories</td>
+                                <td>@BikeCalories</td>
+                            </tr>
+                            <tr>
+                                <td>Steps</td>
+                                <td>@BikeSteps</td>
+                            </tr>
 
-                    </table>
-                    <input type="hidden" name="modeOfTransportation" value="pedestrian" />
-                    <input type="hidden" name="safeOrFast" value="fast" />
+                        </table>
+                        <input type="hidden" name="modeOfTransportation" value="bicycle" />
+                        <input type="hidden" name="safeOrFast" value="safe" />
+                    </div>
+                    <div class="row text-center" style="margin-top: 0px;">
+                        <input type="submit" value="Take Healthiest Walk" class="btn btn-success" />
+                    </div>
                 </form>
             </div>
             <div class="col-md-3">
-                <form action="~/Home/FinalMap" method="post" id="SafeBike" style="margin-top: 5px;">
-                    <table class="table table-condensed table-bordered table-striped" id="Walk">
-                        <tr class="text-center">
-                            <td colspan="2">Bike Safest</td>
-                        </tr>
-                        <tr>
-                            <td>Distance</td>
-                            <td>@BikeDistance Mi</td>
-                        </tr>
-                        <tr>
-                            <td>Time</td>
-                            <td>@BikeTotalTime</td>
-                        </tr>
-                        <tr>
-                            <td>Calories</td>
-                            <td>@BikeCalories</td>
-                        </tr>
-                        <tr>
-                            <td>Steps</td>
-                            <td>@BikeSteps</td>
-                        </tr>
+                <form action="~/Home/FinalMap" method="post" id="FastBike" style="margin: 5px;">
+                    <div class="row">
+                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 2px;">
+                            <tr class="text-center warning">
+                                <td colspan="2">Fastest Bike Path Statistics</td>
+                            </tr>
+                            <tr>
+                                <td>Distance</td>
+                                <td>@BikeFastDistance Mi</td>
+                            </tr>
+                            <tr>
+                                <td>Time</td>
+                                <td>@BikeFastTotalTime</td>
+                            </tr>
+                            <tr>
+                                <td>Calories</td>
+                                <td>@BikeFastCalories</td>
+                            </tr>
+                            <tr>
+                                <td>Steps</td>
+                                <td>@BikeFastSteps</td>
+                            </tr>
 
-                    </table>
-                    <input type="hidden" name="modeOfTransportation" value="bicycle" />
-                    <input type="hidden" name="safeOrFast" value="safe" />
+                        </table>
+                        <input type="hidden" name="modeOfTransportation" value="bicycle" />
+                        <input type="hidden" name="safeOrFast" value="fast" />
+                    </div>
+                    <div class="row text-center" style="margin-top: 0px;">
+                        <input type="submit" value="Take Healthiest Walk" class="btn btn-success" />
+                    </div>
                 </form>
             </div>
-            <div class="col-md-3">
-                <form action="~/Home/FinalMap" method="post" id="FastBike" style="margin-top: 5px;">
-                    <table class="table table-condensed table-bordered table-striped" id="Walk">
-                        <tr class="text-center">
-                            <td colspan="2">Bike Fastest</td>
-                        </tr>
-                        <tr>
-                            <td>Distance</td>
-                            <td>@BikeFastDistance Mi</td>
-                        </tr>
-                        <tr>
-                            <td>Time</td>
-                            <td>@BikeFastTotalTime</td>
-                        </tr>
-                        <tr>
-                            <td>Calories</td>
-                            <td>@BikeFastCalories</td>
-                        </tr>
-                        <tr>
-                            <td>Steps</td>
-                            <td>@BikeFastSteps</td>
-                        </tr>
-
-                    </table>
-                    <input type="hidden" name="modeOfTransportation" value="bicycle" />
-                    <input type="hidden" name="safeOrFast" value="fast" />
-                </form>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-3"></div>
-            <div class="col-md-3"></div>
-            <div class="col-md-3"></div>
         </div>
     </div>
     <form action="~/Home/RouteMap" method="post" id="showWalkPath" style="margin-top: 5px;">
