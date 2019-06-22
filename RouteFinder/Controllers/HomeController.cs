@@ -232,12 +232,12 @@ namespace RouteFinder.Controllers
             }
 
             // find the hourly average for ozone
-            double hourlyO3Avg = AQICalculator.GetHourlyAvg(sixtyMinSensorData, "O3_PPB");
-            int aqiO3 = AQICalculator.CalcluateO3AQI(hourlyO3Avg);
+            double hourlyO3Avg = AQI_Calculator.GetHourlyAvg(sixtyMinSensorData, "O3_PPB");
+            int aqiO3 = AQI_Calculator.CalcluateO3AQI(hourlyO3Avg);
 
             // find the hourly average for particulate matter
-            double hourlyPM25Avg = AQICalculator.GetHourlyAvg(sixtyMinSensorData, "PM25_MicroGramPerCubicMeter");
-            int aqiPM25 = AQICalculator.CalcluatePM25AQI(hourlyPM25Avg);
+            double hourlyPM25Avg = AQI_Calculator.GetHourlyAvg(sixtyMinSensorData, "PM25_MicroGramPerCubicMeter");
+            int aqiPM25 = AQI_Calculator.CalcluatePM25AQI(hourlyPM25Avg);
 
             if (aqiO3 > aqiPM25)
             {
