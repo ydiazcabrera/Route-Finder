@@ -286,11 +286,31 @@
         </div>
     </form>
 
-    
-
-    
-
-
+    <form action="~/Home/FinalMap" method="post" style="margin-top: 5px;">
+        <div class="row" style="margin-bottom: 5px;">
+            <div class="col-md-3">
+                <div class="btn-group">
+                    <input type="hidden" name="modeOfTransportation" value="@selectedModeOfTransportation" />
+                    <input type="radio" name="safeOrFast" value="fast" /> Fast Route
+                    <input type="radio" name="safeOrFast" value="safe" /> Safe Route
+                    <input type="submit" name="finalMap" value="checkoutMap" class="btn btn-warning" />
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class='my-legend'>
+        <div class='legend-title'>AQI Index</div>
+        <div class='legend-scale'>
+            <ul class='legend-labels'>
+                <li><span style='background:#00E400;'></span>Good</li>
+                <li><span style='background:#E1E100;'></span>Moderate</li>
+                <li><span style='background:#E17E00;'></span>Unhealthy for Sensitive Groups</li>
+                <li><span style='background:#FF0000;'></span>Unhealthy</li>
+                <li><span style='background:#8F3F97;'></span>Very Unhealthy</li>
+            </ul>
+        </div>
+        <div class='legend-source'>Source: <a href="#link to source">Name of source</a></div>
+    </div>
 
     @{
         double TotalTime = (double)Model.SafeWalkRoute.TotalTravelTime / 60;
@@ -317,8 +337,6 @@
         double BikeFastSteps = 0;
         string BikeFastModeOfTransportation = (string)Model.FastBikeRoute.ModeOfTransportation;
     }
-
-
 
     <div class="container">
         <div class="row">
@@ -369,14 +387,6 @@
             <div class="row">
 
         </div>
-
-
-
-
-
-
-
-
         <div class="row">
             <div class="col-sm-2">Mode Of T</div>
             <div class="col-sm-4">Walk</div>
