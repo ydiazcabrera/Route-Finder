@@ -12,88 +12,111 @@ namespace RouteFinder.Controllers
     {
         SensorDbContext db = new SensorDbContext();
 
+        //Action for Index view
         public ActionResult Index()
         {
             string mapCenter = "{ lat: " + 42.9634 + ", lng: " + -85.6681 + " }";
             ViewBag.MapCenter = mapCenter;
 
+            //reset sessions for new route
+            Session["ModeOfTransportation"] = null;
+            Session["rvm"] = null;
+
             return View();
         }
 
+        //Action for Index view
         public ActionResult About()
         {
             return View();
         }
 
+        public ActionResult RouteMap()
+        {
+            return RedirectToAction("Index");
+        }
+
+        //Displays RouteMap from a form post
         [HttpPost]
         public ActionResult RouteMap(string startLong, string startLat, string endLong, string endLat, string modeOfT, string finalMap = "no")
         {
             // Makes sure data is entered in form, but doesn't account for invalid data.
             // Need to add validation in action or in the api call. I would assume we could make sure
             // it is a valid number between. Might want to write a validation method for Longitude and Latitude
-            if (startLong == "" || startLat == "" || endLong == "" || endLat == "")
+            if ((startLong == "" || startLat == "" || endLong == "" || endLat == "" || modeOfT == "" || finalMap == "") && Session["rvm"] == null)
             {
                 return RedirectToAction("Index");
             }
 
-            //Combine long and lat into single string
-            string startPoint = $"{startLat},{startLong}";
-            string endPoint = $"{endLat},{endLong}";
+            if (Session["rvm"] == null)
+            {
 
-            //Pull list of sensors directly from database.
-            List<Sensor> sensors = GetSensors();
+                //Combine long and lat into single string
+                string startPoint = $"{startLat},{startLong}";
+                string endPoint = $"{endLat},{endLong}";
 
-            //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
-            List<Sensor> sensorsAboveAQIThreshold = GetSensorsAboveAQIThreshold(sensors);
+                //Pull list of sensors directly from database.
+                List<Sensor> sensors = GetSensors();
 
-            Route safeWalkRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sensorsAboveAQIThreshold, "pedestrian");
-            safeWalkRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
-            //Session["SafeWalkRoute"] = safeWalkRoute;
-            safeWalkRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
+                //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
+                List<Sensor> sensorsAboveAQIThreshold = GetSensorsAboveAQIThreshold(sensors);
 
-
-            Route safeBikeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sensorsAboveAQIThreshold, "bicycle");
-            safeBikeRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
-            //Session["SafeBikeRoute"] = safeWalkRoute;
-            safeBikeRoute.RouteCoordinatesString = GetRoute(safeBikeRoute.RouteCoordinates);
-
-            Route fastWalkRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, "pedestrian");
-            fastWalkRoute.RouteCoordinatesString = GetRoute(fastWalkRoute.RouteCoordinates);
-            //Session["FastWalkRoute"] = fastWalkRoute;
-            fastWalkRoute.RouteCoordinatesString = GetRoute(fastWalkRoute.RouteCoordinates);
+                Route safeWalkRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sensorsAboveAQIThreshold, "pedestrian");
+                safeWalkRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
+                safeWalkRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
 
 
-            Route fastBikeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, "bicycle");
-            fastBikeRoute.RouteCoordinatesString = GetRoute(fastBikeRoute.RouteCoordinates);
-            //Session["FastBikeRoute"] = fastWalkRoute;
-            fastBikeRoute.RouteCoordinatesString = GetRoute(fastBikeRoute.RouteCoordinates);
+                Route safeBikeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sensorsAboveAQIThreshold, "bicycle");
+                safeBikeRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
+                safeBikeRoute.RouteCoordinatesString = GetRoute(safeBikeRoute.RouteCoordinates);
 
-            //Route riskyRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, modeOfT);
-            //riskyRoute.RouteCoordinatesString = GetRoute(riskyRoute.RouteCoordinates);
+                Route fastWalkRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, "pedestrian");
+                fastWalkRoute.RouteCoordinatesString = GetRoute(fastWalkRoute.RouteCoordinates);
+                fastWalkRoute.RouteCoordinatesString = GetRoute(fastWalkRoute.RouteCoordinates);
 
-            //build map marker string for sensors on Google MAP API
-            string sensorMarkers = GetMarkers(sensors);
 
-            // Map center is imperfect because the middle coordinate isn't necessarily the middle of the map.
-            // It also doesn't address the zoom level. We could probably use a C# or .NET geography library to find the 
-            // distance between the two furthest points to set distance and zoom.
+                Route fastBikeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, "bicycle");
+                fastBikeRoute.RouteCoordinatesString = GetRoute(fastBikeRoute.RouteCoordinates);
+                fastBikeRoute.RouteCoordinatesString = GetRoute(fastBikeRoute.RouteCoordinates);
 
-            //Safe Map Route
-            ViewBag.MapCenter = GetMapCenter(safeWalkRoute.RouteCoordinates);
-            ViewBag.Sensors = sensorMarkers;
-            //ViewBag.SafeRoute = safeWalkRoute.RouteCoordinatesString;
-            //ViewBag.Route = GetRoute(safeRouteCoordinates);
+                //build map marker string for sensors on Google MAP API
+                string sensorMarkers = GetMarkers(sensors);
 
-            // Risky Map Route
-            //ViewBag.RiskyMapCenter = GetMapCenter(riskyRoute.RouteCoordinates);
-            //ViewBag.RiskyMapSensors = sensorMarkers;
-            //ViewBag.RiskyMapRoute = GetRoute(riskyRouteCoordinates);
+                // Map center is imperfect because the middle coordinate isn't necessarily the middle of the map.
+                // It also doesn't address the zoom level. We could probably use a C# or .NET geography library to find the 
+                // distance between the two furthest points to set distance and zoom.
 
-            Session["ModeOfTransportation"] = modeOfT;
+                //Sets center of map
+                ViewBag.MapCenter = GetMapCenter(safeWalkRoute.RouteCoordinates);
 
-            RouteViewModel rvm = new RouteViewModel(safeBikeRoute, fastBikeRoute, safeWalkRoute, fastWalkRoute, sensors);
-            Session["rvm"] = rvm;
-            return View(rvm);
+                //Builds Javascript object string to display markers on google API map.
+                ViewBag.Sensors = sensorMarkers;
+
+                // Store currently selected mode of transportation walk/bike
+                Session["ModeOfTransportation"] = modeOfT;
+
+                // Routes for all paths and sensors data
+                RouteViewModel rvm = new RouteViewModel(safeBikeRoute, fastBikeRoute, safeWalkRoute, fastWalkRoute, sensors);
+
+                // Store route view model in session for use on final route choice page
+                Session["rvm"] = rvm;
+                return View(rvm);
+            } else
+            {
+                RouteViewModel rvm = (RouteViewModel)Session["rvm"];
+
+                //Sets center of map
+                ViewBag.MapCenter = GetMapCenter(rvm.SafeWalkRoute.RouteCoordinates);
+
+                //Builds Javascript object string to display markers on google API map.
+                ViewBag.Sensors = GetMarkers(rvm.Sensors);
+
+                // Store currently selected mode of transportation walk/bike
+                Session["ModeOfTransportation"] = modeOfT;
+                return View(rvm);
+            }
+            // Pass Route View Model to view
+            
         }
 
         //public ActionResult FinalMap(int id)
@@ -101,7 +124,13 @@ namespace RouteFinder.Controllers
         //public ActionResult FinalMap(string startLong, string startLat, string endLong, string endLat, string modeOfT, string routeSelected)
         public ActionResult FinalMap(string modeOfTransportation, string safeOrFast)
         {
+            if (String.IsNullOrEmpty(modeOfTransportation) || String.IsNullOrEmpty(safeOrFast))
+            {
+                return RedirectToAction("RouteMap");
+            }
             Route route = new Route();
+
+            // Get Route View Model from session
             RouteViewModel rvm = (RouteViewModel)Session["rvm"];
             if(modeOfTransportation == "pedestrian")
             {
