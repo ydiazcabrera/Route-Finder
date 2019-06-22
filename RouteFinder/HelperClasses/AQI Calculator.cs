@@ -9,9 +9,9 @@ using System.Web.UI.WebControls;
 
 namespace RouteFinder.Models
 {
-    public class AQICalculator
+    public class AQI_Calculator
     {
-        public AQICalculator()
+        public AQI_Calculator()
         {
 
         }
