@@ -22,29 +22,57 @@
 }
 @{
     //statistic data for tables
-    double TotalTime = (double)Model.SafeWalkRoute.TotalTravelTime;
-    double Distance = (double)Model.SafeWalkRoute.TotalDistance;
-    double Calories = Distance * 100;
-    double Steps = Distance * 1500;
-    string ModeOfTransportation = (string)Model.SafeWalkRoute.ModeOfTransportation;
 
-    double FastTotalTime = (double)Model.FastWalkRoute.TotalTravelTime;
-    double FastDistance = (double)Model.FastWalkRoute.TotalDistance;
-    double FastCalories = FastDistance * 100;
-    double FastSteps = Distance * 1500;
-    string FastModeOfTransportation = (string)Model.FastWalkRoute.ModeOfTransportation;
+    List<TimeSpan> travelTimes = new List<TimeSpan>();
 
-    double BikeTotalTime = (double)Model.SafeBikeRoute.TotalTravelTime;
-    double BikeDistance = (double)Model.SafeBikeRoute.TotalDistance;
-    double BikeCalories = BikeDistance * 48;
-    double BikeSteps = 0;
-    string BikeModeOfTransportation = (string)Model.SafeBikeRoute.ModeOfTransportation;
+    //totalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
+    TimeSpan walkTotalTime = TimeSpan.FromMinutes(Model.SafeWalkRoute.TotalTravelTime);
+    travelTimes.Add(walkTotalTime);
+    double walkDistance = (double)Model.SafeWalkRoute.TotalDistance;
+    double walkCalories = walkDistance * 100;
+    double walkSteps = walkDistance * 1500;
+    string walkModeOfTransportation = (string)Model.SafeWalkRoute.ModeOfTransportation;
 
-    double BikeFastTotalTime = (double)Model.FastBikeRoute.TotalTravelTime;
-    double BikeFastDistance = (double)Model.FastBikeRoute.TotalDistance;
-    double BikeFastCalories = BikeFastDistance * 48;
-    double BikeFastSteps = 0;
-    string BikeFastModeOfTransportation = (string)Model.FastBikeRoute.ModeOfTransportation;
+    TimeSpan walkFastTotalTime = TimeSpan.FromMinutes(Model.FastWalkRoute.TotalTravelTime);
+    travelTimes.Add(walkFastTotalTime);
+    double walkFastDistance = (double)Model.FastWalkRoute.TotalDistance;
+    double walkFastCalories = walkFastDistance * 100;
+    double walkFastSteps = walkFastDistance * 1500;
+    string walkFastModeOfTransportation = (string)Model.FastWalkRoute.ModeOfTransportation;
+
+    TimeSpan bikeTotalTime = TimeSpan.FromMinutes(Model.SafeBikeRoute.TotalTravelTime);
+    travelTimes.Add(bikeTotalTime);
+    double bikeDistance = (double)Model.SafeBikeRoute.TotalDistance;
+    double bikeCalories = bikeDistance * 48;
+    double bikeSteps = 0;
+    string bikeModeOfTransportation = (string)Model.SafeBikeRoute.ModeOfTransportation;
+
+    TimeSpan bikeFastTotalTime = TimeSpan.FromMinutes(Model.FastBikeRoute.TotalTravelTime);
+    travelTimes.Add(bikeFastTotalTime);
+    double bikeFastDistance = (double)Model.FastBikeRoute.TotalDistance;
+    double bikeFastCalories = bikeFastDistance * 48;
+    double bikeFastSteps = 0;
+    string bikeFastModeOfTransportation = (string)Model.FastBikeRoute.ModeOfTransportation;
+
+    List<string> formattedTravelTimes = new List<string>();
+    foreach(TimeSpan time in travelTimes)
+    {
+        string totalTimeFormat = "";
+        if (time.Hours <= 1)
+        {
+
+            totalTimeFormat = time.ToString(@"mm") + "min";
+
+        }
+        else
+        {
+            string hrTimeFormat = time.ToString(@"hh");
+            string minTimeFormat = time.ToString(@"%m");
+            totalTimeFormat = $"{hrTimeFormat} h {minTimeFormat} min";
+        }
+
+        formattedTravelTimes.Add(totalTimeFormat);
+    }
 }
 
 <head>
@@ -174,19 +202,19 @@
                             </tr>
                             <tr>
                                 <td>Distance</td>
-                                <td>@Distance Mi</td>
+                                <td>@string.Format("{0:0.0}", walkDistance) mi</td>
                             </tr>
                             <tr>
                                 <td>Time</td>
-                                <td>@TotalTime Hr</td>
+                                <td>@formattedTravelTimes[0]</td>
                             </tr>
                             <tr>
                                 <td>Calories</td>
-                                <td>@Calories</td>
+                                <td>@((int)walkCalories)</td>
                             </tr>
                             <tr>
                                 <td>Steps</td>
-                                <td>@Steps</td>
+                                <td>@((int)walkSteps)</td>
                             </tr>
 
                         </table>
@@ -208,19 +236,19 @@
                             </tr>
                             <tr>
                                 <td>Distance</td>
-                                <td>@FastDistance Mi</td>
+                                <td>@string.Format("{0:0.0}", walkFastDistance) mi</td>
                             </tr>
                             <tr>
                                 <td>Time</td>
-                                <td>@FastTotalTime</td>
+                                <td>@string.Format(formattedTravelTimes[1])</td>
                             </tr>
                             <tr>
                                 <td>Calories</td>
-                                <td>@FastCalories</td>
+                                <td>@((int)walkFastCalories)</td>
                             </tr>
                             <tr>
                                 <td>Steps</td>
-                                <td>@FastSteps</td>
+                                <td>@((int)walkFastSteps)</td>
                             </tr>
 
                         </table>
@@ -241,19 +269,19 @@
                             </tr>
                             <tr>
                                 <td>Distance</td>
-                                <td>@BikeDistance Mi</td>
+                                <td>@string.Format("{0:0.0}", bikeDistance) mi</td>
                             </tr>
                             <tr>
                                 <td>Time</td>
-                                <td>@BikeTotalTime</td>
+                                <td>@formattedTravelTimes[2] </td>
                             </tr>
                             <tr>
                                 <td>Calories</td>
-                                <td>@BikeCalories</td>
+                                <td>@((int)bikeCalories)</td>
                             </tr>
                             <tr>
                                 <td>Steps</td>
-                                <td>@BikeSteps</td>
+                                <td>@bikeSteps</td>
                             </tr>
 
                         </table>
@@ -274,19 +302,19 @@
                             </tr>
                             <tr>
                                 <td>Distance</td>
-                                <td>@BikeFastDistance Mi</td>
+                                <td>@string.Format("{0:0.0}", bikeFastDistance) mi</td>
                             </tr>
                             <tr>
                                 <td>Time</td>
-                                <td>@BikeFastTotalTime</td>
+                                <td>@formattedTravelTimes[3]</td>
                             </tr>
                             <tr>
                                 <td>Calories</td>
-                                <td>@BikeFastCalories</td>
+                                <td>@((int)bikeFastCalories)</td>
                             </tr>
                             <tr>
                                 <td>Steps</td>
-                                <td>@BikeFastSteps</td>
+                                <td>@bikeFastSteps</td>
                             </tr>
 
                         </table>
