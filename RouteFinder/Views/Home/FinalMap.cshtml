@@ -4,23 +4,22 @@
     Layout = null;
     string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
 
-    //var TotalTime = new TimeSpan();
-    //string TotalTimeFormat = "";
-    //if (Model.TotalTravelTime < 60)
-    //{
-    //    TotalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
-    //    TotalTimeFormat = TotalTime.ToString(@"mm") + "mins";
+    var totalTime = new TimeSpan();
+    string totalTimeFormat = "";
+    if (Model.TotalTravelTime < 60)
+    {
+        totalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
+        totalTimeFormat = totalTime.ToString(@"mm") + "min";
 
-    //}
-    //else
-    //{
-    //    TotalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
-    //    TotalTimeFormat = TotalTime.ToString(@"h:mm") + "mins";
-    //}
+    }
+    else
+    {
+        totalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
+        string hrTimeFormat = totalTime.ToString(@"hh");
+        string minTimeFormat = totalTime.ToString(@"%m");
+        totalTimeFormat = $"{hrTimeFormat} h {minTimeFormat} min"; 
+    }
 
-<p>Mode of Transportation @Model.ModeOfTransportation</p>
-<p >Total Distance @Math.Round(@Model.TotalDistance,1) Miles</p>
-//<p>Total Time @TotalTimeFormat</p>
 
     string modeOfTransportationMessage = "";
     if(Model.ModeOfTransportation == "pedestrian")
@@ -94,24 +93,40 @@
         </div>
     </div>
     <div id="map"></div>
-    <p>Total Distance @Math.Round(@Model.TotalDistance, 1) Miles</p>
-    @*<p>Total Time @TotalTimeFormat</p>*@
-    <div class="container">
+    <div>
         <div class="row">
-            <div class="col-sm-5 text-center"><h5>@modeOfTransportationMessage Directions</h5></div>
-            <div class="col-sm-1 text-center"><h5>Distance</h5></div>
-            <div class="col-sm-1 text-center"><h5>Time</h5></div>
-        </div>       
-    </div>
-    <div class="container">
-        @foreach (Maneuver m in Model.Maneuvers)
-        {
-            <div class="row">
-                <div class="col-sm-5">@Html.Raw(m.Instruction)</div>
-                <div class="col-sm-1">@string.Format("{0:0.00}", m.Distance) mi</div>
-                <div class="col-sm-1">@((int)m.TravelTime) min</div>
+            <div class="col-md-6">
+                @*ToDo - redirect to a final page and save the map and instructions as a pdf?  *@
+                <form action="~/Home/FinalMap" method="post" id="SafeWalk" style="margin: 5px;">
+                    <div class="row">
+                        <table class="table table-condensed table-bordered" id="Walk" style="margin-bottom: 2px;">
+                            <tr class="text-center success">
+                                <td colspan="3"><h4>@modeOfTransportationMessage Directions</h4></td>
+
+                            </tr>
+                            <tr class="text-center success">
+                                <td colspan="1"><u>Instruction</u></td>
+                                <td colspan="1"><u>Distance</u><br />@string.Format("{0:0.0}", Model.TotalDistance) mi</td>
+                                <td colspan="1"><u>Time</u><br />@totalTimeFormat</td>
+                            </tr>
+
+                            @foreach (Maneuver m in Model.Maneuvers)
+                            {
+                                <tr>
+                                    <td>@Html.Raw(m.Instruction)</td>
+                                    <td>@string.Format("{0:0.0}", m.Distance)</td>
+                                    <td>@((int)m.TravelTime) min</td>
+                                </tr>
+                            }
+
+                        </table>
+                    </div>
+                    <div class="row text-center" style="margin-top: 2px;">
+                        <input type="submit" value="Save to Device" class="btn btn-success" />
+                    </div>
+                </form>
             </div>
-        }
+        </div>
     </div>
     <div class="container body-content">
         <script async defer

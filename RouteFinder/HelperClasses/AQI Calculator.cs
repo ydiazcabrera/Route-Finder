@@ -158,7 +158,7 @@ namespace RouteFinder.Models
 
         public static int CalculateAQI(int aqiMax, int aquMin, double pollutantMax, double pollutantMin, double pollutantReading)
         {
-            int AQI = Convert.ToInt32((((aqiMax - aquMin) / (pollutantMax - pollutantMin)) * (pollutantReading - pollutantMin)) + aquMin);
+            int AQI = (int)((((aqiMax - aquMin) / (pollutantMax - pollutantMin)) * (pollutantReading - pollutantMin)) + aquMin);
             return AQI;
         }
     }
