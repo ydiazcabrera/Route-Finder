@@ -4,23 +4,23 @@
     Layout = null;
     string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
 
-    var TotalTime = new TimeSpan();
-    string TotalTimeFormat = "";
-    if (Model.TotalTravelTime < 60)
-    {
-        TotalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
-        TotalTimeFormat = TotalTime.ToString(@"mm") + "mins";
+    //var TotalTime = new TimeSpan();
+    //string TotalTimeFormat = "";
+    //if (Model.TotalTravelTime < 60)
+    //{
+    //    TotalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
+    //    TotalTimeFormat = TotalTime.ToString(@"mm") + "mins";
 
-    }
-    else
-    {
-        TotalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
-        TotalTimeFormat = TotalTime.ToString(@"h:mm") + "mins";
-    }
+    //}
+    //else
+    //{
+    //    TotalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
+    //    TotalTimeFormat = TotalTime.ToString(@"h:mm") + "mins";
+    //}
 
 <p>Mode of Transportation @Model.ModeOfTransportation</p>
 <p >Total Distance @Math.Round(@Model.TotalDistance,1) Miles</p>
-<p>Total Time @TotalTimeFormat</p>
+//<p>Total Time @TotalTimeFormat</p>
 
     string modeOfTransportationMessage = "";
     if(Model.ModeOfTransportation == "pedestrian")
@@ -95,7 +95,7 @@
     </div>
     <div id="map"></div>
     <p>Total Distance @Math.Round(@Model.TotalDistance, 1) Miles</p>
-    <p>Total Time @TotalTimeFormat</p>
+    @*<p>Total Time @TotalTimeFormat</p>*@
     <div class="container">
         <div class="row">
             <div class="col-sm-5 text-center"><h5>@modeOfTransportationMessage Directions</h5></div>
