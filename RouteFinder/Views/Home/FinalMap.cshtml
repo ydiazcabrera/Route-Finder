@@ -3,8 +3,24 @@
 @{
     Layout = null;
     string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
-    var TotalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
-    var TotalTimeFormat = TotalTime.ToString(@"h\:mm");
+
+    var TotalTime = new TimeSpan();
+    string TotalTimeFormat = "";
+    if (Model.TotalTravelTime < 60)
+    {
+        TotalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
+        TotalTimeFormat = TotalTime.ToString(@"mm") + "mins";
+
+    }
+    else
+    {
+        TotalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
+        TotalTimeFormat = TotalTime.ToString(@"h:mm") + "mins";
+    }
+
+<p>Mode of Transportation @Model.ModeOfTransportation</p>
+<p >Total Distance @Math.Round(@Model.TotalDistance,1) Miles</p>
+<p>Total Time @TotalTimeFormat</p>
 
     string modeOfTransportationMessage = "";
     if(Model.ModeOfTransportation == "pedestrian")
