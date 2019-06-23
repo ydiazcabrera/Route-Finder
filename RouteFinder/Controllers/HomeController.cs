@@ -15,9 +15,7 @@ namespace RouteFinder.Controllers
         //Action for Index view
         public ActionResult Index()
         {
-            string mapCenter = "{ lat: " + 42.9634 + ", lng: " + -85.6681 + " }";
-            ViewBag.MapCenter = mapCenter;
-
+           
             //reset sessions for new route
             Session["ModeOfTransportation"] = null;
             Session["rvm"] = null;
@@ -38,12 +36,12 @@ namespace RouteFinder.Controllers
 
         //Displays RouteMap from a form post
         [HttpPost]
-        public ActionResult RouteMap(string startLong, string startLat, string endLong, string endLat, string modeOfT, string finalMap = "no")
+        public ActionResult RouteMap(string startLong, string startLat, string endLong, string endLat, string modeOfT)
         {
             // Makes sure data is entered in form, but doesn't account for invalid data.
             // Need to add validation in action or in the api call. I would assume we could make sure
             // it is a valid number between. Might want to write a validation method for Longitude and Latitude
-            if ((startLong == "" || startLat == "" || endLong == "" || endLat == "" || modeOfT == "" || finalMap == "") && Session["rvm"] == null)
+            if ((startLong == "" || startLat == "" || endLong == "" || endLat == "" || modeOfT == "" ) && Session["rvm"] == null)
             {
                 return RedirectToAction("Index");
             }
@@ -62,25 +60,25 @@ namespace RouteFinder.Controllers
                 List<Sensor> sensorsAboveAQIThreshold = GetSensorsAboveAQIThreshold(sensors);
 
                 Route safeWalkRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sensorsAboveAQIThreshold, "pedestrian");
-                safeWalkRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
-                safeWalkRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
+                safeWalkRoute.RouteCoordinatesString = BuildJsRouteCoordinates(safeWalkRoute.RouteCoordinates);
+                safeWalkRoute.RouteCoordinatesString = BuildJsRouteCoordinates(safeWalkRoute.RouteCoordinates);
 
 
                 Route safeBikeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sensorsAboveAQIThreshold, "bicycle");
-                safeBikeRoute.RouteCoordinatesString = GetRoute(safeWalkRoute.RouteCoordinates);
-                safeBikeRoute.RouteCoordinatesString = GetRoute(safeBikeRoute.RouteCoordinates);
+                safeBikeRoute.RouteCoordinatesString = BuildJsRouteCoordinates(safeWalkRoute.RouteCoordinates);
+                safeBikeRoute.RouteCoordinatesString = BuildJsRouteCoordinates(safeBikeRoute.RouteCoordinates);
 
                 Route fastWalkRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, "pedestrian");
-                fastWalkRoute.RouteCoordinatesString = GetRoute(fastWalkRoute.RouteCoordinates);
-                fastWalkRoute.RouteCoordinatesString = GetRoute(fastWalkRoute.RouteCoordinates);
+                fastWalkRoute.RouteCoordinatesString = BuildJsRouteCoordinates(fastWalkRoute.RouteCoordinates);
+                fastWalkRoute.RouteCoordinatesString = BuildJsRouteCoordinates(fastWalkRoute.RouteCoordinates);
 
 
                 Route fastBikeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, "bicycle");
-                fastBikeRoute.RouteCoordinatesString = GetRoute(fastBikeRoute.RouteCoordinates);
-                fastBikeRoute.RouteCoordinatesString = GetRoute(fastBikeRoute.RouteCoordinates);
+                fastBikeRoute.RouteCoordinatesString = BuildJsRouteCoordinates(fastBikeRoute.RouteCoordinates);
+                fastBikeRoute.RouteCoordinatesString = BuildJsRouteCoordinates(fastBikeRoute.RouteCoordinates);
 
                 //build map marker string for sensors on Google MAP API
-                string sensorMarkers = GetMarkers(sensors);
+                string sensorMarkers = BuildJsSensors(sensors);
 
                 // Map center is imperfect because the middle coordinate isn't necessarily the middle of the map.
                 // It also doesn't address the zoom level. We could probably use a C# or .NET geography library to find the 
@@ -109,7 +107,7 @@ namespace RouteFinder.Controllers
                 ViewBag.MapCenter = GetMapCenter(rvm.SafeWalkRoute.RouteCoordinates);
 
                 //Builds Javascript object string to display markers on google API map.
-                ViewBag.Sensors = GetMarkers(rvm.Sensors);
+                ViewBag.Sensors = BuildJsSensors(rvm.Sensors);
 
                 // Store currently selected mode of transportation walk/bike
                 Session["ModeOfTransportation"] = modeOfT;
@@ -168,31 +166,31 @@ namespace RouteFinder.Controllers
             return "{ lat: " + centerCoordinate.Latitude + ", lng: " + centerCoordinate.Longitude + " }";
         }
 
-        public string GetMarkers(List<Sensor> sensors)
+        public string BuildJsSensors(List<Sensor> sensors)
         {
             // This section builds a string, which is passed to the view and used by the JS script to display the sensors
             // https://forums.asp.net/t/2120631.aspx?Using+Razor+in+javascript+to+create+Google+map <= Citation
-            string markers = "[";
+            string sensorMarkers = "[";
             for (int i = 0; i < sensors.Count; i++)
             {
-                markers += "{";
-                markers += string.Format("'name': '{0}',", sensors[i].Name);
-                markers += string.Format("'aqi': '{0}',", sensors[i].AQI);
-                markers += string.Format("'lat': '{0}',", sensors[i].Latitude);
-                markers += string.Format("'lng': '{0}',", sensors[i].Longitude);
-                markers += string.Format("'north': '{0}',", sensors[i].BoundingBox.NorthEast.Longitude);
-                markers += string.Format("'south': '{0}',", sensors[i].BoundingBox.SouthEast.Longitude);
-                markers += string.Format("'east': '{0}',", sensors[i].BoundingBox.NorthEast.Latitude);
-                markers += string.Format("'west': '{0}',", sensors[i].BoundingBox.NorthWest.Latitude);
+                sensorMarkers += "{";
+                sensorMarkers += string.Format("'name': '{0}',", sensors[i].Name);
+                sensorMarkers += string.Format("'aqi': '{0}',", sensors[i].AQI);
+                sensorMarkers += string.Format("'lat': '{0}',", sensors[i].Latitude);
+                sensorMarkers += string.Format("'lng': '{0}',", sensors[i].Longitude);
+                sensorMarkers += string.Format("'north': '{0}',", sensors[i].BoundingBox.NorthEast.Longitude);
+                sensorMarkers += string.Format("'south': '{0}',", sensors[i].BoundingBox.SouthEast.Longitude);
+                sensorMarkers += string.Format("'east': '{0}',", sensors[i].BoundingBox.NorthEast.Latitude);
+                sensorMarkers += string.Format("'west': '{0}',", sensors[i].BoundingBox.NorthWest.Latitude);
                 //markers += string.Format("'description': '{0}'", "AQI: 50"); // This doesn't seem to be working
-                markers += "},";
+                sensorMarkers += "},";
             }
-            markers += "];";
+            sensorMarkers += "];";
 
-            return markers;
+            return sensorMarkers;
         }
 
-        public string GetRoute(List<RouteCoordinate> routeCoordinates)
+        public string BuildJsRouteCoordinates(List<RouteCoordinate> routeCoordinates)
         {
             // This section builds a string, which is passed to the view and used by the JS script to display the route
             string route = "[";

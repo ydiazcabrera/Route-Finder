@@ -64,6 +64,223 @@
             padding: 0;
         }
         /* Legend Styling*/
+
+    </style>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Prime Path", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="map"></div>
+    <script>
+
+        var sensors = @Html.Raw(ViewBag.Sensors) //ToDo - Change this to come in from ViewModel
+
+        function initMap() {
+            //Create a new map
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: @Html.Raw(ViewBag.MapCenter),
+                mapTypeId: 'terrain'
+            });
+
+            // Holds the route coordinates in the correct format to be displayed on the map when used in flightPath
+            var routeCoordinates = @Html.Raw(safeRoute);
+            var fastestCoordinates = @Html.Raw(fastRoute);
+
+            //Create a line from the routeCoordinates
+            var routePath = new google.maps.Polyline({
+                path: routeCoordinates,
+                geodesic: true,
+                strokeColor: '#5600FF',
+                strokeOpacity: .5,
+                strokeWeight: 3
+            });
+
+            //Create a line from the fastestRouteCoordinates
+            var fastRoutePath = new google.maps.Polyline({
+                path: fastestCoordinates,
+                geodesic: true,
+                strokeColor: '#FFDB00',
+                strokeOpacity: .5,
+                strokeWeight: 3
+            });
+
+
+            //Displays the sensors that were passed in as "ViewBag.Sensors"
+            for (i = 0; i < sensors.length; i++) {
+                var data = sensors[i]
+                var myLatlng = new google.maps.LatLng(data.lat, data.lng);
+                var north = sensors[i].north;
+                var south = sensors[i].south;
+                var east = sensors[i].east;
+                var west = sensors[i].west;
+                var marker = new google.maps.Marker({
+                    //opacity: 0,
+                    labelAnchor: { x: 0, y: 30 },
+                    position: myLatlng,
+                    map: map,
+                    title: data.title,
+                    scaledSize: new google.maps.Size(50, 50),
+                    icon: data.aqi/*'http://maps.google.com/mapfiles/kml/pal4/icon57.png'*/,
+                    label: data.aqi,
+                });
+
+                //var sensorBuffer = new google.maps.Rectangle({
+                //    strokeColor: '#FF0000',
+                //    strokeOpacity: 0.8,
+                //    strokeWeight: 1,
+                //    fillColor: '#FF0000',
+                //    fillOpacity: 0.35,
+                //    map: map,
+                //    bounds: {
+                //        north: ,
+                //        south: ,
+                //        east: ,
+                //        west:
+                //    }
+                //    label: data.name,
+                //});
+
+
+                if (data.aqi >= 151 && data.aqi <= 200) {
+                    //var sensorBuffer = new google.maps.Circle({
+                    //    strokeColor: '#FF0000',
+                    //    strokeOpacity: 0.8,
+                    //    strokeWeight: 1,
+                    //    fillColor: '#FF0000',
+                    //    fillOpacity: 0.35,
+                    //    map: map,
+                    //    center: myLatlng,
+                    //    radius: 300,
+                    //    label: data.name,
+                    //});
+                    var sensorBuffer = new google.maps.Rectangle({
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 1,
+                        fillColor: '#FF0000',
+                        fillOpacity: 0.35,
+                        map: map,
+                        bounds: {
+                            north: north,
+                            south: south,
+                            east: east,
+                            west: west
+                        }
+                        //label: data.name
+                    });
+                }
+                else if (data.aqi >= 101 && data.aqi <= 150) {
+                    var sensorBuffer = new google.maps.Circle({
+                        strokeColor: '#E17E00',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 1,
+                        fillColor: '#E17E00',
+                        fillOpacity: 0.35,
+                        map: map,
+                        center: myLatlng,
+                        radius: 300,
+                        label: data.name,
+                    });
+                }
+                else if (data.aqi >= 51 && data.aqi <= 100)
+                {
+                    var sensorBuffer = new google.maps.Circle({
+                        strokeColor: '#E1E100',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 1,
+                        fillColor: '#E1E100',
+                        fillOpacity: 0.35,
+                        map: map,
+                        center: myLatlng,
+                        radius: 300,
+                        label: data.name,
+                    });
+                }
+                else if (data.aqi >= 30 && data.aqi <= 50) {
+                    var sensorBuffer = new google.maps.Circle({
+                        strokeColor: '#E1E100',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 1,
+                        fillColor: '#E1E100',
+                        fillOpacity: 0.35,
+                        map: map,
+                        center: myLatlng,
+                        radius: 300,
+                        label: data.name,
+                    });
+                }
+                else if (data.aqi <= 30) {
+                    var sensorBuffer = new google.maps.Circle({
+                        strokeColor: '#00E400',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 1,
+                        fillColor: '#00E400',
+                        fillOpacity: 0.35,
+                        map: map,
+                        center: myLatlng,
+                        radius: 300,
+                        label: data.name,
+                    });
+                }
+            }
+
+          fastRoutePath.setMap(map);
+          routePath.setMap(map);
+            }
+        var circle = new google.maps.Circle({
+            strokeColor: '#00E400',
+            strokeOpacity: 0.8,
+            strokeWeight: 1,
+            fillColor: '#00E400',
+            fillOpacity: 0.35,
+            map: map,
+            center: myLatlng,
+            radius: 300,
+            label: data.name,
+        });
+        var icons = {
+            Sensor: {
+                name: 'Sensor',
+                icon: circle
+            }
+
+        };
+
+        var legend = document.getElementById('legend');
+        for (var key in icons) {
+            var type = icons[key];
+            var name = type.name;
+            var icon = type.icon;
+            var div = document.createElement('div');
+            div.innerHTML = '<img src="' + icon + '"> ' + name;
+            legend.appendChild(div);
+        }
+        
+
+    </script>
+
+    <!--Legend Styling-->
+    <style type='text/css'>
         .my-legend .legend-title {
             text-align: left;
             margin-bottom: 5px;
@@ -140,7 +357,6 @@
     </script>
     <script src="~/Scripts/googleMap.js"></script>
 
-
     <div class="container">
         <div class="row text-center">
             <div class="col-md-6">
@@ -198,7 +414,6 @@
                     </div>
                 </form>
             </div>
-
             <div class="col-md-3">
                 <form action="~/Home/FinalMap" method="post" id="FastWalk" style="margin: 5px;">
                     <div class="row">
@@ -327,7 +542,6 @@
                     </div>
                 </div>
             </form>
-
         </div>*@
     @*<div class="row" style="margin-bottom: 5px;">
             <div class="col-md-3">
@@ -338,8 +552,6 @@
                     <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
                     <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
                     <input type="hidden" name="modeOfT" value="@Model.SafeRoute.ModeOfTransportation" />
-
-
                     <input type="submit" name="finalMap" value="CheckoutMap" class="btn btn-warning" />
                 </div>
             </div>

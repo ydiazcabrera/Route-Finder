@@ -22,15 +22,8 @@ namespace RouteFinder.Models
             Route route = GetRoute(startPoint, endPoint, sensorsToAvoid, mode);
 
             return route;
-            //string mapImage = GetMap(routeCoordinates);
-            //return mapImage;
         }
-
-        internal static List<string> GetCoordinates()
-        {
-            throw new NotImplementedException();
-        }
-
+        
         /// <summary>
         /// Method to Call Routing API from here.com that generates route
         /// from users start and endpoint while avoiding areas of bad AQI
@@ -117,7 +110,7 @@ namespace RouteFinder.Models
                 string instruction = jsonTokens[i]["instruction"].ToString();
                 double travelTime = double.Parse(jsonTokens[i]["travelTime"].ToString())/60;
                 double distance = double.Parse(jsonTokens[i]["length"].ToString())/1690;
-                                Maneuver man = new Maneuver(travelTime, distance, instruction);
+                Maneuver man = new Maneuver(travelTime, distance, instruction);
                 maneuvers.Add(man);
             }
             return maneuvers;
