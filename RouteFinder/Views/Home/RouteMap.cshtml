@@ -9,7 +9,7 @@
     string safeRoute = "";
     string fastRoute = "";
 
-    if ( selectedModeOfTransportation == "pedestrian")
+    if (selectedModeOfTransportation == "pedestrian")
     {
         safeRoute = Model.SafeWalkRoute.RouteCoordinatesString;
         fastRoute = Model.FastWalkRoute.RouteCoordinatesString;
@@ -20,7 +20,32 @@
         fastRoute = Model.FastBikeRoute.RouteCoordinatesString;
     }
 }
+@{
+    //statistic data for tables
+    double TotalTime = (double)Model.SafeWalkRoute.TotalTravelTime;
+    double Distance = (double)Model.SafeWalkRoute.TotalDistance;
+    double Calories = Distance * 100;
+    double Steps = Distance * 1500;
+    string ModeOfTransportation = (string)Model.SafeWalkRoute.ModeOfTransportation;
 
+    double FastTotalTime = (double)Model.FastWalkRoute.TotalTravelTime;
+    double FastDistance = (double)Model.FastWalkRoute.TotalDistance;
+    double FastCalories = FastDistance * 100;
+    double FastSteps = Distance * 1500;
+    string FastModeOfTransportation = (string)Model.FastWalkRoute.ModeOfTransportation;
+
+    double BikeTotalTime = (double)Model.SafeBikeRoute.TotalTravelTime;
+    double BikeDistance = (double)Model.SafeBikeRoute.TotalDistance;
+    double BikeCalories = BikeDistance * 48;
+    double BikeSteps = 0;
+    string BikeModeOfTransportation = (string)Model.SafeBikeRoute.ModeOfTransportation;
+
+    double BikeFastTotalTime = (double)Model.FastBikeRoute.TotalTravelTime;
+    double BikeFastDistance = (double)Model.FastBikeRoute.TotalDistance;
+    double BikeFastCalories = BikeFastDistance * 48;
+    double BikeFastSteps = 0;
+    string BikeFastModeOfTransportation = (string)Model.FastBikeRoute.ModeOfTransportation;
+}
 
 <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
@@ -30,7 +55,7 @@
         /* Always set the map height explicitly to define the size of the div
                 * element that contains the map. */
         #map {
-            height: 70%;
+            height: 60%;
         }
         /* Optional: Makes the sample page fill the window. */
         html, body {
@@ -38,6 +63,8 @@
             margin: 0;
             padding: 0;
         }
+        /* Legend Styling*/
+
     </style>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
@@ -297,179 +324,262 @@
             color: #777;
         }
     </style>
-    <form action="~/Home/RouteMap" method="post" id="routeMapForm" style="margin-top: 5px;">
-        <div class="row" style="margin-bottom: 5px;">
-            <div class="col-md-3">
-                <div class="btn-group">
-                    <input type="hidden" name="startLong" value="@Model.SafeWalkRoute.RouteCoordinates[0].Longitude" />
-                    <input type="hidden" name="startLat" value="@Model.SafeWalkRoute.RouteCoordinates[0].Latitude" />
-                    <input type="hidden" name="endLong" value="@Model.SafeWalkRoute.RouteCoordinates[Model.SafeWalkRoute.RouteCoordinates.Count - 1].Longitude" />
-                    <input type="hidden" name="endLat" value="@Model.SafeWalkRoute.RouteCoordinates[Model.SafeWalkRoute.RouteCoordinates.Count - 1].Latitude" />
-                    <input type="submit" name="modeOfT" value="pedestrian" class="btn btn-warning" />
-                    <input type="submit" name="modeOfT" value="bicycle" class="btn btn-success" />
-                    @selectedModeOfTransportation
-                </div>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Prime Path", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                </ul>
             </div>
         </div>
-    </form>
-
-    <form action="~/Home/FinalMap" method="post" style="margin-top: 5px;">
-        <div class="row" style="margin-bottom: 5px;">
-            <div class="col-md-3">
-                <div class="btn-group">
-                    <input type="hidden" name="modeOfTransportation" value="@selectedModeOfTransportation" />
-                    <input type="radio" name="safeOrFast" value="fast" /> Fast Route
-                    <input type="radio" name="safeOrFast" value="safe" /> Safe Route
-                    <input type="submit" name="finalMap" value="checkoutMap" class="btn btn-warning" />
-                </div>
-            </div>
-        </div>
-    </form>
-    <div class='my-legend'>
-        <div class='legend-title'>AQI Index</div>
-        <div class='legend-scale'>
-            <ul class='legend-labels'>
-                <li><span style='background:#00E400;'></span>Good</li>
-                <li><span style='background:#E1E100;'></span>Moderate</li>
-                <li><span style='background:#E17E00;'></span>Unhealthy for Sensitive Groups</li>
-                <li><span style='background:#FF0000;'></span>Unhealthy</li>
-                <li><span style='background:#8F3F97;'></span>Very Unhealthy</li>
-            </ul>
-        </div>
-        <div class='legend-source'>Source: <a href="#link to source">Name of source</a></div>
     </div>
-
-    
-   
-
-    @{
-        double TotalTime = (double)Model.SafeWalkRoute.TotalTravelTime ;
-        double Distance = (double)Model.SafeWalkRoute.TotalDistance ;
-        double Calories = Distance * 100;
-        double Steps = Distance * 1500;
-        string ModeOfTransportation = (string)Model.SafeWalkRoute.ModeOfTransportation;
-
-        double FastTotalTime = (double)Model.FastWalkRoute.TotalTravelTime;
-        double FastDistance = (double)Model.FastWalkRoute.TotalDistance ;
-        double FastCalories = FastDistance * 100;
-        double FastSteps = Distance * 1500;
-        string FastModeOfTransportation = (string)Model.FastWalkRoute.ModeOfTransportation;
-
-        double BikeTotalTime = (double)Model.SafeBikeRoute.TotalTravelTime;
-        double BikeDistance = (double)Model.SafeBikeRoute.TotalDistance ;
-        double BikeCalories = BikeDistance * 48;
-        double BikeSteps = 0;
-        string BikeModeOfTransportation = (string)Model.SafeBikeRoute.ModeOfTransportation;
-
-        double BikeFastTotalTime = (double)Model.FastBikeRoute.TotalTravelTime;
-        double BikeFastDistance = (double)Model.FastBikeRoute.TotalDistance;
-        double BikeFastCalories = BikeFastDistance * 48;
-        double BikeFastSteps = 0;
-        string BikeFastModeOfTransportation = (string)Model.FastBikeRoute.ModeOfTransportation;
-    }
+    <div id="map"></div>
+    <script>
+            let sensors = @Html.Raw(ViewBag.Sensors)
+            let mapCenter = @Html.Raw(ViewBag.MapCenter)
+            // Holds the route coordinates in the correct format to be displayed on the map when used in flightPath
+            let routeCoordinates = @Html.Raw(safeRoute);
+            let fastestCoordinates = @Html.Raw(fastRoute);
+    </script>
+    <script src="~/Scripts/googleMap.js"></script>
 
     <div class="container">
+        <div class="row text-center">
+            <div class="col-md-6">
+                @if (selectedModeOfTransportation == "pedestrian")
+                {
+                    <input type="submit" value="Walk Paths Selected" class="btn btn-primary active" form="showWalkPath" disabled />
+                }
+                else
+                {
+                    <input type="submit" value="Show Walk Paths" class="btn btn-primary" form="showWalkPath" />
+                }
+            </div>
+            <div class="col-md-6">
+                @if (selectedModeOfTransportation == "bicycle")
+                {
+                    <input type="submit" value="Bike Paths Selected" class="btn btn-primary active" form="showBikePath" disabled />
+                }
+                else
+                {
+                    <input type="submit" value="Show Bike Paths" class="btn btn-primary" form="showBikePath" />
+                }
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-3">
-                <div class='my-legend'>
-                    <div class='legend-title'>AQI Index</div>
-                    <div class='legend-scale'>
-                        <ul class='legend-labels'>
-                            <li><span style='background:#00E400;'></span>Good</li>
-                            <li><span style='background:#E1E100;'></span>Moderate</li>
-                            <li><span style='background:#E17E00;'></span>Unhealthy for Sensitive Groups</li>
-                            <li><span style='background:#FF0000;'></span>Unhealthy</li>
-                            <li><span style='background:#8F3F97;'></span>Very Unhealthy</li>
-                        </ul>
+                <form action="~/Home/FinalMap" method="post" id="SafeWalk" style="margin: 5px;">
+                    <div class="row">
+                        <table class="table table-condensed table-bordered" id="Walk" style="margin-bottom: 2px;">
+                            <tr class="text-center success">
+                                <td colspan="2">Healthiest Walk Path Statistics</td>
+                            </tr>
+                            <tr>
+                                <td>Distance</td>
+                                <td>@Distance Mi</td>
+                            </tr>
+                            <tr>
+                                <td>Time</td>
+                                <td>@TotalTime Hr</td>
+                            </tr>
+                            <tr>
+                                <td>Calories</td>
+                                <td>@Calories</td>
+                            </tr>
+                            <tr>
+                                <td>Steps</td>
+                                <td>@Steps</td>
+                            </tr>
+
+                        </table>
+                        <input type="hidden" name="modeOfTransportation" value="pedestrian" />
+                        <input type="hidden" name="safeOrFast" value="safe" />
                     </div>
-                </div>
-            </div>
-
-            <div class="row" style="margin-bottom: 5px;">
-                <div class="col-md-3">
-                    <div class="btn-group">
-
-                        @*<input type="hidden" name="startLong" value="@Model.SafeRoute.RouteCoordinates[0].Longitude" />
-                                          <input type="hidden" name="startLat" value="@Model.SafeRoute.RouteCoordinates[0].Latitude" />
-                            <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
-                            <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
-                            <input type="hidden" name="modeOfT" value="@Model.SafeRoute.ModeOfTransportation" />*@
-
-
-                        <input type="submit" name="finalMap" value="CheckoutMap" class="btn btn-warning" />
+                    <div class="row text-center" style="margin-top: 2px;">
+                        <input type="submit" value="Take Healthiest Walk" class="btn btn-success" />
                     </div>
-                </div>
+                </form>
             </div>
+            <div class="col-md-3">
+                <form action="~/Home/FinalMap" method="post" id="FastWalk" style="margin: 5px;">
+                    <div class="row">
+                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 2px;">
+                            <tr class="text-center warning">
+                                <td colspan="2">Fastest Walk Path Statistics</td>
+                            </tr>
+                            <tr>
+                                <td>Distance</td>
+                                <td>@FastDistance Mi</td>
+                            </tr>
+                            <tr>
+                                <td>Time</td>
+                                <td>@FastTotalTime</td>
+                            </tr>
+                            <tr>
+                                <td>Calories</td>
+                                <td>@FastCalories</td>
+                            </tr>
+                            <tr>
+                                <td>Steps</td>
+                                <td>@FastSteps</td>
+                            </tr>
 
-            <form action="~/Home/FinalMap" method="post" style="margin-top: 5px;">
-                <div class="col-md-5">
-                    <div class="row" style="margin-top: 50px;"> <input type="radio" name="FastOrSafe" value="Safe" /> Safe Route</div>
-                    <div class="row">table goes here: </div>
+                        </table>
+                        <input type="hidden" name="modeOfTransportation" value="pedestrian" />
+                        <input type="hidden" name="safeOrFast" value="fast" />
+                    </div>
+                    <div class="row text-center" style="margin-top: 2px;">
+                        <input type="submit" value="Take Fastest Walk" class="btn btn-success" />
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-3">
+                <form action="~/Home/FinalMap" method="post" id="SafeBike" style="margin: 5px;">
+                    <div class="row">
+                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 2px;">
+                            <tr class="text-center success">
+                                <td colspan="2">Healthiest Bike Path Statistics</td>
+                            </tr>
+                            <tr>
+                                <td>Distance</td>
+                                <td>@BikeDistance Mi</td>
+                            </tr>
+                            <tr>
+                                <td>Time</td>
+                                <td>@BikeTotalTime</td>
+                            </tr>
+                            <tr>
+                                <td>Calories</td>
+                                <td>@BikeCalories</td>
+                            </tr>
+                            <tr>
+                                <td>Steps</td>
+                                <td>@BikeSteps</td>
+                            </tr>
 
-                </div>
-                <div class="col-md-5">
-                    <div class="row" style="margin-top: 50px;"> <input type="radio" name="FastOrSafe" value="Fast" /> Fast Route</div>
-                    <div class="row">table goes here: </div>
-                </div>
-            </form>
+                        </table>
+                        <input type="hidden" name="modeOfTransportation" value="bicycle" />
+                        <input type="hidden" name="safeOrFast" value="safe" />
+                    </div>
+                    <div class="row text-center" style="margin-top: 2px;">
+                        <input type="submit" value="Take Healthiest Bike Ride" class="btn btn-success" />
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-3">
+                <form action="~/Home/FinalMap" method="post" id="FastBike" style="margin: 5px;">
+                    <div class="row">
+                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 2px;">
+                            <tr class="text-center warning">
+                                <td colspan="2">Fastest Bike Path Statistics</td>
+                            </tr>
+                            <tr>
+                                <td>Distance</td>
+                                <td>@BikeFastDistance Mi</td>
+                            </tr>
+                            <tr>
+                                <td>Time</td>
+                                <td>@BikeFastTotalTime</td>
+                            </tr>
+                            <tr>
+                                <td>Calories</td>
+                                <td>@BikeFastCalories</td>
+                            </tr>
+                            <tr>
+                                <td>Steps</td>
+                                <td>@BikeFastSteps</td>
+                            </tr>
 
-        </div>
-        <div class="row">
-
-        </div>
-        <div class="row">
-            <div class="col-sm-2">Mode Of T</div>
-            <div class="col-sm-4">Walk</div>
-            <div class="col-sm-4">Bike</div>
-        </div>
-        <div class="row">
-            <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Route</div>
-            <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Safe</div>
-            <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Fast</div>
-            <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Safe</div>
-            <div class="col-sm-2" style="border: solid 1px black; background-color: lightgreen;">Fast</div>
-        </div>
-        <div class="row">
-            <div class="col-sm-2">Distance</div>
-            <div class="col-sm-2">@Distance</div>
-            <div class="col-sm-2">@FastDistance</div>
-            <div class="col-sm-2">@BikeDistance</div>
-            <div class="col-sm-2">@BikeFastDistance</div>
-        </div>
-        <div class="row">
-            <div class="col-sm-2">Time</div>
-            <div class="col-sm-2"><p>@TotalTime</p></div>
-            <div class="col-sm-2"><p>@FastTotalTime</p></div>
-            <div class="col-sm-2">@BikeTotalTime</div>
-            <div class="col-sm-2">@BikeFastTotalTime</div>
-        </div>
-        <div class="row">
-            <div class="col-sm-2">Calories</div>
-            <div class="col-sm-2"><p>@Calories</p></div>
-            <div class="col-sm-2"><p>@FastCalories</p></div>
-            <div class="col-sm-2">@BikeCalories</div>
-            <div class="col-sm-2">@BikeFastCalories</div>
-        </div>
-        <div class="row">
-            <div class="col-sm-2">Steps</div>
-            <div class="col-sm-2"><p>@Steps</p></div>
-            <div class="col-sm-2"><p>@FastSteps</p></div>
-            <div class="col-sm-2">@BikeSteps</div>
-            <div class="col-sm-2">@BikeFastSteps</div>
+                        </table>
+                        <input type="hidden" name="modeOfTransportation" value="bicycle" />
+                        <input type="hidden" name="safeOrFast" value="fast" />
+                    </div>
+                    <div class="row text-center" style="margin-top: 2px;">
+                        <input type="submit" value="Take Fastest Bike Ride" class="btn btn-success" />
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+    <form action="~/Home/RouteMap" method="post" id="showWalkPath" style="margin-top: 5px;">
+        <input type="hidden" name="startLong" value="@Model.SafeWalkRoute.RouteCoordinates[0].Longitude" />
+        <input type="hidden" name="startLat" value="@Model.SafeWalkRoute.RouteCoordinates[0].Latitude" />
+        <input type="hidden" name="endLong" value="@Model.SafeWalkRoute.RouteCoordinates[Model.SafeWalkRoute.RouteCoordinates.Count - 1].Longitude" />
+        <input type="hidden" name="endLat" value="@Model.SafeWalkRoute.RouteCoordinates[Model.SafeWalkRoute.RouteCoordinates.Count - 1].Latitude" />
+        <input type="hidden" name="modeOfT" value="pedestrian" />
+    </form>
+    <form action="~/Home/RouteMap" method="post" id="showBikePath" style="margin-top: 5px;">
+        <input type="hidden" name="startLong" value="@Model.SafeWalkRoute.RouteCoordinates[0].Longitude" />
+        <input type="hidden" name="startLat" value="@Model.SafeWalkRoute.RouteCoordinates[0].Latitude" />
+        <input type="hidden" name="endLong" value="@Model.SafeWalkRoute.RouteCoordinates[Model.SafeWalkRoute.RouteCoordinates.Count - 1].Longitude" />
+        <input type="hidden" name="endLat" value="@Model.SafeWalkRoute.RouteCoordinates[Model.SafeWalkRoute.RouteCoordinates.Count - 1].Latitude" />
+        <input type="hidden" name="modeOfT" value="bicycle" />
+    </form>
 
-    @*<div>
-            <img src="https://mde.maryland.gov/programs/Air/AirQualityMonitoring/PublishingImages/Widget/AQI.png" alt="Alternate Text" />
+    @*<form action="~/Home/FinalMap" method="post" style="margin-top: 5px;">
+                <div class="row" style="margin-bottom: 5px;">
+                    <div class="col-md-3">
+                        <div class="btn-group">
+                            <input type="hidden" name="modeOfTransportation" value="@selectedModeOfTransportation" />
+                            <input type="radio" name="safeOrFast" value="fast" /> Fast Route
+                            <input type="radio" name="safeOrFast" value="safe" /> Safe Route
+                            <input type="submit" name="finalMap" value="checkoutMap" class="btn btn-warning" />
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>*@
-    <script async defer
-            src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
-        document.getElementById('routeMapForm').addEventListener("click", (e) => {
-            this.forms.submit();
-        });
-    </script>
+    @*<div class="row" style="margin-bottom: 5px;">
+            <div class="col-md-3">
+                <div class="btn-group">
+
+                    <input type="hidden" name="startLong" value="@Model.SafeRoute.RouteCoordinates[0].Longitude" />
+                                  <input type="hidden" name="startLat" value="@Model.SafeRoute.RouteCoordinates[0].Latitude" />
+                    <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
+                    <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
+                    <input type="hidden" name="modeOfT" value="@Model.SafeRoute.ModeOfTransportation" />
+                    <input type="submit" name="finalMap" value="CheckoutMap" class="btn btn-warning" />
+                </div>
+            </div>
+        </div>*@
+
+
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    <script async defer
+            src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
 
-    <div id="legend"><p>Legend</p></div>
+    </script>
+    <script>
+        let safeWalk = document.getElementById("SafeWalk")
+        safeWalk.addEventListener("click", (e) => {
+            safeWalk.submit();
+        });
+        let fastWalk = document.getElementById("FastWalk")
+        fastWalk.addEventListener("click", (e) => {
+            fastWalk.submit();
+        })
+        let safeBike = document.getElementById("SafeBike")
+        safeBike.addEventListener("click", (e) => {
+            form.submit();
+        });
+        let fastBike = document.getElementById("FastBike")
+        fastBike.addEventListener("click", (e) => {
+            fastBike.submit();
+        })
+    </script>
 </body>
