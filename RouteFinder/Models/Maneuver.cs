@@ -18,9 +18,22 @@ namespace RouteFinder.Models
         {
             this.TravelTime = travelTime;
             this.Distance = distance;
-            this.Instruction = instruction;
+            this.Instruction = RemoveDistanceInstruction(instruction);
         }
 
-
+        public string RemoveDistanceInstruction(string instruction)
+        {
+            try
+            {
+                int startRemove = instruction.IndexOf("distance");
+                string removedInstruction = instruction.Remove(startRemove); //Remove everything starting at "distance"
+                string newInstruction = removedInstruction.Remove(removedInstruction.Length - 13); //Remove the extra <span>
+                return newInstruction;
+            }
+            catch (System.ArgumentOutOfRangeException) //The last instruction doesn't have a distance. 
+            {
+                return (instruction);              
+            }
+        }
     }
 }

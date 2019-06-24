@@ -1,16 +1,36 @@
 ﻿@model RouteFinder.Models.Route
+@using RouteFinder.Models
 @{
     Layout = null;
     string gMaps = ConfigReaderDAL.ReadSetting("gmaps_key");
-    var TotalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
-    var TotalTimeFormat = TotalTime.ToString(@"h\:mm");
-    
+
+    var totalTime = new TimeSpan();
+    string totalTimeFormat = "";
+    if (Model.TotalTravelTime < 60)
+    {
+        totalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
+        totalTimeFormat = totalTime.ToString(@"mm") + "min";
+
+    }
+    else
+    {
+        totalTime = TimeSpan.FromMinutes(Model.TotalTravelTime);
+        string hrTimeFormat = totalTime.ToString(@"hh");
+        string minTimeFormat = totalTime.ToString(@"%m");
+        totalTimeFormat = $"{hrTimeFormat} h {minTimeFormat} min"; 
+    }
+
+
+    string modeOfTransportationMessage = "";
+    if(Model.ModeOfTransportation == "pedestrian")
+    {
+        modeOfTransportationMessage = "Walking";
+    }
+    else
+    {
+        modeOfTransportationMessage = "Biking";
+    }
 }
-
-<p>Mode of Transportation @Model.ModeOfTransportation</p>
-<p >Total Distance @Math.Round(@Model.TotalDistance,1) Miles</p>
-<p>Total Time @TotalTimeFormat HR</p>
-
 
 <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
@@ -21,16 +41,10 @@
                 * element that contains the map. */
         #map {
             height: 70%;
-        }
-        /* Optional: Makes the sample page fill the window. */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
+            width: 100%;
         }
     </style>
     <script>
-
         var map;
         function initMap() {
             var map = new google.maps.Map(document.getElementById('map'), {
@@ -53,18 +67,10 @@
           routePath.setMap(map);
         }
         google.maps.event.addDomListener(window, 'load', init_map);
-
     </script>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
-
-<div>
-
-    <p> Directctions</p>
-    <p>@Model.Maneuvers</p>
-
-</div>
 
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -86,14 +92,49 @@
             </div>
         </div>
     </div>
-    <div class="container body-content">
-        <div id="map"></div>
+    <div id="map"></div>
+    <div>
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                @*ToDo - redirect to a final page and save the map and instructions as a pdf?  *@
+                <form action="~/Home/FinalMap" method="post" id="SafeWalk" style="margin: 5px;">
+                    <div class="row">
+                        <table class="table table-condensed table-bordered" id="Walk" style="margin-bottom: 2px;">
+                            <tr class="text-center success">
+                                <td colspan="3"><h4>@modeOfTransportationMessage Directions</h4></td>
 
+                            </tr>
+                            <tr class="text-center success">
+                                <td colspan="1"><u>Instruction</u></td>
+                                <td colspan="1"><u>Distance</u><br />@string.Format("{0:0.0}", Model.TotalDistance) mi</td>
+                                <td colspan="1"><u>Time</u><br />@totalTimeFormat</td>
+                            </tr>
+
+                            @foreach (Maneuver m in Model.Maneuvers)
+                            {
+                                <tr>
+                                    <td>@Html.Raw(m.Instruction)</td>
+                                    <td>@string.Format("{0:0.0}", m.Distance)</td>
+                                    <td>@((int)m.TravelTime) min</td>
+                                </tr>
+                            }
+
+                        </table>
+                    </div>
+                    <div class="row text-center" style="margin-top: 2px;">
+                        <input type="submit" value="Save to Device" class="btn btn-success" />
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+    </div>
+    <div class="container body-content">
         <script async defer
                 src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
         </script>
     </div>
-
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
 </body>
