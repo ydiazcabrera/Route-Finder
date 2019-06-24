@@ -14,8 +14,7 @@ namespace RouteFinder.Controllers
 
         //Action for Index view
         public ActionResult Index()
-        {
-           
+        {          
             //reset sessions for new route
             Session["ModeOfTransportation"] = null;
             Session["rvm"] = null;

@@ -110,7 +110,7 @@ namespace RouteFinder.Models
                 string instruction = jsonTokens[i]["instruction"].ToString();
                 double travelTime = double.Parse(jsonTokens[i]["travelTime"].ToString())/60;
                 double distance = double.Parse(jsonTokens[i]["length"].ToString())/1690;
-                                Maneuver man = new Maneuver(travelTime, distance, instruction);
+                Maneuver man = new Maneuver(travelTime, distance, instruction);
                 maneuvers.Add(man);
             }
             return maneuvers;
