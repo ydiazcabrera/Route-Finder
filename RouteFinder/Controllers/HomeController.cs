@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -217,9 +218,16 @@ namespace RouteFinder.Controllers
 
         public List<SensorsData> GetLastSixtyMinutesSensorData(string sensorName)
         {
-            DateTime oneMonthOneHourAgo = DateTime.Today.AddMonths(-1).AddHours(-1);
-            DateTime oneMonthAgo = DateTime.Today.AddMonths(-1);
-            List<SensorsData> sensorsData = db.SensorsData.Where(x => x.Time >= oneMonthOneHourAgo && x.Time <= oneMonthAgo && x.Sensor.Name == sensorName).ToList();
+            //DateTime oneMonthOneHourAgo = DateTime.Today.AddDays(-100).AddHours(-1);
+            //DateTime oneMonthAgo = DateTime.Today.AddDays(-100);
+            //List<SensorsData> sensorsData = db.SensorsData.Where(x => x.Time >= oneMonthOneHourAgo && x.Time <= oneMonthAgo && x.Sensor.Name == sensorName).ToList();
+
+            //"15/05/2019 14:00:00" and "15/05/2019 15:00:00" show pretty extreme differences and would look good
+            //"10/05/2019 18:00:00" and "10/05/2019 19:00:00" are realistic lookign with a couple moderates
+
+            DateTime earlyTime = DateTime.ParseExact("10/05/2019 18:00:00", "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+            DateTime lateTime = DateTime.ParseExact("10/05/2019 19:00:00", "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+            List<SensorsData> sensorsData = db.SensorsData.Where(x => x.Time >= earlyTime && x.Time <= lateTime && x.Sensor.Name == sensorName).ToList();
 
             return sensorsData;
         }
@@ -293,7 +301,6 @@ namespace RouteFinder.Controllers
                 {
                     sensorsAboveAQIThreshold.Add(sensor);
                 }
-
             }
 
             if (sensorsAboveAQIThreshold.Count == 0)
