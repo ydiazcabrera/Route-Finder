@@ -66,17 +66,17 @@ for (i = 0; i < sensors.length; i++) {
 
 
     if (data.aqi >= 151 && data.aqi <= 200) {
-        //var sensorBuffer = new google.maps.Circle({
-        //    strokeColor: '#FF0000',
-        //    strokeOpacity: 0.8,
-        //    strokeWeight: 1,
-        //    fillColor: '#FF0000',
-        //    fillOpacity: 0.35,
-        //    map: map,
-        //    center: myLatlng,
-        //    radius: 300,
-        //    label: data.name,
-        //});
+        var sensorBuffer = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 1,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: map,
+            center: myLatlng,
+            radius: 300,
+            label: data.name,
+        });
         var sensorBuffer = new google.maps.Rectangle({
             strokeColor: '#FF0000',
             strokeOpacity: 0.8,
@@ -140,6 +140,20 @@ for (i = 0; i < sensors.length; i++) {
             fillColor: '#00E400',
             fillOpacity: 0.35,
             map: map,
+            center: myLatlng,
+            radius: 300,
+            label: data.name,
+        });
+    }
+    else if (data.aqi === "no data") {
+        var sensorBuffer = new google.maps.Circle({
+            strokeColor: '#b3b3b3',
+            strokeOpacity: 0.8,
+            strokeWeight: 1,
+            fillColor: '#b3b3b3',
+            fillOpacity: 0.35,
+            map: map,
+            center: myLatlng,
             center: myLatlng,
             radius: 300,
             label: data.name,
