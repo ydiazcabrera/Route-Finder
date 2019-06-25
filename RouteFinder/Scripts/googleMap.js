@@ -14,8 +14,8 @@ function initMap() {
 var routePath = new google.maps.Polyline({
     path: routeCoordinates,
     geodesic: true,
-    strokeColor: '#5600FF',
-    strokeOpacity: .5,
+    strokeColor: '#0000FF',
+    strokeOpacity: 1,
     strokeWeight: 3
 });
 
@@ -23,8 +23,8 @@ var routePath = new google.maps.Polyline({
 var fastRoutePath = new google.maps.Polyline({
     path: fastestCoordinates,
     geodesic: true,
-    strokeColor: '#FFDB00',
-    strokeOpacity: .5,
+    strokeColor: '#FF0000',
+    strokeOpacity: 1,
     strokeWeight: 3
 });
 
@@ -147,6 +147,7 @@ for (i = 0; i < sensors.length; i++) {
     }
 }
 
-fastRoutePath.setMap(map);
-routePath.setMap(map);
+    routePath.setMap(map);
+    fastRoutePath.setMap(map);
+
         }
