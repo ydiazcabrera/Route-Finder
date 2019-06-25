@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -14,8 +15,7 @@ namespace RouteFinder.Controllers
 
         //Action for Index view
         public ActionResult Index()
-        {
-           
+        {          
             //reset sessions for new route
             Session["ModeOfTransportation"] = null;
             Session["rvm"] = null;
@@ -175,14 +175,21 @@ namespace RouteFinder.Controllers
             {
                 sensorMarkers += "{";
                 sensorMarkers += string.Format("'name': '{0}',", sensors[i].Name);
-                sensorMarkers += string.Format("'aqi': '{0}',", sensors[i].AQI);
+                if (sensors[i].AQI == -1)
+                {
+                    sensorMarkers += "'aqi': 'no data',";
+                }
+                else
+                {
+                    sensorMarkers += string.Format("'aqi': '{0}',", sensors[i].AQI);
+                }
+               // "[{'name': 'graqm0106','aqi': '-1','lat': '42.9420703','lng': '-85.6847243','north': '-85.681043','south': '-85.688406','east': '42.939375','west': '42.944765',},
                 sensorMarkers += string.Format("'lat': '{0}',", sensors[i].Latitude);
                 sensorMarkers += string.Format("'lng': '{0}',", sensors[i].Longitude);
                 sensorMarkers += string.Format("'north': '{0}',", sensors[i].BoundingBox.NorthEast.Longitude);
                 sensorMarkers += string.Format("'south': '{0}',", sensors[i].BoundingBox.SouthEast.Longitude);
                 sensorMarkers += string.Format("'east': '{0}',", sensors[i].BoundingBox.NorthEast.Latitude);
                 sensorMarkers += string.Format("'west': '{0}',", sensors[i].BoundingBox.NorthWest.Latitude);
-                //markers += string.Format("'description': '{0}'", "AQI: 50"); // This doesn't seem to be working
                 sensorMarkers += "},";
             }
             sensorMarkers += "];";
@@ -211,9 +218,16 @@ namespace RouteFinder.Controllers
 
         public List<SensorsData> GetLastSixtyMinutesSensorData(string sensorName)
         {
-            DateTime oneMonthOneHourAgo = DateTime.Today.AddMonths(-1).AddHours(-1);
-            DateTime oneMonthAgo = DateTime.Today.AddMonths(-1);
-            List<SensorsData> sensorsData = db.SensorsData.Where(x => x.Time >= oneMonthOneHourAgo && x.Time <= oneMonthAgo && x.Sensor.Name == sensorName).ToList();
+            //DateTime oneMonthOneHourAgo = DateTime.Today.AddDays(-100).AddHours(-1);
+            //DateTime oneMonthAgo = DateTime.Today.AddDays(-100);
+            //List<SensorsData> sensorsData = db.SensorsData.Where(x => x.Time >= oneMonthOneHourAgo && x.Time <= oneMonthAgo && x.Sensor.Name == sensorName).ToList();
+
+            //"15/05/2019 14:00:00" and "15/05/2019 15:00:00" show pretty extreme differences and would look good
+            //"10/05/2019 18:00:00" and "10/05/2019 19:00:00" are realistic lookign with a couple moderates
+
+            DateTime earlyTime = DateTime.ParseExact("10/05/2019 18:00:00", "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+            DateTime lateTime = DateTime.ParseExact("10/05/2019 19:00:00", "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+            List<SensorsData> sensorsData = db.SensorsData.Where(x => x.Time >= earlyTime && x.Time <= lateTime && x.Sensor.Name == sensorName).ToList();
 
             return sensorsData;
         }
@@ -226,7 +240,7 @@ namespace RouteFinder.Controllers
 
             if (sixtyMinSensorData.Count() == 0) //There was no data collected by the sensor for the time called
             {
-                return 0;
+                return -1;
             }
 
             // find the hourly average for ozone
@@ -287,7 +301,6 @@ namespace RouteFinder.Controllers
                 {
                     sensorsAboveAQIThreshold.Add(sensor);
                 }
-
             }
 
             if (sensorsAboveAQIThreshold.Count == 0)
