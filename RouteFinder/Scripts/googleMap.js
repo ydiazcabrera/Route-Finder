@@ -3,19 +3,17 @@
 function initMap() {
     //Create a new map
     var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 12,
+        zoom: 13,
         center: mapCenter,
     mapTypeId: 'terrain'
 });
-
-
 
 //Create a line from the routeCoordinates
 var routePath = new google.maps.Polyline({
     path: routeCoordinates,
     geodesic: true,
-    strokeColor: '#5600FF',
-    strokeOpacity: .5,
+    strokeColor: '#0000FF',
+    strokeOpacity: 1,
     strokeWeight: 3
 });
 
@@ -23,8 +21,8 @@ var routePath = new google.maps.Polyline({
 var fastRoutePath = new google.maps.Polyline({
     path: fastestCoordinates,
     geodesic: true,
-    strokeColor: '#FFDB00',
-    strokeOpacity: .5,
+    strokeColor: '#FF0000',
+    strokeOpacity: 1,
     strokeWeight: 3
 });
 
@@ -66,17 +64,17 @@ for (i = 0; i < sensors.length; i++) {
 
 
     if (data.aqi >= 151 && data.aqi <= 200) {
-        //var sensorBuffer = new google.maps.Circle({
-        //    strokeColor: '#FF0000',
-        //    strokeOpacity: 0.8,
-        //    strokeWeight: 1,
-        //    fillColor: '#FF0000',
-        //    fillOpacity: 0.35,
-        //    map: map,
-        //    center: myLatlng,
-        //    radius: 300,
-        //    label: data.name,
-        //});
+        var sensorBuffer = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 1,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: map,
+            center: myLatlng,
+            radius: 300,
+            label: data.name,
+        });
         var sensorBuffer = new google.maps.Rectangle({
             strokeColor: '#FF0000',
             strokeOpacity: 0.8,
@@ -106,6 +104,19 @@ for (i = 0; i < sensors.length; i++) {
             label: data.name,
         });
     }
+    //else if (data.aqi >= 51 && data.aqi <= 100) {
+    //    var sensorBuffer = new google.maps.Circle({
+    //        strokeColor: '#E1E100',
+    //        strokeOpacity: 0.8,
+    //        strokeWeight: 1,
+    //        fillColor: '#E1E100',
+    //        fillOpacity: 0.35,
+    //        map: map,
+    //        center: myLatlng,
+    //        radius: 300,
+    //        label: data.name,
+    //    });
+    //}
     else if (data.aqi >= 51 && data.aqi <= 100) {
         var sensorBuffer = new google.maps.Circle({
             strokeColor: '#E1E100',
@@ -119,20 +130,7 @@ for (i = 0; i < sensors.length; i++) {
             label: data.name,
         });
     }
-    else if (data.aqi >= 30 && data.aqi <= 50) {
-        var sensorBuffer = new google.maps.Circle({
-            strokeColor: '#E1E100',
-            strokeOpacity: 0.8,
-            strokeWeight: 1,
-            fillColor: '#E1E100',
-            fillOpacity: 0.35,
-            map: map,
-            center: myLatlng,
-            radius: 300,
-            label: data.name,
-        });
-    }
-    else if (data.aqi <= 30) {
+    else if (data.aqi <= 50) {
         var sensorBuffer = new google.maps.Circle({
             strokeColor: '#00E400',
             strokeOpacity: 0.8,
@@ -145,8 +143,23 @@ for (i = 0; i < sensors.length; i++) {
             label: data.name,
         });
     }
+    else if (data.aqi === "no data") {
+        var sensorBuffer = new google.maps.Circle({
+            strokeColor: '#b3b3b3',
+            strokeOpacity: 0.8,
+            strokeWeight: 1,
+            fillColor: '#b3b3b3',
+            fillOpacity: 0.35,
+            map: map,
+            center: myLatlng,
+            center: myLatlng,
+            radius: 300,
+            label: data.name,
+        });
+    }
 }
 
-fastRoutePath.setMap(map);
-routePath.setMap(map);
+    routePath.setMap(map);
+    fastRoutePath.setMap(map);
+
         }
