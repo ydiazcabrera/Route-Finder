@@ -20,7 +20,7 @@
         function initMap() {
             var lat;
             var lng;
-            var opts = { 'center': new google.maps.LatLng(42.9634, -85.6681), 'zoom': 12, mapTypeId: 'terrain' };
+            var opts = { 'center': new google.maps.LatLng(42.9634, -85.6681), 'zoom': 13, mapTypeId: 'terrain' };
             map = new google.maps.Map(document.getElementById('map'), opts);
             google.maps.event.addListener(map, 'click', function (event) {
                 var startlatValue = document.getElementById('startLat');
@@ -107,7 +107,7 @@
                         <span class="input-group-addon">
                             <label for="startLat">&nbsp;&nbsp;&nbsp;Starting Latitude:</label>
                         </span>
-                        <input class="form-control" type="text" name="startLat" id="startLat" placeholder="Enter Starting Latitude" value="" />
+                        <input class="form-control" type="text" name="startLat" id="startLat" placeholder="Enter Starting Latitude" value="" required/>
                     </div>
                 </div>
                 <div class="col-md-4">

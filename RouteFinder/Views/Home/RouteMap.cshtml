@@ -58,7 +58,7 @@
     foreach(TimeSpan time in travelTimes)
     {
         string totalTimeFormat = "";
-        if (time.Hours <= 1)
+        if (time.Hours < 1)
         {
 
             totalTimeFormat = time.ToString(@"mm") + "min";
