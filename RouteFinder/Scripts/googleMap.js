@@ -191,7 +191,7 @@ var marker = new google.maps.Marker({
 
     var div = document.createElement('div');
         div.innerHTML = 
-            `<div style="pointer-events: none;">
+            `<div style="pointer-events: none;" id="legend-div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="my-legend">
@@ -214,6 +214,9 @@ var marker = new google.maps.Marker({
             </div>`;
 
         legend.appendChild(div);
+    setTimeout(function () {
+        document.getElementById("legend").style.display = "block";
+    }, 1000)
     
 
     map.controls[google.maps.ControlPosition.LEFT_CENTER].push(legend);
