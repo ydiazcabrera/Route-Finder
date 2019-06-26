@@ -84,6 +84,9 @@
                 * element that contains the map. */
         #map {
             height: 60%;
+        }  
+        #legend{
+
         }
         /* Optional: Makes the sample page fill the window. */
         html, body {
@@ -115,22 +118,52 @@
             list-style: none;
         }
 
-            .my-legend .legend-scale ul li {
-                font-size: 80%;
-                list-style: none;
-                margin-left: 0;
-                line-height: 18px;
-                margin-bottom: 2px;
-            }
+        .my-legend .legend-scale ul li {
+            font-size: 1.25rem;
+            font-weight: 600;
+            list-style: none;
+            margin-left: 0;
+            line-height: 18px;
+            margin-bottom: 2px;
+        }
 
         .my-legend ul.legend-labels li span {
             display: block;
+            border-radius: 99%;
             float: left;
-            height: 16px;
-            width: 30px;
+            height: 18px;
+            width: 18px;
             margin-right: 5px;
             margin-left: 0;
             border: 1px solid #999;
+        }
+
+        #fastRoute {
+            border-radius: 0px;
+            border: 0px;
+            display: flex;
+            vertical-align: bottom;
+            display: block;
+            float: left;
+            height: 4px;
+            width: 24px;
+            margin-right: 5px;
+            margin-left: 0;
+            background-color: red;
+        }
+
+        #safeRoute {
+            border-radius: 0px;
+            border: 0px;
+            display: flex;
+            vertical-align:;
+            display: block;
+            float: left;
+            height: 4px;
+            width: 24px;
+            margin-right: 5px;
+            margin-left: 0;
+            background-color: blue;
         }
 
         .my-legend .legend-source {
@@ -166,6 +199,8 @@
         </div>
     </div>
     <div id="map"></div>
+    <div id="legend"></div>
+
     <script>
             let sensors = @Html.Raw(ViewBag.Sensors)
             let mapCenter = @Html.Raw(ViewBag.MapCenter)
@@ -174,7 +209,6 @@
             let fastestCoordinates = @Html.Raw(fastRoute);
     </script>
     <script src="~/Scripts/googleMap.js"></script>
-
 
     <div class="container">
         <div class="row text-center">
@@ -351,33 +385,6 @@
         <input type="hidden" name="modeOfT" value="bicycle" />
     </form>
 
-    @*<form action="~/Home/FinalMap" method="post" style="margin-top: 5px;">
-                <div class="row" style="margin-bottom: 5px;">
-                    <div class="col-md-3">
-                        <div class="btn-group">
-                            <input type="hidden" name="modeOfTransportation" value="@selectedModeOfTransportation" />
-                            <input type="radio" name="safeOrFast" value="fast" /> Fast Route
-                            <input type="radio" name="safeOrFast" value="safe" /> Safe Route
-                            <input type="submit" name="finalMap" value="checkoutMap" class="btn btn-warning" />
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>*@
-    @*<div class="row" style="margin-bottom: 5px;">
-            <div class="col-md-3">
-                <div class="btn-group">
-                    <input type="hidden" name="startLong" value="@Model.SafeRoute.RouteCoordinates[0].Longitude" />
-                                  <input type="hidden" name="startLat" value="@Model.SafeRoute.RouteCoordinates[0].Latitude" />
-                    <input type="hidden" name="endLong" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Longitude" />
-                    <input type="hidden" name="endLat" value="@Model.SafeRoute.RouteCoordinates[Model.SafeRoute.RouteCoordinates.Count - 1].Latitude" />
-                    <input type="hidden" name="modeOfT" value="@Model.SafeRoute.ModeOfTransportation" />
-                    <input type="submit" name="finalMap" value="CheckoutMap" class="btn btn-warning" />
-                </div>
-            </div>
-        </div>*@
-
-
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     <script async defer
@@ -402,3 +409,5 @@
         })
     </script>
 </body>
+
+
