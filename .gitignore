@@ -352,6 +352,7 @@ MigrationBackup/
 
 # User-specific files
 Web.Secrets.config
+connections.config
 # User-specific files (MonoDevelop/Xamarin Studio)
 
 # Mono auto generated files
