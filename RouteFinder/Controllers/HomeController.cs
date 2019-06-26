@@ -122,7 +122,7 @@ namespace RouteFinder.Controllers
         //public ActionResult FinalMap(string startLong, string startLat, string endLong, string endLat, string modeOfT, string routeSelected)
         public ActionResult FinalMap(string modeOfTransportation, string safeOrFast)
         {
-            if (String.IsNullOrEmpty(modeOfTransportation) || String.IsNullOrEmpty(safeOrFast))
+            if (String.IsNullOrEmpty(modeOfTransportation) || String.IsNullOrEmpty(safeOrFast) || Session["rvm"] == null)
             {
                 return RedirectToAction("RouteMap");
             }

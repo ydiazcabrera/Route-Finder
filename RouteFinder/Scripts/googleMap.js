@@ -25,6 +25,18 @@ function initMap() {
         strokeWeight: 3
     });
 
+  var marker = new google.maps.Marker({
+    position: routeCoordinates[0],
+    map: map,
+    label: 'Start'
+});
+
+var marker = new google.maps.Marker({
+    position: routeCoordinates[routeCoordinates.length - 1],
+    map: map,
+    label: 'End'
+});
+
 
     //Displays the sensors that were passed in as "ViewBag.Markers"
     for (i = 0; i < sensors.length; i++) {

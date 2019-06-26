@@ -94,6 +94,14 @@
             margin: 0;
             padding: 0;
         }
+        table {
+            border: 2px hidden;
+        }
+
+        table:hover {
+            border: 2px solid red;
+            cursor: pointer;
+        }
         /* Legend Styling*/
         .my-legend .legend-title {
             text-align: left;
@@ -172,7 +180,7 @@
     @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-inverse navbar-fixed-top bg-primary">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -186,7 +194,6 @@
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
                 </ul>
             </div>
         </div>
@@ -264,7 +271,8 @@
             <div class="col-md-3">
                 <form action="~/Home/FinalMap" method="post" id="FastWalk" style="margin: 5px;">
                     <div class="row">
-                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 2px;">
+                        
+                        <table class="table table-condensed table-bordered table-striped" style="margin-bottom: 2px; ">
                             <tr class="text-center warning">
                                 <td colspan="2">Fastest Walk Path Statistics</td>
                             </tr>
@@ -393,7 +401,7 @@
         })
         let safeBike = document.getElementById("SafeBike")
         safeBike.addEventListener("click", (e) => {
-            form.submit();
+            safeBike.submit();
         });
         let fastBike = document.getElementById("FastBike")
         fastBike.addEventListener("click", (e) => {
