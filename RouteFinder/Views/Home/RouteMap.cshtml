@@ -84,6 +84,7 @@
                 * element that contains the map. */
         #map {
             height: 60%;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         }  
         #legend{
 
@@ -103,6 +104,10 @@
             cursor: pointer;
         }
         /* Legend Styling*/
+
+        #legend {
+            display: none;
+        }
         .my-legend .legend-title {
             text-align: left;
             margin-bottom: 5px;
@@ -211,25 +216,25 @@
     <script src="~/Scripts/googleMap.js"></script>
 
     <div class="container">
-        <div class="row text-center">
+        <div class="row text-center" style="margin-top: 5px;">
             <div class="col-md-6">
                 @if (selectedModeOfTransportation == "pedestrian")
                 {
-                    <input type="submit" value="Walk Paths Selected" class="btn btn-primary active" form="showWalkPath" disabled />
+                    <input type="submit" value="Walk Paths Selected" class="btn btn-info active" form="showWalkPath" disabled />
                 }
                 else
                 {
-                    <input type="submit" value="Show Walk Paths" class="btn btn-primary" form="showWalkPath" />
+                    <input type="submit" value="Show Walk Paths" class="btn btn-primary" form="showWalkPath"  style="margin-top: 12px; margin-bottom: 12px"/>
                 }
             </div>
             <div class="col-md-6">
                 @if (selectedModeOfTransportation == "bicycle")
                 {
-                    <input type="submit" value="Bike Paths Selected" class="btn btn-primary active" form="showBikePath" disabled />
+                    <input type="submit" value="Bike Paths Selected" class="btn btn-info active" form="showBikePath" disabled />
                 }
                 else
                 {
-                    <input type="submit" value="Show Bike Paths" class="btn btn-primary" form="showBikePath" />
+                    <input type="submit" value="Show Bike Paths" class="btn btn-primary" form="showBikePath"  style="margin-top: 12px; margin-bottom: 12px"/>
                 }
             </div>
         </div>
@@ -259,19 +264,18 @@
                             </tr>
 
                         </table>
-                        <input type="hidden" name="modeOfTransportation" value="pedestrian" />
-                        <input type="hidden" name="safeOrFast" value="safe" />
+                        <input type="hidden" name="modeOfTransportation" value="pedestrian"/>
+                        <input type="hidden" name="safeOrFast" value="safe" style="margin-top: 2px"/>
                     </div>
                     <div class="row text-center" style="margin-top: 2px;">
-                        <input type="submit" value="Take Healthiest Walk" class="btn btn-success" />
+                        <input type="submit" value="Take Healthiest Walk" class="btn btn-success" style="margin-top: 12px"/>
                     </div>
                 </form>
             </div>
 
             <div class="col-md-3">
                 <form action="~/Home/FinalMap" method="post" id="FastWalk" style="margin: 5px;">
-                    <div class="row">
-                        
+                    <div class="row">                       
                         <table class="table table-condensed table-bordered table-striped" style="margin-bottom: 2px; ">
                             <tr class="text-center warning">
                                 <td colspan="2">Fastest Walk Path Statistics</td>
@@ -305,7 +309,7 @@
             <div class="col-md-3">
                 <form action="~/Home/FinalMap" method="post" id="SafeBike" style="margin: 5px;">
                     <div class="row">
-                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 2px;">
+                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 12px;">
                             <tr class="text-center success">
                                 <td colspan="2">Healthiest Bike Path Statistics</td>
                             </tr>
@@ -338,7 +342,7 @@
             <div class="col-md-3">
                 <form action="~/Home/FinalMap" method="post" id="FastBike" style="margin: 5px;">
                     <div class="row">
-                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 2px;">
+                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 12px;">
                             <tr class="text-center warning">
                                 <td colspan="2">Fastest Bike Path Statistics</td>
                             </tr>
@@ -407,6 +411,7 @@
         fastBike.addEventListener("click", (e) => {
             fastBike.submit();
         })
+        
     </script>
 </body>
 
