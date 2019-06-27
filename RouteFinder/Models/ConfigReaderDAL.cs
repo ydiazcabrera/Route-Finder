@@ -19,7 +19,9 @@ namespace RouteFinder
             try
             {
                 var appSettings = ConfigurationManager.AppSettings; //Gets setting from Web.config file
-                return appSettings[key] ?? null; //return the value of the key passed in if that fails return null;
+                string appKeyValue = appSettings[key];
+                //return appSettings[key] ?? null; //return the value of the key passed in if that fails return null;
+                return appKeyValue;
             }
             catch (ConfigurationErrorsException)
             {
