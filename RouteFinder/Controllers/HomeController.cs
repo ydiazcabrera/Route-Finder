@@ -55,7 +55,10 @@ namespace RouteFinder.Controllers
 
                 //Pull list of sensors directly from database.
                 List<Sensor> sensors = GetSensors();
-
+                if(sensors == null)
+                {
+                    return RedirectToAction("Index");
+                }
                 //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
                 List<Sensor> sensorsAboveAQIThreshold = GetSensorsAboveAQIThreshold(sensors);
 
@@ -266,12 +269,15 @@ namespace RouteFinder.Controllers
         public List<Sensor> GetSensors()
         {
             List<Sensor> sensors = GetSensorsFromDatabase();
+            
+            if(sensors != null)
+            {  
+                for (int i = 0; i < sensors.Count; i++)
+                {
+                    sensors[i].BoundingBox = GetSensorBoundingBox(sensors[i]);
+                    sensors[i].AQI = GetSensorAQI(sensors[i]);
 
-            for (int i = 0; i < sensors.Count; i++)
-            {
-                sensors[i].BoundingBox = GetSensorBoundingBox(sensors[i]);
-                sensors[i].AQI = GetSensorAQI(sensors[i]);
-
+                }
             }
 
             return sensors;
@@ -281,8 +287,8 @@ namespace RouteFinder.Controllers
         public List<Sensor> GetSensorsFromDatabase()
         {
             try
-            {
-                return db.Sensors.ToList();
+            {               
+               return db.Sensors.ToList();
             }
             catch (Exception)
             {
