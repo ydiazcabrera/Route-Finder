@@ -87,6 +87,11 @@
             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         }  
         #legend{
+            width:20%;
+            background-color: white;
+            opacity:.7;
+            border: solid black;
+            border-width: 1px;
 
         }
         /* Optional: Makes the sample page fill the window. */
@@ -124,7 +129,7 @@
         }
 
         .my-legend .legend-scale ul li {
-            font-size: 1.25rem;
+            font-size: 1.20rem;
             font-weight: 600;
             list-style: none;
             margin-left: 0;
@@ -185,7 +190,7 @@
     @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top bg-primary">
+    <div id="nav_bar"class="navbar navbar-inverse navbar-fixed-top bg-primary">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -224,7 +229,7 @@
                 }
                 else
                 {
-                    <input type="submit" value="Show Walk Paths" class="btn btn-primary" form="showWalkPath"  style="margin-top: 12px; margin-bottom: 12px"/>
+                    <input type="submit" value="Show Walk Paths" class="btn btn-primary" form="showWalkPath">
                 }
             </div>
             <div class="col-md-6">
@@ -234,7 +239,7 @@
                 }
                 else
                 {
-                    <input type="submit" value="Show Bike Paths" class="btn btn-primary" form="showBikePath"  style="margin-top: 12px; margin-bottom: 12px"/>
+                    <input type="submit" value="Show Bike Paths" class="btn btn-primary" form="showBikePath" />
                 }
             </div>
         </div>
@@ -265,10 +270,10 @@
 
                         </table>
                         <input type="hidden" name="modeOfTransportation" value="pedestrian"/>
-                        <input type="hidden" name="safeOrFast" value="safe" style="margin-top: 2px"/>
+                        <input type="hidden" name="safeOrFast" value="safe" />
                     </div>
                     <div class="row text-center" style="margin-top: 2px;">
-                        <input type="submit" value="Take Healthiest Walk" class="btn btn-success" style="margin-top: 12px"/>
+                        <input type="submit" value="Take Healthiest Walk" class="btn btn-success" />
                     </div>
                 </form>
             </div>
@@ -309,7 +314,7 @@
             <div class="col-md-3">
                 <form action="~/Home/FinalMap" method="post" id="SafeBike" style="margin: 5px;">
                     <div class="row">
-                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 12px;">
+                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 2px;">
                             <tr class="text-center success">
                                 <td colspan="2">Healthiest Bike Path Statistics</td>
                             </tr>
@@ -342,7 +347,7 @@
             <div class="col-md-3">
                 <form action="~/Home/FinalMap" method="post" id="FastBike" style="margin: 5px;">
                     <div class="row">
-                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 12px;">
+                        <table class="table table-condensed table-bordered table-striped" id="Walk" style="margin-bottom: 2px;">
                             <tr class="text-center warning">
                                 <td colspan="2">Fastest Bike Path Statistics</td>
                             </tr>

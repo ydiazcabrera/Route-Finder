@@ -64,6 +64,18 @@
                 strokeWeight: 3
             });
 
+            var marker = new google.maps.Marker({
+                position: routeCoordinates[0],
+                map: map,
+                label: 'Start'
+            });
+
+            var marker = new google.maps.Marker({
+                position: routeCoordinates[routeCoordinates.length - 1],
+                map: map,
+                label: 'End'
+            });
+
           routePath.setMap(map);
         }
         google.maps.event.addDomListener(window, 'load', init_map);
@@ -73,7 +85,7 @@
 </head>
 
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div id="nav_bar" class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">

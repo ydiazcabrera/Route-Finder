@@ -36,7 +36,8 @@ namespace RouteFinder.Models
 
     public class SensorDbContext : DbContext
     {
-        public SensorDbContext() : base("SeamlessSensorData")
+        //public SensorDbContext() : base("SeamlessSensorData")
+        public SensorDbContext() : base("name=SeamlessSensorData")
         {
 
         }
