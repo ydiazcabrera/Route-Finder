@@ -15,6 +15,7 @@
             width: 100%;
         }
     </style>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
         var map;
         function initMap() {
@@ -23,16 +24,16 @@
             var opts = { 'center': new google.maps.LatLng(42.9634, -85.6681), 'zoom': 13, mapTypeId: 'terrain' };
             map = new google.maps.Map(document.getElementById('map'), opts);
             google.maps.event.addListener(map, 'click', function (event) {
-                var startlatValue = document.getElementById('startLat');
-                var startlngValue = document.getElementById('startLong');
-                var endlatValue = document.getElementById('endLat');
-                var endlngValue = document.getElementById('endLong');
+                let startlatValue = document.getElementById('startLat');
+                let startlngValue = document.getElementById('startLong');
+                let endlatValue = document.getElementById('endLat');
+                let endlngValue = document.getElementById('endLong');
                 if (startlatValue.value == "") {
                     lat = event.latLng.lat();
                     lng = event.latLng.lng();
                     startlatValue.value = lat;
                     startlngValue.value = lng;
-                    var marker = new google.maps.Marker({
+                    var startMarker = new google.maps.Marker({
                         position: { lat: lat, lng: lng },
                         map: map,
                         label: 'Start'
@@ -43,7 +44,7 @@
                     lng = event.latLng.lng();
                     endlatValue.value = lat;
                     endlngValue.value = lng;
-                    var marker = new google.maps.Marker({
+                    var endMarker = new google.maps.Marker({
                         position: { lat: lat, lng: lng },
                         map: map,
                         label: 'End'
@@ -53,8 +54,11 @@
                     alert("You already entered a start and end point.\nClear coordinates to start over.");
                 }
             });
+
         }
         google.maps.event.addDomListener(window, 'load', init_map);
+
+
     </script>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
@@ -81,86 +85,194 @@
     </div>
 
     <div id="map"></div>
+    <script async defer
+            src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
+    </script>
+        ﻿<form action="~/Home/RouteMap" method="post" class="form-inline" id="routeMapForm"></form>
+        <form id="location-form" class="form-inline"></form>
     <div class="container body-content">
-        <script async defer
-                src='https://maps.googleapis.com/maps/api/js?key=@gMaps&callback=initMap'>
-        </script>
+
         @*<div class="container">*@
-        ﻿<form action="~/Home/RouteMap" method="post" class="form-inline">
-            <div class="row">
-                <div class="col-md-2">
-                    <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-primary active focus">
-                            <input type="radio" name="modeOfT" id="walk" value="pedestrian" onclick="setWalkChecked()" checked> Walk
-                        </label>
-                        <label class="btn btn-primary">
-                            <input type="radio" name="modeOfT" id="bike" value="bicycle" onclick="setBikeChecked()"> Bike
-                        </label>
-                    </div>
+        <div class="row">
+            <div class="col-md-2">
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-primary active focus">
+                        <input type="radio" name="modeOfT" id="walk" value="pedestrian" onclick="setWalkChecked()" checked form="routeMapForm"> Walk
+                    </label>
+                    <label class="btn btn-primary">
+                        <input type="radio" name="modeOfT" id="bike" value="bicycle" onclick="setBikeChecked()" form="routeMapForm"> Bike
+                    </label>
                 </div>
             </div>
-            <div class="row" style="margin-top: 15px; margin-bottom: 12px">
-                @*<div class="form-group">*@
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-addon">
-                            <label for="startLat">&nbsp;&nbsp;&nbsp;Starting Latitude:</label>
-                        </span>
-                        <input class="form-control" type="text" name="startLat" id="startLat" placeholder="Enter Starting Latitude" value="" required/>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-addon">
-                            <label for="endLat">&nbsp;&nbsp;&nbsp;Ending Latitude:</label>
-                        </span>
-                        <input class="form-control" type="text" name="endLat" id="endLat" placeholder="Enter Ending Latitude" value="" required/>
-                    </div>
-                </div>
-                @*</div>*@
+        </div>
+        <div class="row" style="margin-top: 15px; margin-bottom: 12px">
+            <div class="col-md-12">
+                <input type="text" id="start-location-input" class="form-control form-control-lg" placeholder="Enter Starting Address" form="location-form" style="margin-bottom: 12px;">
+                <input type="text" id="end-location-input" class="form-control form-control-lg" placeholder="Enter Ending Address" form="location-form" style="margin-bottom: 12px;">
+                <button type="submit" class="btn btn-primary" form="location-form">Locate Address</button>
             </div>
-            <div class="row" style="margin-bottom: 15px;">
-                @*<div class="form-group">*@
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-addon">
-                            <label for="startLong">Starting Longitude:</label>
-                        </span>
-                        <input class="form-control" type="text" name="startLong" id="startLong" placeholder="Enter Starting Longitude" value="" required/>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-addon">
-                            <label for="endLong">Ending Longitude:</label>
-                        </span>
-                        <input class="form-control" type="text" name="endLong" id="endLong" placeholder="Enter Ending Longitude" value="" required/>
-                    </div>
-                </div>
-                @*</div>*@
-            </div>
-            <div class="row" style="margin-bottom: 5px;">
-                <div class="col-md-3">
-                    <div class="btn-group">
-                        <input type="button" value="Clear coordinates" onclick='refreshPage()' class="btn btn-warning" />
-                        <input type="submit" name="submit" value="Go" class="btn btn-success" />
-                    </div>
-                </div>
-            </div>
+        </div>
 
-        </form>
-        <p></p>
-
-        <script type="text/javascript">
-            function refreshPage() {
-                if (confirm("Are you sure, want to clear?")) {
-                    location.reload();
-                }
-            }
-        </script>
+    <div class="row" style="margin-top: 15px; margin-bottom: 12px">
+        @*<div class="form-group">*@
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <label for="startLat">&nbsp;&nbsp;&nbsp;Starting Latitude:</label>
+                </span>
+                <input class="form-control" type="text" name="startLat" id="startLat" placeholder="Enter Starting Latitude" value="" required form="routeMapForm" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <label for="endLat">&nbsp;&nbsp;&nbsp;Ending Latitude:</label>
+                </span>
+                <input class="form-control" type="text" name="endLat" id="endLat" placeholder="Enter Ending Latitude" value="" required form="routeMapForm" />
+            </div>
+        </div>
         @*</div>*@
+    </div>
+    <div class="row" style="margin-bottom: 15px;">
+        @*<div class="form-group">*@
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <label for="startLong">Starting Longitude:</label>
+                </span>
+                <input class="form-control" type="text" name="startLong" id="startLong" placeholder="Enter Starting Longitude" value="" required form="routeMapForm" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <label for="endLong">Ending Longitude:</label>
+                </span>
+                <input class="form-control" type="text" name="endLong" id="endLong" placeholder="Enter Ending Longitude" value="" required form="routeMapForm" />
+            </div>
+        </div>
+        @*</div>*@
+    </div>
+    <div class="row" style="margin-bottom: 5px;">
+        <div class="col-md-3">
+            <div class="btn-group">
+                <input type="button" value="Clear coordinates" onclick='refreshPage()' class="btn btn-warning" />
+                <input type="submit" name="submit" value="Go" class="btn btn-success" form="routeMapForm" />
+            </div>
+        </div>
+    </div>
+
+    @*</form>*@
+    @*<form id="location-form">
+        <input type="text" id="start-location-input" class="form-control form-control-lg" placeholder="Enter Starting Address">
+        <input type="text" id="end-location-input" class="form-control form-control-lg" placeholder="Enter Ending Address">
+        <br>
+        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+    </form>*@
+    <script type="text/javascript">
+        function refreshPage() {
+            if (confirm("Are you sure, want to clear?")) {
+                location.reload();
+            }
+        }
+
+    </script>
+    <script>
+
+        //var map = new google.maps.Map(document.getElementById("map"), {});
+
+        // Get location form
+        let locationForm = document.getElementById('location-form');
+
+        // Listen for submit
+        locationForm.addEventListener('submit', geocode);
+
+        function geocode(e) {
+            // Prevent actual submit
+            e.preventDefault();
+            var myLatlng;
+            let endMarker;
+            let startMarker;
+            let startLocation = document.getElementById('start-location-input').value;
+            let endLocation = document.getElementById('end-location-input').value;
+            let startlatValue = document.getElementById('startLat');
+            let startlngValue = document.getElementById('startLong');
+            let endlatValue = document.getElementById('endLat');
+            let endlngValue = document.getElementById('endLong');
+
+            axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+                params: {
+                    address: startLocation,
+                    /**/
+                    key: 'AIzaSyCVJt8Kug_yjMWi_NHTjcMhlzVQBQMUCsc'
+                    /**/
+                }
+            })
+                .then(function (response) {
+                    // Log full response
+                    console.log(response);
+
+
+                    // Geometry
+                    startlatValue.value = response.data.results[0].geometry.location.lat;
+                    startlngValue.value = response.data.results[0].geometry.location.lng;
+                }).then(() => {
+                    myLatlng = new google.maps.LatLng(startlatValue.value, startlngValue.value);
+                }).then(() => {
+                    
+                    startMarker = new google.maps.Marker({
+                        position: myLatlng,
+                        map: map,
+                        label: 'Start'
+                    });
+                    startMarker.setMap(map)
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+            axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+                params: {
+                    address: endLocation,
+                    /**/
+                    key: 'AIzaSyCVJt8Kug_yjMWi_NHTjcMhlzVQBQMUCsc'
+                    /**/
+                }
+            })
+                .then(function (response) {
+                    // Log full response
+                    console.log(response);
+
+
+                    // Geometry
+                    endlatValue.value = response.data.results[0].geometry.location.lat;
+                    endlngValue.value = response.data.results[0].geometry.location.lng;
+                }).then(() => {
+                    myLatlng = new google.maps.LatLng(endlatValue.value, endlngValue.value);
+                }).then(() => {
+                    
+                    console.log(startlatValue.value);
+                    endMarker = new google.maps.Marker({
+                        position: myLatlng,
+                        map: map,
+                        label: 'End'
+                    });
+                    endMarker.setMap(map);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+            //var myLatlng = new google.maps.LatLng(startlngValue.value, startlatValue.value);
+
+        }
+
+
+    </script>
+    @*</div>*@
     </div>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+
 </body>
