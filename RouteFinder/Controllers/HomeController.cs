@@ -19,7 +19,8 @@ namespace RouteFinder.Controllers
             //reset sessions for new route
             Session["ModeOfTransportation"] = null;
             Session["rvm"] = null;
-
+            ViewBag.Gcode = ConfigReaderDAL.ReadSetting("gcode_key");
+            ViewBag.Gmap = ConfigReaderDAL.ReadSetting("gmaps_key");
             return View();
         }
 
