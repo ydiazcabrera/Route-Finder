@@ -87,6 +87,11 @@
             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         }  
         #legend{
+            width:20%;
+            background-color: white;
+            opacity:.7;
+            border: solid black;
+            border-width: 1px;
 
         }
         /* Optional: Makes the sample page fill the window. */
@@ -124,7 +129,7 @@
         }
 
         .my-legend .legend-scale ul li {
-            font-size: 1.25rem;
+            font-size: 1.20rem;
             font-weight: 600;
             list-style: none;
             margin-left: 0;
@@ -185,7 +190,7 @@
     @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top bg-primary">
+    <div id="nav_bar"class="navbar navbar-inverse navbar-fixed-top bg-primary">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">

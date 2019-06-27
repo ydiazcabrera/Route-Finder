@@ -188,22 +188,22 @@ var marker = new google.maps.Marker({
     };
 
     var legend = document.getElementById('legend');
-
+    
     var div = document.createElement('div');
         div.innerHTML = 
             `<div style="pointer-events: none;" id="legend-div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="my-legend">
-                            <div class="legend-title"><h4>AQI</h4></div>
+                            <div class="legend-title"><h5>AQI</h5></div>
                             <div class="legend-scale">
                                 <ul class="legend-labels">
-                                    <li><span style="background:#00E400;"></span>Good 0 - 50</li>
-                                    <li><span style="background:#E1E100;"></span>Moderate 51 - 100</li>
-                                    <li><span style="background:#E17E00;"></span>Unhealthy for Sensitive Groups 101 - 150</li>
-                                    <li><span style="background:#FF0000;"></span>Unhealthy 151 - 200</li>
-                                    <li><span style="background:#8F3F97;"></span>Hazardous 201 +</li>
-                            <div class="legend-title"><h4>Paths</h4></div>
+                                    <li><span style="background:#00E400;"></span>Good</li>
+                                    <li><span style="background:#E1E100;"></span>Moderate</li>
+                                    <li><span style="background:#E17E00;"></span>Unhealthy for Sensitive Groups</li>
+                                    <li><span style="background:#FF0000;"></span>Unhealthy</li>
+                                    <li><span style="background:#8F3F97;"></span>Hazardous</li>
+                            <div class="legend-title"><h5>Paths</h5></div>
                                     <li style="display: flex; vertical-align: sub"><span id="safeRoute"></span>Healthy Path</li>
                                     <li><span id="fastRoute"></span>Fast Path</li>
                                 </ul>
