@@ -155,8 +155,11 @@
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="connections.config" />
+    <Content Include="connections.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Properties\PublishProfiles\RouteFinder20190626114343 - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\RouteFinder20190701121946 - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\googleMap.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
@@ -185,7 +188,9 @@
     <Content Include="Views\Home\RouteMap.cshtml" />
     <Content Include="Views\Home\ConcentrationTable.cshtml" />
     <Content Include="Views\Home\FinalMap.cshtml" />
-    <None Include="Web.Secrets.config" />
+    <None Include="Web.Secrets.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
