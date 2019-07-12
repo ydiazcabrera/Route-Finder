@@ -1,6 +1,5 @@
 ﻿using RouteFinder.Models;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -15,11 +14,14 @@ namespace RouteFinder.Controllers
 
         //Action for Index view
         public ActionResult Index()
-        {          
+        {
             //reset sessions for new route
             Session["ModeOfTransportation"] = null;
             Session["rvm"] = null;
 
+            //pass API Keys to view
+            ViewBag.Gcode = ConfigReaderDAL.ReadSetting("gcode_key");
+            ViewBag.Gmap = ConfigReaderDAL.ReadSetting("gmaps_key");
             return View();
         }
 
@@ -41,7 +43,7 @@ namespace RouteFinder.Controllers
             // Makes sure data is entered in form, but doesn't account for invalid data.
             // Need to add validation in action or in the api call. I would assume we could make sure
             // it is a valid number between. Might want to write a validation method for Longitude and Latitude
-            if ((startLong == "" || startLat == "" || endLong == "" || endLat == "" || modeOfT == "" ) && Session["rvm"] == null)
+            if ((startLong == "" || startLat == "" || endLong == "" || endLat == "" || modeOfT == "") && Session["rvm"] == null)
             {
                 return RedirectToAction("Index");
             }
@@ -55,37 +57,31 @@ namespace RouteFinder.Controllers
 
                 //Pull list of sensors directly from database.
                 List<Sensor> sensors = GetSensors();
-                if(sensors == null)
+                if (sensors == null)
                 {
                     return RedirectToAction("Index");
                 }
                 //Call AvoidSensor Method and get a list of SensorboundingBox to avoid 
                 List<Sensor> sensorsAboveAQIThreshold = GetSensorsAboveAQIThreshold(sensors);
 
+                // Get avoid route for poor air quality
                 Route safeWalkRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sensorsAboveAQIThreshold, "pedestrian");
                 safeWalkRoute.RouteCoordinatesString = BuildJsRouteCoordinates(safeWalkRoute.RouteCoordinates);
-                safeWalkRoute.RouteCoordinatesString = BuildJsRouteCoordinates(safeWalkRoute.RouteCoordinates);
 
-
+                // Get avoid route for poor air quality
                 Route safeBikeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, sensorsAboveAQIThreshold, "bicycle");
                 safeBikeRoute.RouteCoordinatesString = BuildJsRouteCoordinates(safeWalkRoute.RouteCoordinates);
-                safeBikeRoute.RouteCoordinatesString = BuildJsRouteCoordinates(safeBikeRoute.RouteCoordinates);
 
+                // Get route ignore air quality
                 Route fastWalkRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, "pedestrian");
                 fastWalkRoute.RouteCoordinatesString = BuildJsRouteCoordinates(fastWalkRoute.RouteCoordinates);
-                fastWalkRoute.RouteCoordinatesString = BuildJsRouteCoordinates(fastWalkRoute.RouteCoordinates);
 
-
+                // Get route ignore air quality
                 Route fastBikeRoute = RouteAPIDAL.DisplayMap(startPoint, endPoint, null, "bicycle");
-                fastBikeRoute.RouteCoordinatesString = BuildJsRouteCoordinates(fastBikeRoute.RouteCoordinates);
                 fastBikeRoute.RouteCoordinatesString = BuildJsRouteCoordinates(fastBikeRoute.RouteCoordinates);
 
                 //build map marker string for sensors on Google MAP API
                 string sensorMarkers = BuildJsSensors(sensors);
-
-                // Map center is imperfect because the middle coordinate isn't necessarily the middle of the map.
-                // It also doesn't address the zoom level. We could probably use a C# or .NET geography library to find the 
-                // distance between the two furthest points to set distance and zoom.
 
                 //Sets center of map
                 ViewBag.MapCenter = GetMapCenter(safeWalkRoute.RouteCoordinates);
@@ -101,8 +97,11 @@ namespace RouteFinder.Controllers
 
                 // Store route view model in session for use on final route choice page
                 Session["rvm"] = rvm;
+
+                // Pass Route View Model to view
                 return View(rvm);
-            } else
+            }
+            else
             {
                 RouteViewModel rvm = (RouteViewModel)Session["rvm"];
 
@@ -114,15 +113,13 @@ namespace RouteFinder.Controllers
 
                 // Store currently selected mode of transportation walk/bike
                 Session["ModeOfTransportation"] = modeOfT;
+
+                // Pass Route View Model to view
                 return View(rvm);
             }
-            // Pass Route View Model to view
-            
+
         }
 
-        //public ActionResult FinalMap(int id)
-        //public ActionResult FinalMap(RouteViewModel finalMap)
-        //public ActionResult FinalMap(string startLong, string startLat, string endLong, string endLat, string modeOfT, string routeSelected)
         public ActionResult FinalMap(string modeOfTransportation, string safeOrFast)
         {
             if (String.IsNullOrEmpty(modeOfTransportation) || String.IsNullOrEmpty(safeOrFast) || Session["rvm"] == null)
@@ -133,9 +130,9 @@ namespace RouteFinder.Controllers
 
             // Get Route View Model from session
             RouteViewModel rvm = (RouteViewModel)Session["rvm"];
-            if(modeOfTransportation == "pedestrian")
+            if (modeOfTransportation == "pedestrian")
             {
-                if(safeOrFast == "safe")
+                if (safeOrFast == "safe")
                 {
                     route = rvm.SafeWalkRoute;
                 }
@@ -146,7 +143,7 @@ namespace RouteFinder.Controllers
             }
             else
             {
-                if(safeOrFast == "safe")
+                if (safeOrFast == "safe")
                 {
                     route = rvm.SafeBikeRoute;
                 }
@@ -160,8 +157,13 @@ namespace RouteFinder.Controllers
 
             return View(route);
         }
-
-    public string GetMapCenter(List<RouteCoordinate> routeCoordinates)
+        
+        /// <summary>
+        /// Finds center of map and returns a string that is a javascript object. It is passed to a view using HTML.Raw helper
+        /// </summary>
+        /// <param name="routeCoordinates">List<RouteCoordinates></param>
+        /// <returns>string</returns>
+        public string GetMapCenter(List<RouteCoordinate> routeCoordinates)
         {
             //Finds center of map. Probably need to find more elogant solution.
             RouteCoordinate centerCoordinate = routeCoordinates[(routeCoordinates.Count() / 2)];
@@ -169,6 +171,11 @@ namespace RouteFinder.Controllers
             return "{ lat: " + centerCoordinate.Latitude + ", lng: " + centerCoordinate.Longitude + " }";
         }
 
+        /// <summary>
+        /// Builds a list of sensors in a string that is a Javascript object. It is passed to a view using HTML.Raw helper
+        /// </summary>
+        /// <param name="sensors">List<Sensor></param>
+        /// <returns>string</returns>
         public string BuildJsSensors(List<Sensor> sensors)
         {
             // This section builds a string, which is passed to the view and used by the JS script to display the sensors
@@ -186,7 +193,7 @@ namespace RouteFinder.Controllers
                 {
                     sensorMarkers += string.Format("'aqi': '{0}',", sensors[i].AQI);
                 }
-               // "[{'name': 'graqm0106','aqi': '-1','lat': '42.9420703','lng': '-85.6847243','north': '-85.681043','south': '-85.688406','east': '42.939375','west': '42.944765',},
+                // "[{'name': 'graqm0106','aqi': '-1','lat': '42.9420703','lng': '-85.6847243','north': '-85.681043','south': '-85.688406','east': '42.939375','west': '42.944765',},
                 sensorMarkers += string.Format("'lat': '{0}',", sensors[i].Latitude);
                 sensorMarkers += string.Format("'lng': '{0}',", sensors[i].Longitude);
                 sensorMarkers += string.Format("'north': '{0}',", sensors[i].BoundingBox.NorthEast.Longitude);
@@ -200,6 +207,11 @@ namespace RouteFinder.Controllers
             return sensorMarkers;
         }
 
+        /// <summary>
+        /// Builds a list of routeCoordinates in a string that is a Javascript object. It is passed to a view using HTML.Raw helper
+        /// </summary>
+        /// <param name="routeCoordinates">List<RouteCoordinate></param>
+        /// <returns>string</returns>
         public string BuildJsRouteCoordinates(List<RouteCoordinate> routeCoordinates)
         {
             // This section builds a string, which is passed to the view and used by the JS script to display the route
@@ -219,6 +231,12 @@ namespace RouteFinder.Controllers
             return route;
         }
 
+        /// <summary>
+        /// This pulls 1 hour of data for a given sensor. T
+        /// his is hard coded to a date as a proof of concept but can be used if we had real time data.
+        /// </summary>
+        /// <param name="sensorName"></param>
+        /// <returns></returns>
         public List<SensorsData> GetLastSixtyMinutesSensorData(string sensorName)
         {
             //DateTime oneMonthOneHourAgo = DateTime.Today.AddDays(-100).AddHours(-1);
@@ -235,6 +253,11 @@ namespace RouteFinder.Controllers
             return sensorsData;
         }
 
+        /// <summary>
+        /// Calculates AQI for a given sensor and returns an int.
+        /// </summary>
+        /// <param name="sensor">Sensor</param>
+        /// <returns>int</returns>
         public int GetSensorAQI(Sensor sensor)
         {
             int aqi = 0;
@@ -266,12 +289,16 @@ namespace RouteFinder.Controllers
             return aqi;
         }
 
+        /// <summary>
+        /// Get a list of sensors that has the bounding boxes and AQI rating attached.
+        /// </summary>
+        /// <returns>List<Sensor></returns>
         public List<Sensor> GetSensors()
         {
             List<Sensor> sensors = GetSensorsFromDatabase();
-            
-            if(sensors != null)
-            {  
+
+            if (sensors != null)
+            {
                 for (int i = 0; i < sensors.Count; i++)
                 {
                     sensors[i].BoundingBox = GetSensorBoundingBox(sensors[i]);
@@ -283,12 +310,15 @@ namespace RouteFinder.Controllers
             return sensors;
         }
 
-        //public List<Sensor> GetListSensors(List<int> aqis)
+        /// <summary>
+        /// Gets a list of sensors from database
+        /// </summary>
+        /// <returns>List<Sensor></returns>
         public List<Sensor> GetSensorsFromDatabase()
         {
             try
-            {               
-               return db.Sensors.ToList();
+            {
+                return db.Sensors.ToList();
             }
             catch (Exception)
             {
@@ -297,13 +327,18 @@ namespace RouteFinder.Controllers
 
         }
 
+        /// <summary>
+        /// Gets a list of sensors that are above 50 AQI from a list of all sensors.
+        /// </summary>
+        /// <param name="sensors">List<Sensor></param>
+        /// <returns>List<Sensor></returns>
         public List<Sensor> GetSensorsAboveAQIThreshold(List<Sensor> sensors)
         {
             List<Sensor> sensorsAboveAQIThreshold = new List<Sensor>();
 
             foreach (Sensor sensor in sensors)
             {
-                if (sensor.AQI > 35)
+                if (sensor.AQI > 50)
                 {
                     sensorsAboveAQIThreshold.Add(sensor);
                 }
@@ -317,9 +352,13 @@ namespace RouteFinder.Controllers
             return sensorsAboveAQIThreshold;
         }
 
+        /// <summary>
+        /// Gets the area around a sensor and returns a SensorBoundingBox object
+        /// </summary>
+        /// <param name="sensor">Sensor</param>
+        /// <returns>SensorBoundingBox</returns>
         public SensorBoundingBox GetSensorBoundingBox(Sensor sensor)
         {
-
             double lat = double.Parse(sensor.Latitude);
             double lon = double.Parse(sensor.Longitude);
             double earthRadius = 6378137;
@@ -347,24 +386,6 @@ namespace RouteFinder.Controllers
             SensorBoundingBox sbb = new SensorBoundingBox(sensor, NorthWest, SouthEast, NorthEast, SouthWest);
 
             return sbb;
-        }
-
-        public int CaloriesBurnedWalked(int weight, int mile)
-        {
-            int caloriesBurned = 0;
-            if (weight >= 180)
-            {
-                caloriesBurned = 100 * mile;
-            }
-            else if (weight < 180 && weight >= 120)
-            {
-                caloriesBurned = 65 * mile;
-            }
-            else
-            {
-                caloriesBurned = 53 * mile;
-            }
-            return caloriesBurned;
         }
     }
 }

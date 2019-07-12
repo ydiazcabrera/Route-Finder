@@ -4590,17 +4590,17 @@ fieldset[disabled] .navbar-default .btn-link:focus {
 }
 .navbar-inverse {
     background-color: #222;
-    border-color: #080808 !important;
+    border-color: #080808;    
+    /*border-color: #080808 !important;*/
 }
 #nav_bar{
     background-color: #286090;
     font-family:Arial, Helvetica, sans-serif;
     color:white
 }
-.navbar-inverse .navbar-brand {
-  color: white;
-  
-}
+/*.navbar-inverse .navbar-brand {
+  color: white; 
+}*/
 .navbar-inverse .navbar-brand:hover,
 .navbar-inverse .navbar-brand:focus {
   color: #fff;
@@ -4608,12 +4608,12 @@ fieldset[disabled] .navbar-default .btn-link:focus {
 }
 .navbar-inverse .navbar-text {
     font-family: Arial, Helvetica, sans-serif;
-    color: #9d9d9d !important;
+    /*color: #9d9d9d !important;*/
 }
-.navbar-inverse .navbar-nav > li > a {
+/*.navbar-inverse .navbar-nav > li > a {
 
   color: White;
-}
+}*/
 .navbar-inverse .navbar-nav > li > a:hover,
 .navbar-inverse .navbar-nav > li > a:focus {
   color: #fff;
@@ -6575,6 +6575,12 @@ button.close {
 .visible-lg-inline-block {
   display: none !important;
 }
+/*#nav_bar {
+    background-color: #286090;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white
+}*/
+
 @media (max-width: 767px) {
   .visible-xs {
     display: block !important;
