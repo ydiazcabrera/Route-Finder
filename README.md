@@ -1,5 +1,7 @@
 # Route-Finder
 
+Licenced under GNU GENERAL PUBLIC LICENSE V2
+
 Live website: bit.ly/primepath  
 
 The purpose of this project is to provide transparency to the citizens of Grand Rapids about air quality at at a hyper-local and real-time scale. Specifically, this application provides users with a walking or biking path through the city that avoids areas that currently have poor air quality. The user enters starting and ending locations on a map and they are provided with their path. 
